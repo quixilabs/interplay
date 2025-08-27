@@ -1,0 +1,121 @@
+import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import { SurveyState, SurveyAction, Demographics, FlourishingScores, SchoolWellbeing, TextResponses, TensionsAssessment, GrowthModule } from '../types/survey';
+import { SurveyService } from '../services/surveyService';
+
+const initialState: SurveyState = {
+  currentSection: 0,
+  sessionId: '',
+  universitySlug: '',
+  isCompleted: false,
+  startTime: null,
+  demographics: {},
+  flourishingScores: {},
+  schoolWellbeing: {},
+  textResponses: {},
+  tensionsAssessment: {},
+  growthModules: [],
+  consentGiven: false,
+  emailForResults: ''
+};
+
+function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
+  switch (action.type) {
+    case 'SET_SECTION':
+      return { ...state, currentSection: action.payload };
+    case 'SET_DEMOGRAPHICS':
+      const newDemographics = { ...state.demographics, ...action.payload };
+      // Save to database
+      if (state.sessionId) {
+        SurveyService.saveDemographics(state.sessionId, newDemographics).catch(console.error);
+      }
+      return { ...state, demographics: newDemographics };
+    case 'SET_FLOURISHING_SCORES':
+      const newFlourishingScores = { ...state.flourishingScores, ...action.payload };
+      // Save to database
+      if (state.sessionId) {
+        SurveyService.saveFlourishingScores(state.sessionId, newFlourishingScores).catch(console.error);
+      }
+      return { ...state, flourishingScores: newFlourishingScores };
+    case 'SET_SCHOOL_WELLBEING':
+      const newSchoolWellbeing = { ...state.schoolWellbeing, ...action.payload };
+      // Save to database
+      if (state.sessionId) {
+        SurveyService.saveSchoolWellbeing(state.sessionId, newSchoolWellbeing).catch(console.error);
+      }
+      return { ...state, schoolWellbeing: newSchoolWellbeing };
+    case 'SET_TEXT_RESPONSES':
+      const newTextResponses = { ...state.textResponses, ...action.payload };
+      // Save to database
+      if (state.sessionId) {
+        SurveyService.saveTextResponses(state.sessionId, newTextResponses).catch(console.error);
+      }
+      return { ...state, textResponses: newTextResponses };
+    case 'SET_TENSIONS_ASSESSMENT':
+      const newTensionsAssessment = { ...state.tensionsAssessment, ...action.payload };
+      // Save to database
+      if (state.sessionId) {
+        SurveyService.saveTensionsAssessment(state.sessionId, newTensionsAssessment).catch(console.error);
+      }
+      return { ...state, tensionsAssessment: newTensionsAssessment };
+    case 'ADD_GROWTH_MODULE':
+      const existingIndex = state.growthModules.findIndex(gm => gm.domainName === action.payload.domainName);
+      let updatedGrowthModules;
+      if (existingIndex >= 0) {
+        const updated = [...state.growthModules];
+        updated[existingIndex] = action.payload;
+        updatedGrowthModules = updated;
+      } else {
+        updatedGrowthModules = [...state.growthModules, action.payload];
+      }
+      // Save to database
+      if (state.sessionId) {
+        SurveyService.saveGrowthModule(state.sessionId, action.payload).catch(console.error);
+      }
+      return { ...state, growthModules: updatedGrowthModules };
+    case 'SET_CONSENT':
+      return { ...state, consentGiven: action.payload };
+    case 'SET_EMAIL':
+      return { ...state, emailForResults: action.payload };
+    case 'INITIALIZE_SURVEY':
+      const initializedState = { 
+        ...state, 
+        sessionId: action.payload.sessionId,
+        universitySlug: action.payload.universitySlug,
+        startTime: new Date().toISOString()
+      };
+      // Initialize survey in database
+      SurveyService.initializeSurvey(action.payload.sessionId, action.payload.universitySlug).catch(console.error);
+      return initializedState;
+    case 'COMPLETE_SURVEY':
+      // Complete survey in database
+      if (state.sessionId) {
+        SurveyService.completeSurvey(state.sessionId, state.emailForResults).catch(console.error);
+      }
+      return { ...state, isCompleted: true };
+    default:
+      return state;
+  }
+}
+
+const SurveyContext = createContext<{
+  state: SurveyState;
+  dispatch: React.Dispatch<SurveyAction>;
+} | null>(null);
+
+export function SurveyProvider({ children }: { children: ReactNode }) {
+  const [state, dispatch] = useReducer(surveyReducer, initialState);
+
+  return (
+    <SurveyContext.Provider value={{ state, dispatch }}>
+      {children}
+    </SurveyContext.Provider>
+  );
+}
+
+export function useSurvey() {
+  const context = useContext(SurveyContext);
+  if (!context) {
+    throw new Error('useSurvey must be used within a SurveyProvider');
+  }
+  return context;
+}
