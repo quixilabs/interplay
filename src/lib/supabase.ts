@@ -1,10 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
+import { LOCAL_SUPABASE_CONFIG, USE_LOCAL_SUPABASE } from '../config/local';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Use local config if enabled, otherwise fall back to environment variables
+const supabaseUrl = USE_LOCAL_SUPABASE 
+  ? LOCAL_SUPABASE_CONFIG.url 
+  : import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = USE_LOCAL_SUPABASE 
+  ? LOCAL_SUPABASE_CONFIG.anonKey 
+  : import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables. Please set up your Supabase connection.');
+  throw new Error('Missing Supabase configuration. Please set up your Supabase connection.');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
