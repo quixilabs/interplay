@@ -7,11 +7,13 @@ export class SurveyService {
     try {
       const { error } = await supabase
         .from('survey_sessions')
-        .insert({
+        .upsert({
           session_id: sessionId,
           university_slug: universitySlug,
           start_time: new Date().toISOString(),
           is_completed: false
+        }, {
+          onConflict: 'session_id'
         });
 
       if (error) {

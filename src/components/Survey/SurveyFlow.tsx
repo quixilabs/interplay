@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { useSurvey } from '../../contexts/SurveyContext';
 import UniversityValidator from './UniversityValidator';
@@ -26,10 +26,13 @@ const SECTIONS = [
 export default function SurveyFlow() {
   const { universitySlug } = useParams<{ universitySlug: string }>();
   const { state, dispatch } = useSurvey();
+  const initializingRef = useRef(false);
 
   useEffect(() => {
-    if (universitySlug && !state.sessionId) {
+    if (universitySlug && !state.sessionId && !initializingRef.current) {
+      initializingRef.current = true; // Prevent duplicate initialization during this effect
       const sessionId = generateSessionId();
+
       dispatch({
         type: 'INITIALIZE_SURVEY',
         payload: {
@@ -43,9 +46,19 @@ export default function SurveyFlow() {
         .then(() => {
           dispatch({ type: 'SET_INITIALIZED', payload: true });
         })
-        .catch(console.error);
+        .catch((error) => {
+          console.error('Failed to initialize survey:', error);
+        })
+        .finally(() => {
+          initializingRef.current = false; // Reset after completion/error
+        });
     }
   }, [universitySlug, state.sessionId, dispatch]);
+
+  // Reset initialization ref when university slug changes
+  useEffect(() => {
+    initializingRef.current = false;
+  }, [universitySlug]);
 
   if (!universitySlug) {
     return <Navigate to="/" replace />;
