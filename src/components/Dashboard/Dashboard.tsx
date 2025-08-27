@@ -21,7 +21,9 @@ export default function Dashboard() {
     const fetchAnalytics = async () => {
       try {
         setLoading(true);
-        const data = await AnalyticsService.getSurveyAnalytics('demo-university');
+        // Use the authenticated user's university slug
+        const universitySlug = adminUser?.universitySlug || 'demo-university';
+        const data = await AnalyticsService.getSurveyAnalytics(universitySlug);
         setSurveyData(data);
         setError(null);
       } catch (err) {
@@ -36,14 +38,14 @@ export default function Dashboard() {
     };
 
     fetchAnalytics();
-  }, [dateRange]);
+  }, [dateRange, adminUser?.universitySlug]);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-light-gray flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-2 border-blue-600 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-slate-600">Loading analytics...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-2 border-sage border-t-transparent mx-auto mb-4"></div>
+          <p className="text-warm-gray font-primary">Loading analytics...</p>
         </div>
       </div>
     );
@@ -51,12 +53,12 @@ export default function Dashboard() {
 
   if (error && !surveyData) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-light-gray flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600 mb-4">{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+          <p className="text-danger mb-4 font-primary">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="btn-primary px-4 py-2 rounded-brand"
           >
             Retry
           </button>
@@ -66,17 +68,17 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <DashboardHeader 
+    <div className="min-h-screen bg-light-gray">
+      <DashboardHeader
         universityName={adminUser?.universityName || 'Demo University'}
         dateRange={dateRange}
         onDateRangeChange={setDateRange}
       />
-      
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {error && (
-          <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <p className="text-yellow-800">
+          <div className="mb-4 bg-warning/10 border border-warning/30 rounded-brand p-4">
+            <p className="text-warning font-primary">
               <strong>Note:</strong> Using demo data. {error}
             </p>
           </div>
@@ -88,8 +90,8 @@ export default function Dashboard() {
         {/* Primary Visualizations */}
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
           <FlourishingChart data={surveyData} />
-          <DemographicsAnalysis 
-            data={surveyData} 
+          <DemographicsAnalysis
+            data={surveyData}
             selectedDemographic={selectedDemographic}
             onDemographicChange={setSelectedDemographic}
           />

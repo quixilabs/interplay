@@ -11,7 +11,7 @@ function App() {
   return (
     <SurveyProvider>
       <Router>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="min-h-screen bg-light-gray font-primary">
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/survey/:universitySlug" element={<SurveyFlow />} />
@@ -27,11 +27,11 @@ function App() {
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
-  
+
   if (!isAuthenticated) {
     return <Navigate to="/admin/login" replace />;
   }
-  
+
   return <>{children}</>;
 }
 

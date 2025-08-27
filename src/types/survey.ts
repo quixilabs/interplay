@@ -74,6 +74,7 @@ export interface SurveyState {
   growthModules: GrowthModule[];
   consentGiven: boolean;
   emailForResults: string;
+  isInitialized: boolean;
 }
 
 export type SurveyAction =
@@ -87,4 +88,5 @@ export type SurveyAction =
   | { type: 'SET_CONSENT'; payload: boolean }
   | { type: 'SET_EMAIL'; payload: string }
   | { type: 'INITIALIZE_SURVEY'; payload: { sessionId: string; universitySlug: string } }
+  | { type: 'SET_INITIALIZED'; payload: boolean }
   | { type: 'COMPLETE_SURVEY' };

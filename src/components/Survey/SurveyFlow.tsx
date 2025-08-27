@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { useSurvey } from '../../contexts/SurveyContext';
+import UniversityValidator from './UniversityValidator';
 import ProgressBar from './ProgressBar';
 import StartPage from './sections/StartPage';
 import DemographicsSection from './sections/DemographicsSection';
@@ -10,6 +11,7 @@ import TensionsSection from './sections/TensionsSection';
 import FastestWinSection from './sections/FastestWinSection';
 import WrapUpSection from './sections/WrapUpSection';
 import { generateSessionId } from '../../utils/helpers';
+import { SurveyService } from '../../services/surveyService';
 
 const SECTIONS = [
   { name: 'Start', component: StartPage },
@@ -27,13 +29,21 @@ export default function SurveyFlow() {
 
   useEffect(() => {
     if (universitySlug && !state.sessionId) {
+      const sessionId = generateSessionId();
       dispatch({
         type: 'INITIALIZE_SURVEY',
         payload: {
-          sessionId: generateSessionId(),
+          sessionId,
           universitySlug
         }
       });
+
+      // Initialize survey in database asynchronously
+      SurveyService.initializeSurvey(sessionId, universitySlug)
+        .then(() => {
+          dispatch({ type: 'SET_INITIALIZED', payload: true });
+        })
+        .catch(console.error);
     }
   }, [universitySlug, state.sessionId, dispatch]);
 
@@ -52,30 +62,32 @@ export default function SurveyFlow() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-md shadow-sm border-b border-slate-200/50">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-xl font-semibold text-slate-800">
-              Student Flourishing Survey
-            </h1>
-            <div className="text-sm text-slate-600">
-              Section {state.currentSection + 1} of {SECTIONS.length}
+    <UniversityValidator universitySlug={universitySlug}>
+      <div className="min-h-screen bg-light-gray">
+        {/* Header */}
+        <div className="bg-white/90 backdrop-blur-md shadow-brand border-b border-gray-200/50">
+          <div className="max-w-4xl mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <h1 className="text-xl font-semibold text-navy font-primary">
+                Student Success Survey
+              </h1>
+              <div className="text-sm text-warm-gray font-primary">
+                Section {state.currentSection + 1} of {SECTIONS.length}
+              </div>
             </div>
+            <ProgressBar
+              currentSection={state.currentSection}
+              totalSections={SECTIONS.length}
+              sections={SECTIONS.map(s => s.name)}
+            />
           </div>
-          <ProgressBar 
-            currentSection={state.currentSection} 
-            totalSections={SECTIONS.length} 
-            sections={SECTIONS.map(s => s.name)}
-          />
         </div>
-      </div>
 
-      {/* Content */}
-      <main className="max-w-4xl mx-auto px-4 py-8">
-        <CurrentSection />
-      </main>
-    </div>
+        {/* Content */}
+        <main className="max-w-4xl mx-auto px-4 py-8">
+          <CurrentSection />
+        </main>
+      </div>
+    </UniversityValidator>
   );
 }

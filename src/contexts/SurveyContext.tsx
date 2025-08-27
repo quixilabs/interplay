@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { SurveyState, SurveyAction, Demographics, FlourishingScores, SchoolWellbeing, TextResponses, TensionsAssessment, GrowthModule } from '../types/survey';
+import { SurveyState, SurveyAction } from '../types/survey';
 import { SurveyService } from '../services/surveyService';
 
 const initialState: SurveyState = {
@@ -15,7 +15,8 @@ const initialState: SurveyState = {
   tensionsAssessment: {},
   growthModules: [],
   consentGiven: false,
-  emailForResults: ''
+  emailForResults: '',
+  isInitialized: false
 };
 
 function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
@@ -24,36 +25,36 @@ function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
       return { ...state, currentSection: action.payload };
     case 'SET_DEMOGRAPHICS':
       const newDemographics = { ...state.demographics, ...action.payload };
-      // Save to database
-      if (state.sessionId) {
+      // Save to database (only if initialized)
+      if (state.sessionId && state.isInitialized) {
         SurveyService.saveDemographics(state.sessionId, newDemographics).catch(console.error);
       }
       return { ...state, demographics: newDemographics };
     case 'SET_FLOURISHING_SCORES':
       const newFlourishingScores = { ...state.flourishingScores, ...action.payload };
-      // Save to database
-      if (state.sessionId) {
+      // Save to database (only if initialized)
+      if (state.sessionId && state.isInitialized) {
         SurveyService.saveFlourishingScores(state.sessionId, newFlourishingScores).catch(console.error);
       }
       return { ...state, flourishingScores: newFlourishingScores };
     case 'SET_SCHOOL_WELLBEING':
       const newSchoolWellbeing = { ...state.schoolWellbeing, ...action.payload };
-      // Save to database
-      if (state.sessionId) {
+      // Save to database (only if initialized)
+      if (state.sessionId && state.isInitialized) {
         SurveyService.saveSchoolWellbeing(state.sessionId, newSchoolWellbeing).catch(console.error);
       }
       return { ...state, schoolWellbeing: newSchoolWellbeing };
     case 'SET_TEXT_RESPONSES':
       const newTextResponses = { ...state.textResponses, ...action.payload };
-      // Save to database
-      if (state.sessionId) {
+      // Save to database (only if initialized)
+      if (state.sessionId && state.isInitialized) {
         SurveyService.saveTextResponses(state.sessionId, newTextResponses).catch(console.error);
       }
       return { ...state, textResponses: newTextResponses };
     case 'SET_TENSIONS_ASSESSMENT':
       const newTensionsAssessment = { ...state.tensionsAssessment, ...action.payload };
-      // Save to database
-      if (state.sessionId) {
+      // Save to database (only if initialized)
+      if (state.sessionId && state.isInitialized) {
         SurveyService.saveTensionsAssessment(state.sessionId, newTensionsAssessment).catch(console.error);
       }
       return { ...state, tensionsAssessment: newTensionsAssessment };
@@ -67,8 +68,8 @@ function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
       } else {
         updatedGrowthModules = [...state.growthModules, action.payload];
       }
-      // Save to database
-      if (state.sessionId) {
+      // Save to database (only if initialized)
+      if (state.sessionId && state.isInitialized) {
         SurveyService.saveGrowthModule(state.sessionId, action.payload).catch(console.error);
       }
       return { ...state, growthModules: updatedGrowthModules };
@@ -77,15 +78,16 @@ function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
     case 'SET_EMAIL':
       return { ...state, emailForResults: action.payload };
     case 'INITIALIZE_SURVEY':
-      const initializedState = { 
-        ...state, 
+      const initializedState = {
+        ...state,
         sessionId: action.payload.sessionId,
         universitySlug: action.payload.universitySlug,
-        startTime: new Date().toISOString()
+        startTime: new Date().toISOString(),
+        isInitialized: false
       };
-      // Initialize survey in database
-      SurveyService.initializeSurvey(action.payload.sessionId, action.payload.universitySlug).catch(console.error);
       return initializedState;
+    case 'SET_INITIALIZED':
+      return { ...state, isInitialized: action.payload };
     case 'COMPLETE_SURVEY':
       // Complete survey in database
       if (state.sessionId) {

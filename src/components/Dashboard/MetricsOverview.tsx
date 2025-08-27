@@ -14,13 +14,13 @@ export default function MetricsOverview({ data }: MetricsOverviewProps) {
     topGrowthOpportunity: 'Mental health support'
   };
 
-  const MetricCard = ({ 
-    title, 
-    value, 
-    icon: Icon, 
-    change, 
+  const MetricCard = ({
+    title,
+    value,
+    icon: Icon,
+    change,
     changeType,
-    subtitle 
+    subtitle
   }: {
     title: string;
     value: string | number;
@@ -29,30 +29,29 @@ export default function MetricsOverview({ data }: MetricsOverviewProps) {
     changeType?: 'positive' | 'negative' | 'neutral';
     subtitle?: string;
   }) => (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+    <div className="card p-6">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-slate-600">{title}</p>
-          <p className="text-2xl font-bold text-slate-900 mt-1">{value}</p>
-          {subtitle && <p className="text-sm text-slate-500 mt-1">{subtitle}</p>}
+          <p className="text-sm font-medium text-warm-gray font-primary">{title}</p>
+          <p className="text-2xl font-bold text-navy font-primary mt-1">{value}</p>
+          {subtitle && <p className="text-sm text-warm-gray/80 font-primary mt-1">{subtitle}</p>}
         </div>
-        <div className="p-3 bg-slate-50 rounded-lg">
-          <Icon className="h-6 w-6 text-slate-600" />
+        <div className="p-3 bg-light-gray rounded-brand">
+          <Icon className="h-6 w-6 text-sage" />
         </div>
       </div>
-      
+
       {change && (
         <div className="mt-4 flex items-center">
           {changeType === 'positive' ? (
-            <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
+            <TrendingUp className="h-4 w-4 text-success mr-1" />
           ) : changeType === 'negative' ? (
-            <TrendingDown className="h-4 w-4 text-red-600 mr-1" />
+            <TrendingDown className="h-4 w-4 text-danger mr-1" />
           ) : null}
-          <span className={`text-sm ${
-            changeType === 'positive' ? 'text-green-600' : 
-            changeType === 'negative' ? 'text-red-600' : 
-            'text-slate-600'
-          }`}>
+          <span className={`text-sm ${changeType === 'positive' ? 'text-success' :
+            changeType === 'negative' ? 'text-danger' :
+              'text-warm-gray'
+            }`}>
             {change}
           </span>
         </div>
@@ -62,7 +61,7 @@ export default function MetricsOverview({ data }: MetricsOverviewProps) {
 
   return (
     <div className="mb-8">
-      <h2 className="text-lg font-semibold text-slate-900 mb-4">Key Metrics Overview</h2>
+      <h2 className="text-lg font-semibold text-navy font-primary mb-4">Key Metrics Overview</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard
           title="Overall Flourishing Score"
@@ -72,7 +71,7 @@ export default function MetricsOverview({ data }: MetricsOverviewProps) {
           changeType="positive"
           subtitle="Out of 10"
         />
-        
+
         <MetricCard
           title="Students Below Threshold"
           value={`${metrics.studentsAtRisk}%`}
@@ -81,7 +80,7 @@ export default function MetricsOverview({ data }: MetricsOverviewProps) {
           changeType="positive"
           subtitle="Any domain score < 6"
         />
-        
+
         <MetricCard
           title="Survey Completion Rate"
           value={`${metrics.completionRate}%`}
@@ -90,7 +89,7 @@ export default function MetricsOverview({ data }: MetricsOverviewProps) {
           changeType="positive"
           subtitle="1,247 responses"
         />
-        
+
         <MetricCard
           title="Top Growth Opportunity"
           value={metrics.topGrowthOpportunity}
