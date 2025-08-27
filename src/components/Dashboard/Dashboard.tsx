@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useEffect } from 'react';
 import { useAuthStore } from '../../stores/authStore';
 import DashboardHeader from './DashboardHeader';
@@ -7,6 +7,7 @@ import FlourishingChart from './FlourishingChart';
 import DemographicsAnalysis from './DemographicsAnalysis';
 import InterventionMatrix from './InterventionMatrix';
 import ActionableInsights from './ActionableInsights';
+import SchoolWellbeingTrends from './SchoolWellbeingTrends';
 import { AnalyticsService } from '../../services/analyticsService';
 
 export default function Dashboard() {
@@ -100,6 +101,11 @@ export default function Dashboard() {
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
           <InterventionMatrix data={surveyData} />
           <ActionableInsights data={surveyData} />
+        </div>
+
+        {/* School Wellbeing Trends */}
+        <div className="mb-8">
+          <SchoolWellbeingTrends data={surveyData} />
         </div>
       </main>
     </div>

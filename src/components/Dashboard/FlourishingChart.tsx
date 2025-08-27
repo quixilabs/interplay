@@ -6,41 +6,43 @@ interface FlourishingChartProps {
 }
 
 export default function FlourishingChart({ data }: FlourishingChartProps) {
-  // Mock data for flourishing domains
+  // Use real data from the analytics service
+  const domainAverages = data?.flourishingDomainAverages || {};
+  
   const flourishingData = [
     {
       domain: 'Happiness & Life Satisfaction',
-      current: 7.2,
-      benchmark: 6.8,
+      current: domainAverages.happiness_satisfaction || 0,
+      benchmark: 6.8, // Keep benchmark as static for now
       fullMark: 10
     },
     {
       domain: 'Mental & Physical Health',
-      current: 6.4,
+      current: domainAverages.mental_physical_health || 0,
       benchmark: 6.9,
       fullMark: 10
     },
     {
       domain: 'Meaning & Purpose',
-      current: 7.8,
+      current: domainAverages.meaning_purpose || 0,
       benchmark: 7.1,
       fullMark: 10
     },
     {
       domain: 'Character & Virtue',
-      current: 8.1,
+      current: domainAverages.character_virtue || 0,
       benchmark: 7.6,
       fullMark: 10
     },
     {
       domain: 'Social Relationships',
-      current: 6.9,
+      current: domainAverages.social_relationships || 0,
       benchmark: 7.3,
       fullMark: 10
     },
     {
       domain: 'Financial Stability',
-      current: 5.8,
+      current: domainAverages.financial_stability || 0,
       benchmark: 6.2,
       fullMark: 10
     }
@@ -104,15 +106,23 @@ export default function FlourishingChart({ data }: FlourishingChartProps) {
         <div>
           <h4 className="font-medium text-green-800 mb-2">Strengths</h4>
           <ul className="space-y-1 text-green-700">
-            <li>• Character & Virtue (8.1/10)</li>
-            <li>• Meaning & Purpose (7.8/10)</li>
+            {flourishingData
+              .sort((a, b) => b.current - a.current)
+              .slice(0, 2)
+              .map((domain, index) => (
+                <li key={index}>• {domain.domain} ({domain.current}/10)</li>
+              ))}
           </ul>
         </div>
         <div>
           <h4 className="font-medium text-orange-800 mb-2">Growth Areas</h4>
           <ul className="space-y-1 text-orange-700">
-            <li>• Financial Stability (5.8/10)</li>
-            <li>• Mental & Physical Health (6.4/10)</li>
+            {flourishingData
+              .sort((a, b) => a.current - b.current)
+              .slice(0, 2)
+              .map((domain, index) => (
+                <li key={index}>• {domain.domain} ({domain.current}/10)</li>
+              ))}
           </ul>
         </div>
       </div>

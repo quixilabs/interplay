@@ -6,69 +6,23 @@ interface InterventionMatrixProps {
 }
 
 export default function InterventionMatrix({ data }: InterventionMatrixProps) {
-  // Mock data for intervention opportunities
-  const interventionData = [
-    { 
-      intervention: 'Mental health support', 
-      frequency: 85, 
-      impact: 9.2, 
-      category: 'High Priority'
-    },
-    { 
-      intervention: 'Financial assistance', 
-      frequency: 72, 
-      impact: 8.8, 
-      category: 'High Priority'
-    },
-    { 
-      intervention: 'Better time management', 
-      frequency: 68, 
-      impact: 7.1, 
-      category: 'Quick Win'
-    },
-    { 
-      intervention: 'Academic support', 
-      frequency: 61, 
-      impact: 8.3, 
-      category: 'High Priority'
-    },
-    { 
-      intervention: 'More social connections', 
-      frequency: 58, 
-      impact: 7.8, 
-      category: 'Medium Priority'
-    },
-    { 
-      intervention: 'Stress reduction programs', 
-      frequency: 54, 
-      impact: 8.5, 
-      category: 'Medium Priority'
-    },
-    { 
-      intervention: 'Career guidance', 
-      frequency: 49, 
-      impact: 7.3, 
-      category: 'Medium Priority'
-    },
-    { 
-      intervention: 'Better sleep habits', 
-      frequency: 42, 
-      impact: 6.9, 
-      category: 'Low Priority'
-    },
-    { 
-      intervention: 'Physical health support', 
-      frequency: 38, 
-      impact: 7.6, 
-      category: 'Medium Priority'
-    },
-    { 
-      intervention: 'Creative outlets', 
-      frequency: 31, 
-      impact: 6.2, 
-      category: 'Low Priority'
-    }
-  ];
+  // Use real data from the analytics service
+  const topInterventions = data?.topInterventions || [];
+  
+  // Categorize interventions based on frequency and impact
+  const categorizeIntervention = (frequency: number, impact: number) => {
+    if (frequency >= 60 && impact >= 8.0) return 'High Priority';
+    if (frequency >= 60 && impact >= 7.0) return 'Quick Win';
+    if (frequency >= 40 || impact >= 7.5) return 'Medium Priority';
+    return 'Low Priority';
+  };
+
+  const interventionData = topInterventions.map((intervention: any) => ({
+    intervention: intervention.name,
+    frequency: intervention.frequency,
+    impact: intervention.impact,
+    category: categorizeIntervention(intervention.frequency, intervention.impact)
+  }));
 
   const getColor = (category: string) => {
     switch (category) {
@@ -147,15 +101,26 @@ export default function InterventionMatrix({ data }: InterventionMatrixProps) {
         <div>
           <h4 className="font-medium text-red-800 mb-2">High Priority Actions</h4>
           <ul className="space-y-1 text-red-700">
-            <li>• Mental health support (85% frequency, 9.2 impact)</li>
-            <li>• Financial assistance (72% frequency, 8.8 impact)</li>
+            {interventionData
+              .filter(item => item.category === 'High Priority')
+              .slice(0, 2)
+              .map((item, index) => (
+                <li key={index}>• {item.intervention} ({item.frequency}% frequency, {item.impact} impact)</li>
+              ))}
           </ul>
         </div>
         <div>
           <h4 className="font-medium text-orange-800 mb-2">Quick Wins</h4>
           <ul className="space-y-1 text-orange-700">
-            <li>• Time management resources (68% frequency, 7.1 impact)</li>
-            <li>• Study skills workshops (moderate effort, good ROI)</li>
+            {interventionData
+              .filter(item => item.category === 'Quick Win')
+              .slice(0, 2)
+              .map((item, index) => (
+                <li key={index}>• {item.intervention} ({item.frequency}% frequency, {item.impact} impact)</li>
+              ))}
+            {interventionData.filter(item => item.category === 'Quick Win').length === 0 && (
+              <li>• No quick wins identified with current data</li>
+            )}
           </ul>
         </div>
       </div>

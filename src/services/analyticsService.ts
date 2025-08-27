@@ -18,57 +18,87 @@ export class AnalyticsService {
       if (sessionsError) throw sessionsError;
 
       // Get flourishing scores with session info
-      const { data: flourishingData, error: flourishingError } = await supabase
+      let flourishingQuery = supabase
         .from('flourishing_scores')
         .select(`
           *,
           survey_sessions!inner(university_slug, is_completed)
         `)
         .eq('survey_sessions.is_completed', true);
+      
+      if (universitySlug) {
+        flourishingQuery = flourishingQuery.eq('survey_sessions.university_slug', universitySlug);
+      }
+
+      const { data: flourishingData, error: flourishingError } = await flourishingQuery;
 
       if (flourishingError) throw flourishingError;
 
       // Get demographics data
-      const { data: demographicsData, error: demographicsError } = await supabase
+      let demographicsQuery = supabase
         .from('demographics')
         .select(`
           *,
           survey_sessions!inner(university_slug, is_completed)
         `)
         .eq('survey_sessions.is_completed', true);
+      
+      if (universitySlug) {
+        demographicsQuery = demographicsQuery.eq('survey_sessions.university_slug', universitySlug);
+      }
+
+      const { data: demographicsData, error: demographicsError } = await demographicsQuery;
 
       if (demographicsError) throw demographicsError;
 
       // Get school wellbeing data
-      const { data: wellbeingData, error: wellbeingError } = await supabase
+      let wellbeingQuery = supabase
         .from('school_wellbeing')
         .select(`
           *,
           survey_sessions!inner(university_slug, is_completed)
         `)
         .eq('survey_sessions.is_completed', true);
+      
+      if (universitySlug) {
+        wellbeingQuery = wellbeingQuery.eq('survey_sessions.university_slug', universitySlug);
+      }
+
+      const { data: wellbeingData, error: wellbeingError } = await wellbeingQuery;
 
       if (wellbeingError) throw wellbeingError;
 
       // Get growth modules data
-      const { data: growthModulesData, error: growthModulesError } = await supabase
+      let growthModulesQuery = supabase
         .from('growth_modules')
         .select(`
           *,
           survey_sessions!inner(university_slug, is_completed)
         `)
         .eq('survey_sessions.is_completed', true);
+      
+      if (universitySlug) {
+        growthModulesQuery = growthModulesQuery.eq('survey_sessions.university_slug', universitySlug);
+      }
+
+      const { data: growthModulesData, error: growthModulesError } = await growthModulesQuery;
 
       if (growthModulesError) throw growthModulesError;
 
       // Get text responses
-      const { data: textResponsesData, error: textResponsesError } = await supabase
+      let textResponsesQuery = supabase
         .from('text_responses')
         .select(`
           *,
           survey_sessions!inner(university_slug, is_completed)
         `)
         .eq('survey_sessions.is_completed', true);
+      
+      if (universitySlug) {
+        textResponsesQuery = textResponsesQuery.eq('survey_sessions.university_slug', universitySlug);
+      }
+
+      const { data: textResponsesData, error: textResponsesError } = await textResponsesQuery;
 
       if (textResponsesError) throw textResponsesError;
 

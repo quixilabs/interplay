@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { TrendingUp, TrendingDown, AlertTriangle, Target } from 'lucide-react';
 
 interface MetricsOverviewProps {
@@ -6,12 +6,12 @@ interface MetricsOverviewProps {
 }
 
 export default function MetricsOverview({ data }: MetricsOverviewProps) {
-  // Mock calculations based on the survey data structure
+  // Use real data from the analytics service
   const metrics = {
-    averageFlourishingScore: 7.2,
-    studentsAtRisk: 23,
-    completionRate: 78,
-    topGrowthOpportunity: 'Mental health support'
+    averageFlourishingScore: data?.overallFlourishingScore || 0,
+    studentsAtRisk: data?.studentsAtRisk || 0,
+    completionRate: data?.completionRate || 0,
+    topGrowthOpportunity: data?.topInterventions?.[0]?.name || 'No data available'
   };
 
   const MetricCard = ({
@@ -87,7 +87,7 @@ export default function MetricsOverview({ data }: MetricsOverviewProps) {
           icon={TrendingUp}
           change="+12% from last campaign"
           changeType="positive"
-          subtitle="1,247 responses"
+          subtitle={`${data?.totalResponses || 0} responses`}
         />
 
         <MetricCard

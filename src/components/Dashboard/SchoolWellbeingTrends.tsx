@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 interface SchoolWellbeingTrendsProps {
@@ -6,51 +6,21 @@ interface SchoolWellbeingTrendsProps {
 }
 
 export default function SchoolWellbeingTrends({ data }: SchoolWellbeingTrendsProps) {
-  // Mock trend data over time
-  const trendData = [
-    {
-      month: 'Aug 2023',
-      belonging: 6.5,
-      safety: 8.2,
-      academicSupport: 6.1,
-      mentalHealth: 5.8
-    },
-    {
-      month: 'Sep 2023', 
-      belonging: 6.7,
-      safety: 8.3,
-      academicSupport: 6.3,
-      mentalHealth: 6.1
-    },
-    {
-      month: 'Oct 2023',
-      belonging: 6.6,
-      safety: 8.1,
-      academicSupport: 6.4,
-      mentalHealth: 5.9
-    },
-    {
-      month: 'Nov 2023',
-      belonging: 6.8,
-      safety: 8.4,
-      academicSupport: 6.7,
-      mentalHealth: 6.3
-    },
-    {
-      month: 'Dec 2023',
-      belonging: 7.1,
-      safety: 8.5,
-      academicSupport: 6.9,
-      mentalHealth: 6.5
-    },
-    {
-      month: 'Jan 2024',
-      belonging: 6.8,
-      safety: 8.4,
-      academicSupport: 6.5,
-      mentalHealth: 6.1
-    }
-  ];
+  // Use real school wellbeing data from the analytics service
+  const wellbeingAverages = data?.schoolWellbeingAverages || {};
+
+  // For now, create a single data point since we don't have historical trend data
+  // In the future, this could be enhanced to show actual trends over time
+  const currentScores = {
+    month: 'Current Period',
+    belonging: wellbeingAverages.belonging_score || 0,
+    safety: wellbeingAverages.feel_safe || 0,
+    academicSupport: wellbeingAverages.work_connected_goals || 0,
+    mentalHealth: wellbeingAverages.manage_emotions || 0
+  };
+
+  // Create trend data showing current scores (could be enhanced with historical data)
+  const trendData = [currentScores];
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
@@ -63,15 +33,15 @@ export default function SchoolWellbeingTrends({ data }: SchoolWellbeingTrendsPro
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={trendData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-            <XAxis 
-              dataKey="month" 
+            <XAxis
+              dataKey="month"
               tick={{ fontSize: 12, fill: '#64748b' }}
             />
-            <YAxis 
+            <YAxis
               domain={[5, 9]}
               tick={{ fontSize: 12, fill: '#64748b' }}
             />
-            <Tooltip 
+            <Tooltip
               content={({ active, payload, label }) => {
                 if (active && payload && payload.length) {
                   return (
@@ -89,35 +59,35 @@ export default function SchoolWellbeingTrends({ data }: SchoolWellbeingTrendsPro
               }}
             />
             <Legend />
-            <Line 
-              type="monotone" 
-              dataKey="belonging" 
-              stroke="#3b82f6" 
-              strokeWidth={2} 
+            <Line
+              type="monotone"
+              dataKey="belonging"
+              stroke="#3b82f6"
+              strokeWidth={2}
               name="Sense of Belonging"
               dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
             />
-            <Line 
-              type="monotone" 
-              dataKey="safety" 
-              stroke="#10b981" 
-              strokeWidth={2} 
+            <Line
+              type="monotone"
+              dataKey="safety"
+              stroke="#10b981"
+              strokeWidth={2}
               name="Campus Safety"
               dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
             />
-            <Line 
-              type="monotone" 
-              dataKey="academicSupport" 
-              stroke="#f59e0b" 
-              strokeWidth={2} 
+            <Line
+              type="monotone"
+              dataKey="academicSupport"
+              stroke="#f59e0b"
+              strokeWidth={2}
               name="Academic Support"
               dot={{ fill: '#f59e0b', strokeWidth: 2, r: 4 }}
             />
-            <Line 
-              type="monotone" 
-              dataKey="mentalHealth" 
-              stroke="#ef4444" 
-              strokeWidth={2} 
+            <Line
+              type="monotone"
+              dataKey="mentalHealth"
+              stroke="#ef4444"
+              strokeWidth={2}
               name="Mental Health Access"
               dot={{ fill: '#ef4444', strokeWidth: 2, r: 4 }}
             />
