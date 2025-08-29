@@ -39,16 +39,16 @@ export default function LandingPage() {
               to="/survey/saint-louis-university"
               className="btn-primary px-8 py-4 rounded-brand flex items-center justify-center text-lg font-semibold"
             >
-              Saint Louis University Survey
+              Saint Louis University Demo Survey
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
-            <Link
+            {/* <Link
               to="/survey/demo-university"
               className="btn-secondary px-8 py-4 rounded-brand flex items-center justify-center"
             >
               Try Demo Survey
               <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
+            </Link> */}
             <Link
               to="/admin/login"
               className="btn-subtle px-6 py-3 rounded-brand"
