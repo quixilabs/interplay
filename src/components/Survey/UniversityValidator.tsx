@@ -16,28 +16,45 @@ export default function UniversityValidator({ universitySlug, children }: Univer
     useEffect(() => {
         const validateUniversity = async () => {
             try {
+                console.log('🏛️ [DEBUG] UniversityValidator starting validation...');
+                console.log('📥 [DEBUG] Input universitySlug:', JSON.stringify(universitySlug));
+                console.log('🔤 [DEBUG] universitySlug type:', typeof universitySlug);
+                console.log('📏 [DEBUG] universitySlug length:', universitySlug?.length);
+
                 setLoading(true);
+
+                console.log('🔍 [DEBUG] Calling UniversityService.getUniversityBySlug...');
                 const universityData = await UniversityService.getUniversityBySlug(universitySlug);
 
+                console.log('📊 [DEBUG] UniversityService response:', JSON.stringify(universityData, null, 2));
+
                 if (!universityData) {
+                    console.log('❌ [DEBUG] University not found - setting error state');
                     setError('University not found');
                     setUniversity(null);
                 } else if (!universityData.survey_active) {
+                    console.log('⚠️ [DEBUG] University found but survey inactive');
+                    console.log('📋 [DEBUG] University data:', JSON.stringify(universityData, null, 2));
                     setError('Survey is not currently active for this university');
                     setUniversity(universityData);
                 } else {
+                    console.log('✅ [DEBUG] University found and survey active');
+                    console.log('📋 [DEBUG] University data:', JSON.stringify(universityData, null, 2));
                     setUniversity(universityData);
                     setError(null);
                 }
             } catch (err) {
-                console.error('Error validating university:', err);
+                console.error('❌ [DEBUG] Error in UniversityValidator:', err);
+                console.error('❌ [DEBUG] Error stack:', err instanceof Error ? err.stack : 'No stack trace');
                 setError('Error loading university information');
                 setUniversity(null);
             } finally {
+                console.log('🏁 [DEBUG] UniversityValidator validation complete');
                 setLoading(false);
             }
         };
 
+        console.log('🚀 [DEBUG] UniversityValidator useEffect triggered with slug:', universitySlug);
         validateUniversity();
     }, [universitySlug]);
 

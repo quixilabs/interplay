@@ -14,7 +14,11 @@
     "supabase:restart": "supabase stop && supabase start",
     "supabase:studio": "open http://127.0.0.1:54323",
     "supabase:reset": "supabase db reset",
-    "dev:local": "npm run supabase:start && npm run dev"
+    "dev:local": "npm run supabase:start && npm run dev",
+    "debug:db": "node debug-db-connection.js",
+    "setup:universities": "node setup-universities-admin.js",
+    "fix:rls": "node apply-rls-fixes.js",
+    "test:unique-session": "node test-unique-session-logic.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.56.0",
@@ -32,6 +36,7 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.18",
+    "dotenv": "^17.2.1",
     "eslint": "^9.9.1",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.11",

@@ -9,4 +9,4 @@ export const LOCAL_SUPABASE_CONFIG = {
 };
 
 // Use this flag to switch between local and production
-export const USE_LOCAL_SUPABASE = true;
+export const USE_LOCAL_SUPABASE = false;
