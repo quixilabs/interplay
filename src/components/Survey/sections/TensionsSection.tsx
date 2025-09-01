@@ -5,32 +5,32 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 const TENSION_PAIRS = [
   {
     key: 'performance_wellbeing',
-    left: 'High Performance',
+    left: 'Performance',
     right: 'Well-Being',
     description: 'How do you balance achieving high performance with maintaining your well-being?'
   },
   {
     key: 'ambition_contribution',
     left: 'Personal Ambition',
-    right: 'Contributing to Others',
+    right: 'Beyond-Self Contribution',
     description: 'How do you balance pursuing your own goals with helping others achieve theirs?'
   },
   {
     key: 'selfreliance_connection',
     left: 'Self-Reliance',
-    right: 'Connection to Others',
+    right: 'Connection & Support',
     description: 'How do you balance being independent with staying connected to your community?'
   },
   {
     key: 'stability_growth',
-    left: 'Stability & Security',
-    right: 'Growth & Adventure',
+    left: 'Stability & Routine',
+    right: 'Growth & Change',
     description: 'How do you balance seeking security with pursuing new growth opportunities?'
   },
   {
     key: 'academic_creative',
-    left: 'Academic Excellence',
-    right: 'Creative Expression',
+    left: 'Academic Focus',
+    right: 'Creative Exploration',
     description: 'How do you balance academic achievement with creative and artistic pursuits?'
   }
 ];

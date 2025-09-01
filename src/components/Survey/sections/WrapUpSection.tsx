@@ -12,7 +12,7 @@ export default function WrapUpSection() {
       dispatch({ type: 'SET_EMAIL', payload: email });
     }
     dispatch({ type: 'COMPLETE_SURVEY' });
-    
+
     // Here you would typically submit the survey data to your backend
     console.log('Survey completed:', state);
   };
@@ -36,11 +36,10 @@ export default function WrapUpSection() {
           <CheckCircle className="h-12 w-12 text-green-600" />
         </div>
         <h1 className="text-3xl font-bold text-slate-900 mb-4">
-          Thank You! 🎉
+          Thank you for sharing your voice! 🎉
         </h1>
         <p className="text-xl text-slate-600 leading-relaxed">
-          You've completed The Growth Index survey and contributed valuable insights 
-          to improve student well-being at your university.
+          Interplay translates your feedback into a research-based measure of flourishing, highlighting what’s working and where support is needed. Your input helps your university act quickly and wisely so every student has the best chance to thrive.
         </p>
       </div>
 
@@ -51,13 +50,13 @@ export default function WrapUpSection() {
           <div className="text-2xl font-bold text-blue-800">{completionTime} min</div>
           <div className="text-sm text-blue-600">Completion time</div>
         </div>
-        
+
         <div className="text-center p-4 bg-purple-50 rounded-lg">
           <Heart className="h-8 w-8 text-purple-600 mx-auto mb-2" />
           <div className="text-2xl font-bold text-purple-800">6</div>
           <div className="text-sm text-purple-600">Domains assessed</div>
         </div>
-        
+
         <div className="text-center p-4 bg-teal-50 rounded-lg">
           <CheckCircle className="h-8 w-8 text-teal-600 mx-auto mb-2" />
           <div className="text-2xl font-bold text-teal-800">100%</div>
@@ -69,7 +68,7 @@ export default function WrapUpSection() {
       <div className="bg-gradient-to-r from-blue-50 to-teal-50 border border-blue-200 rounded-lg p-6 mb-8">
         <h3 className="text-lg font-semibold text-blue-900 mb-3">Your Impact</h3>
         <p className="text-blue-800 mb-3">
-          Your responses will help university administrators understand student needs and make 
+          Your responses will help university administrators understand student needs and make
           data-driven decisions about:
         </p>
         <ul className="text-blue-700 space-y-1 text-sm">
@@ -88,10 +87,9 @@ export default function WrapUpSection() {
           <h3 className="text-lg font-semibold text-slate-900">Get Your Personal Results</h3>
         </div>
         <p className="text-slate-600 mb-4">
-          Would you like to receive a personalized summary of your flourishing scores and growth insights? 
-          Your email will only be used to send your results and will not be connected to your survey responses.
+          “Would you like to receive your personal results once the survey is complete?”
         </p>
-        
+
         <label className="flex items-center cursor-pointer mb-4">
           <input
             type="checkbox"
@@ -99,7 +97,7 @@ export default function WrapUpSection() {
             onChange={(e) => setWantsResults(e.target.checked)}
             className="h-5 w-5 text-blue-600 border-slate-300 rounded focus:ring-2 focus:ring-blue-500"
           />
-          <span className="ml-3 text-slate-700">Yes, send me my personal flourishing results</span>
+          <span className="ml-3 text-slate-700">Yes, send me my personal results</span>
         </label>
 
         {wantsResults && (
@@ -122,7 +120,7 @@ export default function WrapUpSection() {
       <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-8">
         <h4 className="font-semibold text-green-800 mb-2">Privacy Protection</h4>
         <p className="text-sm text-green-700">
-          Your survey responses remain completely anonymous. Even if you provide your email, 
+          Your survey responses remain completely anonymous. Even if you provide your email,
           it will not be linked to your answers in any way that could identify you.
         </p>
       </div>

@@ -5,59 +5,59 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 const SCHOOL_WELLBEING_QUESTIONS = [
   {
     key: 'belonging_score',
-    question: 'How much do you feel you belong at this school?'
+    question: ' I feel a strong sense of belonging at my school.'
   },
   {
     key: 'enjoy_school_days',
-    question: 'How much do you enjoy your school days?'
+    question: 'I enjoy most of my school days.'
   },
   {
     key: 'physical_activity',
-    question: 'How often do you get physical activity that makes you feel energized?'
+    question: 'I get at least 60 minutes of physical activity most days.'
   },
   {
     key: 'feel_safe',
-    question: 'How safe do you feel at school?'
+    question: 'I feel safe in and around my school.'
   },
   {
     key: 'work_connected_goals',
-    question: 'How connected is your school work to your goals and interests?'
+    question: 'My schoolwork feels connected to my future goals.'
   },
   {
     key: 'contribute_bigger_purpose',
-    question: 'How much does your school experience help you contribute to a bigger purpose?'
+    question: 'I have opportunities at school to contribute to something bigger than myself.'
   },
   {
     key: 'kind_to_others',
-    question: 'How often are you kind and helpful to others at school?'
+    question: 'I am kind to others at school each day.'
   },
   {
     key: 'manage_emotions',
-    question: 'How well are you able to manage your emotions during challenging times at school?'
+    question: 'I know how to manage my emotions when I feel stressed.'
   },
   {
     key: 'trusted_adult',
-    question: 'How much do you have at least one trusted adult at school you can talk to?'
+    question: 'I have at least one trusted adult at school I can talk to if I need help.'
   },
   {
     key: 'supportive_friends',
-    question: 'How much do you have supportive friends at school?'
+    question: 'I have friends at school who support me.'
   },
   {
     key: 'resources_participation',
-    question: 'How much do you have access to resources and opportunities to participate in school activities that interest you?'
+    question: 'I have what I need to participate fully in school activities.'
   }
 ];
 
 const WELLBEING_CHECKLIST = [
-  'I feel connected to my school community',
-  'I have meaningful relationships with faculty/staff',
-  'I participate in extracurricular activities',
-  'I use campus mental health resources when needed',
-  'I feel comfortable expressing my identity on campus',
-  'I have academic support when I need it',
-  'I feel physically safe on campus',
-  'I can balance academic and personal life effectively'
+  'I have at least one teacher who knows me well.',
+  'I participate in school sports or regular physical activity.',
+  'I participate in arts, music, or creative activities at school.',
+  'I have opportunities for service learning or helping the community.',
+  'I have time during the school week for fun, play, or humor.',
+  'I spend time in nature at or near school.',
+  'My school celebrates student kindness and respect.',
+  'I know where to get help at school if I’m struggling.'
 ];
 
 export default function SchoolWellbeingSection() {
