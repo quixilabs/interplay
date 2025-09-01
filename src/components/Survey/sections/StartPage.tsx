@@ -17,10 +17,10 @@ export default function StartPage() {
     <div className="bg-white rounded-xl shadow-lg p-8 max-w-3xl mx-auto">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-slate-900 mb-4">
-          Welcome to The Growth Index
+          Your Voice Powers Youth Flourishing
         </h1>
         <p className="text-lg text-slate-600 leading-relaxed">
-          Help us understand your well-being and flourishing to improve the university experience for all students.
+          Interplay™ is the first Flourishing Intelligence™ platform built for colleges and universities. We capture authentic student perspectives, map them across Harvard’s six validated domains of well-being, and deliver actionable, research-backed strategies to improve engagement, retention, and student success.
         </p>
       </div>
 
@@ -33,7 +33,7 @@ export default function StartPage() {
             <p className="text-sm text-blue-600">Average completion time</p>
           </div>
         </div>
-        
+
         <div className="flex items-start space-x-3 p-4 bg-green-50 rounded-lg">
           <Shield className="h-6 w-6 text-green-600 mt-1" />
           <div>
@@ -41,7 +41,7 @@ export default function StartPage() {
             <p className="text-sm text-green-600">Your responses are confidential</p>
           </div>
         </div>
-        
+
         <div className="flex items-start space-x-3 p-4 bg-purple-50 rounded-lg">
           <Users className="h-6 w-6 text-purple-600 mt-1" />
           <div>
@@ -55,11 +55,11 @@ export default function StartPage() {
       <div className="bg-slate-50 rounded-lg p-6 mb-8">
         <h2 className="text-xl font-semibold text-slate-900 mb-4">What to Expect</h2>
         <div className="space-y-3 text-slate-700">
-          <p>• <strong>Demographics:</strong> Basic information about your student experience</p>
-          <p>• <strong>Flourishing Assessment:</strong> Questions about six core well-being domains</p>
-          <p>• <strong>School-Specific Well-Being:</strong> Your experience with university resources and environment</p>
-          <p>• <strong>Growth Opportunities:</strong> Areas where additional support could help</p>
-          <p>• <strong>Feedback:</strong> Suggestions for improving student well-being on campus</p>
+          <p>• <strong>Your Story ⎯</strong> Share a bit about yourself and your student journey.</p>
+          <p>• <strong>Flourishing Check-In ⎯</strong> Evidence-based questions across six domains of well-being: happiness, health, purpose, character, relationships, and financial stability.</p>
+          <p>• <strong>Campus Experience ⎯</strong> Reflect on how your university’s culture, resources, and support systems are shaping your growth.</p>
+          <p>• <strong>Opportunities for Impact ⎯</strong> Highlight where you see gaps or tensions so your feedback leads directly to actionable strategies.</p>
+          <p>• <strong>Shaping the Future ⎯</strong> Your voice helps your university strengthen student flourishing and success.</p>
         </div>
       </div>
 
@@ -67,7 +67,7 @@ export default function StartPage() {
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
         <h3 className="font-semibold text-yellow-800 mb-2">Privacy & Confidentiality</h3>
         <p className="text-sm text-yellow-700">
-          Your responses are completely anonymous and will be used only in aggregate to improve university programs and services. 
+          Your responses are completely anonymous and will be used only in aggregate to improve university programs and services.
           No individual responses will be shared, and participation is entirely voluntary. You may skip questions or stop at any time.
         </p>
       </div>

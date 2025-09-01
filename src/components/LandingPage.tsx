@@ -27,12 +27,11 @@ export default function LandingPage() {
       <section className="relative px-4 py-20 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-navy font-primary mb-6">
-            Evidence-Based
-            <span className="block text-sage font-secondary italic">Student Success</span>
+            Your Voice
+            <span className="block text-navy font-secondary italic">Matters</span>
           </h1>
           <p className="text-xl text-warm-gray font-primary mb-8 max-w-3xl mx-auto leading-relaxed">
-            Comprehensive analytics platform helping universities track and improve student well-being
-            through data-driven insights and evidence-based interventions.
+            Interplay turns youth perspectives into a real-time measure of flourishing—helping universities identify hidden tensions across happiness, health, purpose, relationships, character, and stability, then translate them into strategies that drive success.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -69,32 +68,32 @@ export default function LandingPage() {
             <FeatureCard
               icon={<Users className="h-8 w-8 text-sage" />}
               title="Multi-Domain Assessment"
-              description="Measure happiness, health, purpose, relationships, character, and financial stability across 6 core flourishing domains."
+              description="Assess student well-being across six flourishing domains—happiness, health, purpose, relationships, character, and stability—using Harvard’s validated framework as the foundation."
             />
             <FeatureCard
               icon={<BarChart3 className="h-8 w-8 text-info" />}
               title="Real-Time Analytics"
-              description="Interactive dashboards with demographic analysis, risk assessment, and actionable insights for administrators."
+              description="Go beyond static reports. Interplay delivers interactive dashboards that reveal patterns and tensions across flourishing domains, segmented by demographics, programs, and cohorts."
             />
             <FeatureCard
               icon={<TrendingUp className="h-8 w-8 text-success" />}
               title="Growth Opportunities"
-              description="Identify intervention points and track improvement over time with detailed progress monitoring."
+              description="Pinpoint areas where students struggle most, then monitor progress over time. Interplay connects well-being data directly to outcomes like engagement, retention, and student success."
             />
             <FeatureCard
               icon={<Shield className="h-8 w-8 text-success" />}
               title="Privacy-First Design"
-              description="Anonymous responses with secure data handling and FERPA-compliant privacy protections."
+              description="FERPA-compliant, anonymous student responses and secure data handling ensure trust and integrity for universities and students alike."
             />
             <FeatureCard
               icon={<CheckCircle className="h-8 w-8 text-navy" />}
               title="Evidence-Based"
-              description="Built on Harvard's validated Flourishing Measure with proven reliability and academic rigor."
+              description="Grounded in Harvard’s Flourishing Measure, Interplay integrates global research with institutional data, applying proven reliability and academic rigor to higher education contexts."
             />
             <FeatureCard
               icon={<ArrowRight className="h-8 w-8 text-sage" />}
               title="Actionable Insights"
-              description="Generate specific recommendations and intervention strategies based on student feedback patterns."
+              description="What makes Interplay different: our proprietary Flourishing Intelligence™ closes the loop—translating student voice into prioritized, evidence-based strategies tailored to your university’s resources."
             />
           </div>
         </div>
@@ -107,8 +106,7 @@ export default function LandingPage() {
             Start Measuring Student Flourishing Today
           </h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto font-primary">
-            Join universities nationwide using Interplay to improve student outcomes
-            through data-driven well-being initiatives.
+            Join colleges and universities nationwide using Interplay to improve student outcomes through data-driven well-being initiatives.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -118,13 +116,13 @@ export default function LandingPage() {
               Saint Louis University Survey
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
-            <Link
+            {/* <Link
               to="/survey/demo-university"
               className="bg-white/80 hover:bg-white text-navy px-8 py-4 rounded-brand font-semibold inline-flex items-center transition-colors"
             >
               Try Demo Survey
               <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
+            </Link> */}
           </div>
         </div>
       </section>
@@ -137,7 +135,7 @@ export default function LandingPage() {
             <span className="text-lg font-semibold font-primary">Interplay</span>
           </div>
           <p className="text-white/60 font-primary">
-            Evidence-Based Student Success
+            Your Voice Matters
           </p>
         </div>
       </footer>
