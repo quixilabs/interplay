@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useSurvey } from '../../../contexts/SurveyContext';
 import { ChevronLeft, ChevronRight, Lightbulb } from 'lucide-react';
 
@@ -7,18 +7,18 @@ export default function FastestWinSection() {
   const [suggestion, setSuggestion] = useState(state.textResponses.fastestWinSuggestion || '');
 
   const handleNext = () => {
-    dispatch({ 
-      type: 'SET_TEXT_RESPONSES', 
-      payload: { 
+    dispatch({
+      type: 'SET_TEXT_RESPONSES',
+      payload: {
         ...state.textResponses,
-        fastestWinSuggestion: suggestion 
-      } 
+        fastestWinSuggestion: suggestion
+      }
     });
-    dispatch({ type: 'SET_SECTION', payload: 6 });
+    dispatch({ type: 'SET_SECTION', payload: 10 }); // Go to Complete
   };
 
   const handleBack = () => {
-    dispatch({ type: 'SET_SECTION', payload: 4 });
+    dispatch({ type: 'SET_SECTION', payload: 8 }); // Go back to Tensions Assessment
   };
 
   return (
@@ -29,7 +29,7 @@ export default function FastestWinSection() {
           <h2 className="text-2xl font-bold text-slate-900">Your Fastest Win Suggestion</h2>
         </div>
         <p className="text-slate-600 text-lg leading-relaxed">
-          Based on your responses, you've shared insights about your flourishing experience. 
+          Based on your responses, you've shared insights about your flourishing experience.
           Now we'd love to hear your ideas for improvement.
         </p>
       </div>
@@ -39,7 +39,7 @@ export default function FastestWinSection() {
           💡 Your Voice Matters
         </h3>
         <p className="text-orange-700">
-          Student feedback directly influences university decisions about programs, resources, and policies. 
+          Student feedback directly influences university decisions about programs, resources, and policies.
           Your suggestion could spark meaningful change for the entire campus community.
         </p>
       </div>

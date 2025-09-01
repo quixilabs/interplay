@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useSurvey } from '../../../contexts/SurveyContext';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -70,8 +70,8 @@ export default function SchoolWellbeingSection() {
   };
 
   const handleChecklistToggle = (item: string) => {
-    setChecklist(prev => 
-      prev.includes(item) 
+    setChecklist(prev =>
+      prev.includes(item)
         ? prev.filter(i => i !== item)
         : [...prev, item]
     );
@@ -79,14 +79,14 @@ export default function SchoolWellbeingSection() {
 
   const handleNext = () => {
     dispatch({ type: 'SET_SCHOOL_WELLBEING', payload: { ...scores, wellbeingChecklist: checklist } });
-    dispatch({ type: 'SET_SECTION', payload: 4 });
+    dispatch({ type: 'SET_SECTION', payload: 7 }); // Go to Tensions Intro
   };
 
   const handleBack = () => {
-    dispatch({ type: 'SET_SECTION', payload: 2 });
+    dispatch({ type: 'SET_SECTION', payload: 5 }); // Go back to Well-Being Intro
   };
 
-  const allQuestionsAnswered = SCHOOL_WELLBEING_QUESTIONS.every(q => 
+  const allQuestionsAnswered = SCHOOL_WELLBEING_QUESTIONS.every(q =>
     scores[q.key as keyof typeof scores] !== undefined
   );
 
@@ -101,9 +101,9 @@ export default function SchoolWellbeingSection() {
 
       <div className="space-y-8">
         {/* School Well-Being Questions */}
-        {SCHOOL_WELLBEING_QUESTIONS.map((item, index) => {
+        {SCHOOL_WELLBEING_QUESTIONS.map((item) => {
           const score = scores[item.key as keyof typeof scores];
-          
+
           return (
             <div key={item.key}>
               <label className="block text-lg font-medium text-slate-800 mb-4">
@@ -116,11 +116,10 @@ export default function SchoolWellbeingSection() {
                     <button
                       key={num}
                       onClick={() => handleScoreChange(item.key, num)}
-                      className={`w-10 h-10 rounded-lg font-medium transition-colors ${
-                        score === num
-                          ? 'bg-teal-600 text-white'
-                          : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                      }`}
+                      className={`w-10 h-10 rounded-lg font-medium transition-colors ${score === num
+                        ? 'bg-teal-600 text-white'
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                        }`}
                     >
                       {num}
                     </button>
@@ -141,8 +140,8 @@ export default function SchoolWellbeingSection() {
             Which of the following statements apply to you? (Select all that apply)
           </p>
           <div className="grid grid-cols-1 gap-3">
-            {WELLBEING_CHECKLIST.map((item, index) => (
-              <label key={index} className="flex items-center cursor-pointer p-3 rounded-lg hover:bg-slate-50 transition-colors">
+            {WELLBEING_CHECKLIST.map((item) => (
+              <label key={item} className="flex items-center cursor-pointer p-3 rounded-lg hover:bg-slate-50 transition-colors">
                 <input
                   type="checkbox"
                   checked={checklist.includes(item)}

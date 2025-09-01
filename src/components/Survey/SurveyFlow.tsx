@@ -4,6 +4,7 @@ import { useSurvey } from '../../contexts/SurveyContext';
 import UniversityValidator from './UniversityValidator';
 import ProgressBar from './ProgressBar';
 import StartPage from './sections/StartPage';
+import SectionIntro from './sections/SectionIntro';
 import DemographicsSection from './sections/DemographicsSection';
 import FlourishingSection from './sections/FlourishingSection';
 import SchoolWellbeingSection from './sections/SchoolWellbeingSection';
@@ -13,14 +14,38 @@ import WrapUpSection from './sections/WrapUpSection';
 import { generateSessionId } from '../../utils/helpers';
 import { SurveyService } from '../../services/surveyService';
 
+// Section intro texts
+const SECTION_INTROS = {
+  demographics: {
+    title: 'About You',
+    description: 'These questions help us understand different student experiences and ensure all voices are represented in our analysis. Your responses will remain completely confidential.'
+  },
+  flourishing: {
+    title: 'Core Flourishing Domains',
+    description: 'These questions are based on a research-validated measure of flourishing, developed at Harvard, and adapted for your university through Interplay. Your answers help us understand well-being in a holistic way—so your school can respond where it matters most.'
+  },
+  wellbeing: {
+    title: 'School Well-Being',
+    description: 'These questions focus specifically on your experience at this institution and how it impacts your overall well-being. Your insights help us understand what\'s working well and where there are opportunities for improvement.'
+  },
+  tensions: {
+    title: 'Tensions Self-Check',
+    description: 'Sometimes thriving means balancing two important things that can feel in tension—like focusing on performance vs. caring for your well-being. These sliders help us see where students feel pulled, so your university can better support both sides.'
+  }
+};
+
 const SECTIONS = [
-  { name: 'Start', component: StartPage },
-  { name: 'Demographics', component: DemographicsSection },
-  { name: 'Core Flourishing', component: FlourishingSection },
-  { name: 'School Well-Being', component: SchoolWellbeingSection },
-  { name: 'Tensions Assessment', component: TensionsSection },
-  { name: 'Fastest Win', component: FastestWinSection },
-  { name: 'Complete', component: WrapUpSection }
+  { name: 'Start', component: StartPage, type: 'content' },
+  { name: 'Demographics Intro', component: null, type: 'intro', introKey: 'demographics' },
+  { name: 'Demographics', component: DemographicsSection, type: 'content' },
+  { name: 'Flourishing Intro', component: null, type: 'intro', introKey: 'flourishing' },
+  { name: 'Core Flourishing', component: FlourishingSection, type: 'content' },
+  { name: 'Well-Being Intro', component: null, type: 'intro', introKey: 'wellbeing' },
+  { name: 'School Well-Being', component: SchoolWellbeingSection, type: 'content' },
+  { name: 'Tensions Intro', component: null, type: 'intro', introKey: 'tensions' },
+  { name: 'Tensions Assessment', component: TensionsSection, type: 'content' },
+  { name: 'Fastest Win', component: FastestWinSection, type: 'content' },
+  { name: 'Complete', component: WrapUpSection, type: 'content' }
 ];
 
 export default function SurveyFlow() {
@@ -68,11 +93,24 @@ export default function SurveyFlow() {
     return <Navigate to="/" replace />;
   }
 
-  const CurrentSection = SECTIONS[state.currentSection]?.component;
+  const currentSectionData = SECTIONS[state.currentSection];
 
-  if (!CurrentSection) {
+  if (!currentSectionData) {
     return <Navigate to="/" replace />;
   }
+
+  const handleNext = () => {
+    dispatch({ type: 'SET_SECTION', payload: state.currentSection + 1 });
+  };
+
+  const handleBack = () => {
+    dispatch({ type: 'SET_SECTION', payload: state.currentSection - 1 });
+  };
+
+  // Calculate progress based on content sections only (excluding intro pages)
+  const contentSections = SECTIONS.filter(s => s.type === 'content');
+  const currentContentSectionIndex = SECTIONS.slice(0, state.currentSection + 1)
+    .filter(s => s.type === 'content').length - 1;
 
   return (
     <UniversityValidator universitySlug={universitySlug}>
@@ -85,20 +123,30 @@ export default function SurveyFlow() {
                 Student Success Survey
               </h1>
               <div className="text-sm text-warm-gray font-primary">
-                Section {state.currentSection + 1} of {SECTIONS.length}
+                Section {Math.max(1, currentContentSectionIndex + 1)} of {contentSections.length}
               </div>
             </div>
             <ProgressBar
-              currentSection={state.currentSection}
-              totalSections={SECTIONS.length}
-              sections={SECTIONS.map(s => s.name)}
+              currentSection={Math.max(0, currentContentSectionIndex)}
+              totalSections={contentSections.length}
+              sections={contentSections.map(s => s.name)}
             />
           </div>
         </div>
 
         {/* Content */}
         <main className="max-w-4xl mx-auto px-4 py-8">
-          <CurrentSection />
+          {currentSectionData.type === 'intro' ? (
+            <SectionIntro
+              title={SECTION_INTROS[currentSectionData.introKey as keyof typeof SECTION_INTROS].title}
+              description={SECTION_INTROS[currentSectionData.introKey as keyof typeof SECTION_INTROS].description}
+              onNext={handleNext}
+              onBack={handleBack}
+              canGoBack={state.currentSection > 0}
+            />
+          ) : (
+            currentSectionData.component && <currentSectionData.component />
+          )}
         </main>
       </div>
     </UniversityValidator>

@@ -40,6 +40,7 @@ export interface SchoolWellbeing {
   trusted_adult?: number;
   supportive_friends?: number;
   resources_participation?: number;
+  wellbeingChecklist?: string[];
 }
 
 export interface TextResponses {

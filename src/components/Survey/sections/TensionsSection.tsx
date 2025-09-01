@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useSurvey } from '../../../contexts/SurveyContext';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -45,14 +45,14 @@ export default function TensionsSection() {
 
   const handleNext = () => {
     dispatch({ type: 'SET_TENSIONS_ASSESSMENT', payload: values });
-    dispatch({ type: 'SET_SECTION', payload: 5 });
+    dispatch({ type: 'SET_SECTION', payload: 9 }); // Go to Fastest Win
   };
 
   const handleBack = () => {
-    dispatch({ type: 'SET_SECTION', payload: 3 });
+    dispatch({ type: 'SET_SECTION', payload: 7 }); // Go back to Tensions Intro
   };
 
-  const allTensionsAnswered = TENSION_PAIRS.every(pair => 
+  const allTensionsAnswered = TENSION_PAIRS.every(pair =>
     values[pair.key as keyof typeof values] !== undefined
   );
 
@@ -61,21 +61,21 @@ export default function TensionsSection() {
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-slate-900 mb-2">Tensions Self-Check</h2>
         <p className="text-slate-600">
-          Life often involves balancing competing priorities. For each pair below, move the slider to show 
+          Life often involves balancing competing priorities. For each pair below, move the slider to show
           where you currently find yourself in balancing these two important areas.
         </p>
       </div>
 
       <div className="space-y-10">
-        {TENSION_PAIRS.map((pair, index) => {
+        {TENSION_PAIRS.map((pair) => {
           const value = values[pair.key as keyof typeof values] || 50;
-          
+
           return (
             <div key={pair.key} className="bg-slate-50 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-slate-900 mb-2">
                 {pair.description}
               </h3>
-              
+
               <div className="mt-6">
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-sm font-medium text-slate-700 flex-1 text-left">
@@ -85,7 +85,7 @@ export default function TensionsSection() {
                     {pair.right}
                   </span>
                 </div>
-                
+
                 <div className="relative">
                   <input
                     type="range"
@@ -98,18 +98,18 @@ export default function TensionsSection() {
                       background: `linear-gradient(to right, #dbeafe 0%, #e879f9 ${value}%, #a7f3d0 100%)`
                     }}
                   />
-                  <div 
+                  <div
                     className="absolute top-1/2 transform -translate-y-1/2 w-6 h-6 bg-white border-2 border-slate-400 rounded-full shadow-lg pointer-events-none"
                     style={{ left: `calc(${value}% - 12px)` }}
                   />
                 </div>
-                
+
                 <div className="flex justify-between mt-2 text-xs text-slate-500">
                   <span>0</span>
                   <span>50</span>
                   <span>100</span>
                 </div>
-                
+
                 <div className="text-center mt-3">
                   <span className="inline-block px-3 py-1 bg-slate-200 rounded-full text-sm text-slate-700">
                     Current balance: {value}%
@@ -123,7 +123,7 @@ export default function TensionsSection() {
 
       <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
         <p className="text-blue-800 text-sm">
-          <strong>Remember:</strong> There's no "right" answer here. This is about understanding your current 
+          <strong>Remember:</strong> There's no "right" answer here. This is about understanding your current
           approach to balancing these important aspects of life as a student.
         </p>
       </div>

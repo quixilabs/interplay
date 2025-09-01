@@ -92,11 +92,11 @@ export default function DemographicsSection() {
 
   const handleNext = () => {
     dispatch({ type: 'SET_DEMOGRAPHICS', payload: formData });
-    dispatch({ type: 'SET_SECTION', payload: 2 });
+    dispatch({ type: 'SET_SECTION', payload: 3 }); // Go to Flourishing Intro
   };
 
   const handleBack = () => {
-    dispatch({ type: 'SET_SECTION', payload: 0 });
+    dispatch({ type: 'SET_SECTION', payload: 1 }); // Go back to Demographics Intro
   };
 
   return (

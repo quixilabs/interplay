@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useSurvey } from '../../../contexts/SurveyContext';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import GrowthModuleModal from '../GrowthModuleModal';
@@ -8,48 +8,48 @@ const FLOURISHING_DOMAINS = [
     key: 'happiness_satisfaction',
     name: 'Happiness & Life Satisfaction',
     questions: [
-      'How happy would you say you are?',
-      'How satisfied are you with your life?'
+      'Overall, how satisfied am I with my life as a whole these days?',
+      'In general, how happy or unhappy do I usually feel?'
     ]
   },
   {
     key: 'mental_physical_health',
     name: 'Mental & Physical Health',
     questions: [
-      'How would you rate your mental health?',
-      'How would you rate your physical health?'
+      'In general, how would I rate my physical health?',
+      'How would I rate my overall mental health?'
     ]
   },
   {
     key: 'meaning_purpose',
     name: 'Meaning & Purpose',
     questions: [
-      'How meaningful is your life?',
-      'To what extent do you feel your life has a sense of direction or purpose?'
+      'Overall, to what extent do I feel the things I do in my life are worthwhile?',
+      'I understand my purpose in life.'
     ]
   },
   {
     key: 'character_virtue',
     name: 'Character & Virtue',
     questions: [
-      'How often do you do good for others without expecting anything in return?',
-      'To what extent do you receive respect from others?'
+      'I try to do what is right in all circumstances, even when it is difficult.',
+      'I am willing to give up some happiness now for greater happiness later.'
     ]
   },
   {
     key: 'social_relationships',
     name: 'Close Social Relationships',
     questions: [
-      'How satisfied are you with your personal relationships?',
-      'How loved do you feel by others?'
+      'I am content with my friendships and relationships.',
+      'My relationships are as satisfying as I want them to be.'
     ]
   },
   {
     key: 'financial_stability',
     name: 'Financial & Material Stability',
     questions: [
-      'How satisfied are you with your standard of living?',
-      'How often do you worry about money?'
+      'I rarely worry about being able to meet normal monthly living expenses.',
+      'I rarely worry about safety, food, or housing.'
     ]
   }
 ];
@@ -91,11 +91,11 @@ export default function FlourishingSection() {
   const continueToNext = () => {
     dispatch({ type: 'SET_FLOURISHING_SCORES', payload: scores });
     dispatch({ type: 'SET_TEXT_RESPONSES', payload: { brightSpots } });
-    
+
     if (currentDomain < FLOURISHING_DOMAINS.length - 1) {
       setCurrentDomain(currentDomain + 1);
     } else {
-      dispatch({ type: 'SET_SECTION', payload: 3 });
+      dispatch({ type: 'SET_SECTION', payload: 5 }); // Go to Well-Being Intro
     }
   };
 
@@ -108,7 +108,7 @@ export default function FlourishingSection() {
     if (currentDomain > 0) {
       setCurrentDomain(currentDomain - 1);
     } else {
-      dispatch({ type: 'SET_SECTION', payload: 1 });
+      dispatch({ type: 'SET_SECTION', payload: 3 }); // Go back to Flourishing Intro
     }
   };
 
@@ -136,7 +136,7 @@ export default function FlourishingSection() {
           {domain.questions.map((question, index) => {
             const questionKey = questionKeys[index];
             const score = scores[questionKey as keyof typeof scores];
-            
+
             return (
               <div key={index}>
                 <label className="block text-lg font-medium text-slate-800 mb-4">
@@ -149,11 +149,10 @@ export default function FlourishingSection() {
                       <button
                         key={num}
                         onClick={() => handleScoreChange(questionKey, num)}
-                        className={`w-10 h-10 rounded-lg font-medium transition-colors ${
-                          score === num
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                        }`}
+                        className={`w-10 h-10 rounded-lg font-medium transition-colors ${score === num
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                          }`}
                       >
                         {num}
                       </button>
