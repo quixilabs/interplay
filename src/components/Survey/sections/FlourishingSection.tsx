@@ -8,48 +8,84 @@ const FLOURISHING_DOMAINS = [
     key: 'happiness_satisfaction',
     name: 'Happiness & Life Satisfaction',
     questions: [
-      'Overall, how satisfied am I with my life as a whole these days?',
-      'In general, how happy or unhappy do I usually feel?'
+      {
+        text: 'Overall, how satisfied am I with my life as a whole these days?',
+        scaleLabels: { left: 'Not Satisfied at all', right: 'Completely Satisfied' }
+      },
+      {
+        text: 'In general, how happy or unhappy do I usually feel?',
+        scaleLabels: { left: 'Extremely Unhappy', right: 'Extremely Happy' }
+      }
     ]
   },
   {
     key: 'mental_physical_health',
     name: 'Mental & Physical Health',
     questions: [
-      'In general, how would I rate my physical health?',
-      'How would I rate my overall mental health?'
+      {
+        text: 'In general, how would I rate my physical health?',
+        scaleLabels: { left: 'Poor', right: 'Excellent' }
+      },
+      {
+        text: 'How would I rate my overall mental health?',
+        scaleLabels: { left: 'Poor', right: 'Excellent' }
+      }
     ]
   },
   {
     key: 'meaning_purpose',
     name: 'Meaning & Purpose',
     questions: [
-      'Overall, to what extent do I feel the things I do in my life are worthwhile?',
-      'I understand my purpose in life.'
+      {
+        text: 'Overall, to what extent do I feel the things I do in my life are worthwhile?',
+        scaleLabels: { left: 'Not at all worthwhile', right: 'Completely worthwhile' }
+      },
+      {
+        text: 'I understand my purpose in life.',
+        scaleLabels: { left: 'Strongly disagree', right: 'Strongly agree' }
+      }
     ]
   },
   {
     key: 'character_virtue',
     name: 'Character & Virtue',
     questions: [
-      'I try to do what is right in all circumstances, even when it is difficult.',
-      'I am willing to give up some happiness now for greater happiness later.'
+      {
+        text: 'I try to do what is right in all circumstances, even when it is difficult.',
+        scaleLabels: { left: 'Not true of me', right: 'Completely true of me' }
+      },
+      {
+        text: 'I am willing to give up some happiness now for greater happiness later.',
+        scaleLabels: { left: 'Not true of me', right: 'Completely true of me' }
+      }
     ]
   },
   {
     key: 'social_relationships',
     name: 'Close Social Relationships',
     questions: [
-      'I am content with my friendships and relationships.',
-      'My relationships are as satisfying as I want them to be.'
+      {
+        text: 'I am content with my friendships and relationships.',
+        scaleLabels: { left: 'Strongly Disagree', right: 'Strongly Agree' }
+      },
+      {
+        text: 'My relationships are as satisfying as I want them to be.',
+        scaleLabels: { left: 'Strongly Disagree', right: 'Strongly Agree' }
+      }
     ]
   },
   {
     key: 'financial_stability',
     name: 'Financial & Material Stability',
     questions: [
-      'I rarely worry about being able to meet normal monthly living expenses.',
-      'I rarely worry about safety, food, or housing.'
+      {
+        text: 'I rarely worry about being able to meet normal monthly living expenses.',
+        scaleLabels: { left: 'Worry All of the Time', right: 'Do Not Ever Worry' }
+      },
+      {
+        text: 'I rarely worry about safety, food, or housing.',
+        scaleLabels: { left: 'Worry All of the Time', right: 'Do Not Ever Worry' }
+      }
     ]
   }
 ];
@@ -140,10 +176,10 @@ export default function FlourishingSection() {
             return (
               <div key={index}>
                 <label className="block text-lg font-medium text-slate-800 mb-4">
-                  {question}
+                  {question.text}
                 </label>
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm text-slate-500 w-16">Not at all</span>
+                  <span className="text-sm text-slate-500 w-20 text-left">{question.scaleLabels.left}</span>
                   <div className="flex space-x-2">
                     {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
                       <button
@@ -158,7 +194,7 @@ export default function FlourishingSection() {
                       </button>
                     ))}
                   </div>
-                  <span className="text-sm text-slate-500 w-16">Completely</span>
+                  <span className="text-sm text-slate-500 w-20 text-right">{question.scaleLabels.right}</span>
                 </div>
               </div>
             );
