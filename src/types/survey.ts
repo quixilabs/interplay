@@ -9,6 +9,8 @@ export interface Demographics {
   employmentStatus?: string;
   hasCaregavingResponsibilities?: string;
   inGreekOrganization?: string;
+  studyMode?: string;
+  transferStudent?: string;
 }
 
 export interface FlourishingScores {

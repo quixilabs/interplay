@@ -200,7 +200,9 @@ export class SurveyService {
       is_international: demographics.isInternational,
       employment_status: demographics.employmentStatus,
       has_caregiving_responsibilities: demographics.hasCaregavingResponsibilities,
-      in_greek_organization: demographics.inGreekOrganization
+      in_greek_organization: demographics.inGreekOrganization,
+      study_mode: demographics.studyMode,
+      transfer_student: demographics.transferStudent
     };
 
     await this.upsertRecord('demographics', demographicsData, ['session_id'], sessionId, 'Demographics');

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useSurvey } from '../../../contexts/SurveyContext';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const YEAR_OPTIONS = [
   'First year/Freshman',
-  'Second year/Sophomore', 
+  'Second year/Sophomore',
   'Third year/Junior',
   'Fourth year/Senior',
   'Fifth year or beyond',
@@ -67,6 +67,19 @@ const GREEK_OPTIONS = [
   'Yes, currently active',
   'No',
   'Prefer not to say'
+];
+
+const STUDY_MODE_OPTIONS = [
+  'Entirely in-person',
+  'Entirely online',
+  'Hybrid (a mix of in-person and online)'
+];
+
+const TRANSFER_STUDENT_OPTIONS = [
+  'No, I started at this university as a first-time freshman',
+  'Yes, I transferred this year',
+  'Yes, I transferred last year',
+  'Yes, I transferred two or more years ago'
 ];
 
 export default function DemographicsSection() {
@@ -301,6 +314,50 @@ export default function DemographicsSection() {
                   value={option}
                   checked={formData.inGreekOrganization === option}
                   onChange={(e) => handleInputChange('inGreekOrganization', e.target.value)}
+                  className="h-4 w-4 text-blue-600 border-slate-300 focus:ring-2 focus:ring-blue-500"
+                />
+                <span className="ml-3 text-slate-700">{option}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Study Mode */}
+        <div>
+          <label className="block text-sm font-semibold text-slate-700 mb-3">
+            What is your current mode of study?
+          </label>
+          <div className="space-y-2">
+            {STUDY_MODE_OPTIONS.map(option => (
+              <label key={option} className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="studyMode"
+                  value={option}
+                  checked={formData.studyMode === option}
+                  onChange={(e) => handleInputChange('studyMode', e.target.value)}
+                  className="h-4 w-4 text-blue-600 border-slate-300 focus:ring-2 focus:ring-blue-500"
+                />
+                <span className="ml-3 text-slate-700">{option}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Transfer Student */}
+        <div>
+          <label className="block text-sm font-semibold text-slate-700 mb-3">
+            Are you a transfer student?
+          </label>
+          <div className="space-y-2">
+            {TRANSFER_STUDENT_OPTIONS.map(option => (
+              <label key={option} className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="transferStudent"
+                  value={option}
+                  checked={formData.transferStudent === option}
+                  onChange={(e) => handleInputChange('transferStudent', e.target.value)}
                   className="h-4 w-4 text-blue-600 border-slate-300 focus:ring-2 focus:ring-blue-500"
                 />
                 <span className="ml-3 text-slate-700">{option}</span>
