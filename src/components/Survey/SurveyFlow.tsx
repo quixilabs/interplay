@@ -18,11 +18,11 @@ import { SurveyService } from '../../services/surveyService';
 const SECTION_INTROS = {
   demographics: {
     title: 'About You',
-    description: 'These questions help us understand different student experiences and ensure all voices are represented in our analysis. Your responses will remain completely confidential.'
+    description: 'These questions help us understand different student experiences and ensure all voices are represented in our analysis. Your responses will remain completely anonymous and confidential.'
   },
   flourishing: {
     title: 'Core Flourishing Domains',
-    description: 'These questions are based on a research-validated measure of flourishing, developed at Harvard, and adapted for your university through Interplay. Your answers help us understand well-being in a holistic way—so your school can respond where it matters most.'
+    description: 'These questions are built on a research-validated measure of flourishing, developed at Harvard, and adapted for your university through Interplay. Your answers help us understand well-being in a holistic way—so your school can respond where it matters most.'
   },
   wellbeing: {
     title: 'School Well-Being',

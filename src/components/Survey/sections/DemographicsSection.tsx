@@ -7,7 +7,6 @@ const YEAR_OPTIONS = [
   'Second year/Sophomore',
   'Third year/Junior',
   'Fourth year/Senior',
-  'Fifth year or beyond',
   'Graduate student',
   'Other'
 ];
