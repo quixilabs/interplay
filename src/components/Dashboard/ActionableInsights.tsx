@@ -1,4 +1,3 @@
-import React from 'react';
 import { Lightbulb, TrendingUp, AlertTriangle, Star } from 'lucide-react';
 
 interface ActionableInsightsProps {
@@ -7,20 +6,22 @@ interface ActionableInsightsProps {
 
 export default function ActionableInsights({ data }: ActionableInsightsProps) {
   // Generate dynamic insights based on real data
-  const topIntervention = data?.topInterventions?.[0];
+  const interventionAnalysis = data?.interventionAnalysis || {};
+  const topIntervention = interventionAnalysis?.topInterventions?.[0] || interventionAnalysis?.topEnablers?.[0];
+  const topBarrier = interventionAnalysis?.topBarriers?.[0];
   const flourishingDomains = data?.flourishingDomainAverages || {};
   const studentsAtRisk = data?.studentsAtRisk || 0;
   const brightSpots = data?.brightSpotThemes || [];
 
   // Find strongest and weakest domains
   const domainEntries = Object.entries(flourishingDomains);
-  const strongestDomain = domainEntries.reduce((max, [key, value]) => 
-    value > max[1] ? [key, value] : max, ['', 0]);
-  const weakestDomain = domainEntries.reduce((min, [key, value]) => 
-    value < min[1] ? [key, value] : min, ['', 10]);
+  const strongestDomain = domainEntries.reduce((max, [key, value]) =>
+    (value as number) > (max[1] as number) ? [key, value] : max, ['', 0]);
+  const weakestDomain = domainEntries.reduce((min, [key, value]) =>
+    (value as number) < (min[1] as number) ? [key, value] : min, ['', 10]);
 
   const formatDomainName = (key: string) => {
-    return key.split('_').map(word => 
+    return key.split('_').map(word =>
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' & ');
   };
@@ -29,26 +30,28 @@ export default function ActionableInsights({ data }: ActionableInsightsProps) {
     {
       type: 'recommendation',
       icon: Lightbulb,
-      title: 'Priority Intervention Needed',
-      content: topIntervention 
-        ? `${topIntervention.name} is the top intervention need cited by students (${topIntervention.frequency}% frequency, ${topIntervention.impact} impact). Consider prioritizing resources in this area.`
-        : 'No intervention data available yet. Collect more survey responses to identify priority areas.',
-      action: topIntervention ? 'Review current capacity and expand resources' : 'Increase survey participation',
+      title: 'Top Enabler to Strengthen',
+      content: topIntervention
+        ? `"${topIntervention.name}" is the most frequently cited enabler by students (${topIntervention.percentage || topIntervention.frequency}% of responses). Strengthening this support could have broad impact.`
+        : 'No enablers data available yet. Collect more survey responses to identify what students need most.',
+      action: topIntervention ? 'Expand and strengthen this enabler across campus' : 'Increase survey participation',
       urgency: 'high'
     },
     {
       type: 'risk',
       icon: AlertTriangle,
-      title: 'At-Risk Student Alert',
-      content: `${studentsAtRisk}% of students show at-risk indicators (any flourishing domain below 6). ${weakestDomain[0] ? `${formatDomainName(weakestDomain[0])} is the lowest scoring area (${weakestDomain[1]}/10).` : ''}`,
-      action: 'Develop targeted interventions for lowest-scoring domains',
+      title: 'Top Barrier to Address',
+      content: topBarrier
+        ? `"${topBarrier.name}" is the most frequently cited barrier by students (${topBarrier.percentage}% of responses). Removing this barrier could unlock significant student potential.`
+        : `${studentsAtRisk}% of students show at-risk indicators (any flourishing domain below 6). ${weakestDomain[0] ? `${formatDomainName(weakestDomain[0])} is the lowest scoring area (${weakestDomain[1]}/10).` : ''}`,
+      action: topBarrier ? 'Develop strategies to reduce or eliminate this barrier' : 'Develop targeted interventions for lowest-scoring domains',
       urgency: studentsAtRisk > 25 ? 'high' : 'medium'
     },
     {
       type: 'opportunity',
       icon: TrendingUp,
       title: 'Strengths to Leverage',
-      content: strongestDomain[0] 
+      content: strongestDomain[0]
         ? `${formatDomainName(strongestDomain[0])} scores are strong (${strongestDomain[1]}/10). Build on this strength through related programs and initiatives.`
         : 'Identify and leverage institutional strengths once more data is collected.',
       action: 'Expand programs that support your strongest domains',
@@ -58,7 +61,7 @@ export default function ActionableInsights({ data }: ActionableInsightsProps) {
       type: 'positive',
       icon: Star,
       title: 'Bright Spot Highlight',
-      content: brightSpots.length > 0 
+      content: brightSpots.length > 0
         ? `"${brightSpots[0]}" - This theme appears in student positive feedback, showing what's working well on campus.`
         : 'Collect more survey responses to identify what students appreciate most about campus life.',
       action: brightSpots.length > 0 ? 'Expand and promote similar programs' : 'Encourage more detailed survey feedback',
@@ -110,11 +113,10 @@ export default function ActionableInsights({ data }: ActionableInsightsProps) {
                     <span className="text-xs font-medium text-slate-600 bg-white px-2 py-1 rounded">
                       Action: {insight.action}
                     </span>
-                    <span className={`text-xs font-medium px-2 py-1 rounded ${
-                      insight.urgency === 'high' ? 'bg-red-100 text-red-700' :
+                    <span className={`text-xs font-medium px-2 py-1 rounded ${insight.urgency === 'high' ? 'bg-red-100 text-red-700' :
                       insight.urgency === 'medium' ? 'bg-orange-100 text-orange-700' :
-                      'bg-blue-100 text-blue-700'
-                    }`}>
+                        'bg-blue-100 text-blue-700'
+                      }`}>
                       {insight.urgency.toUpperCase()} PRIORITY
                     </span>
                   </div>
@@ -132,7 +134,7 @@ export default function ActionableInsights({ data }: ActionableInsightsProps) {
           Most frequently cited "fastest win" improvements from open-text responses
         </p>
         <div className="space-y-3">
-          {fastestWinSuggestions.map((item, index) => (
+          {fastestWinSuggestions.map((item: any, index: number) => (
             <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
               <div>
                 <p className="font-medium text-slate-900">{item.suggestion}</p>
@@ -145,10 +147,10 @@ export default function ActionableInsights({ data }: ActionableInsightsProps) {
             </div>
           ))}
         </div>
-        
+
         <div className="mt-4 p-3 bg-blue-50 rounded-lg">
           <p className="text-sm text-blue-800">
-            <strong>Next Steps:</strong> These student-generated suggestions provide clear direction for 
+            <strong>Next Steps:</strong> These student-generated suggestions provide clear direction for
             immediate improvements. Consider implementing 2-3 of these changes this semester for maximum impact.
           </p>
         </div>

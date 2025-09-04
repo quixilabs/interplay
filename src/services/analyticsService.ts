@@ -4,6 +4,11 @@ export class AnalyticsService {
   // Get survey analytics for dashboard
   static async getSurveyAnalytics(universitySlug?: string) {
     try {
+      // Return mock data for demo university
+      if (universitySlug === 'demo-university') {
+        const { mockSurveyData } = await import('../data/mockData');
+        return mockSurveyData;
+      }
       // Get basic survey session stats
       let sessionsQuery = supabase
         .from('survey_sessions')
@@ -68,9 +73,9 @@ export class AnalyticsService {
 
       if (wellbeingError) throw wellbeingError;
 
-      // Get growth modules data
-      let growthModulesQuery = supabase
-        .from('growth_modules')
+      // Get enablers and barriers data
+      let enablersBarriersQuery = supabase
+        .from('user_enablers_barriers')
         .select(`
           *,
           survey_sessions!inner(university_slug, is_completed)
@@ -78,12 +83,19 @@ export class AnalyticsService {
         .eq('survey_sessions.is_completed', true);
       
       if (universitySlug) {
-        growthModulesQuery = growthModulesQuery.eq('survey_sessions.university_slug', universitySlug);
+        enablersBarriersQuery = enablersBarriersQuery.eq('survey_sessions.university_slug', universitySlug);
       }
 
-      const { data: growthModulesData, error: growthModulesError } = await growthModulesQuery;
+      const { data: enablersBarriersData, error: enablersBarriersError } = await enablersBarriersQuery;
 
-      if (growthModulesError) throw growthModulesError;
+      if (enablersBarriersError) throw enablersBarriersError;
+
+      // Get domain reference data for enablers and barriers
+      const { data: domainData, error: domainError } = await supabase
+        .from('domain_enablers_barriers')
+        .select('*');
+
+      if (domainError) throw domainError;
 
       // Get text responses
       let textResponsesQuery = supabase
@@ -139,15 +151,15 @@ export class AnalyticsService {
       // Analyze demographics
       const demographicBreakdown = this.analyzeDemographics(demographicsData || []);
 
-      // Analyze interventions
-      const topInterventions = this.analyzeInterventions(growthModulesData || []);
+      // Analyze interventions (enablers and barriers)
+      const interventionAnalysis = this.analyzeEnablersBarriers(enablersBarriersData || [], domainData || []);
 
       // Analyze text responses
       const fastestWinSuggestions = this.analyzeFastestWins(textResponsesData || []);
       const brightSpotThemes = this.analyzeBrightSpots(textResponsesData || []);
 
       // Analyze tension data
-      const tensionAnalysis = this.analyzeTensions(tensionsData || [], flourishingData || [], wellbeingData || []);
+      const tensionAnalysis = this.analyzeTensions(tensionsData || [], flourishingData || [], wellbeingData || [], enablersBarriersData || [], domainData || []);
 
       return {
         totalResponses,
@@ -157,7 +169,7 @@ export class AnalyticsService {
         flourishingDomainAverages,
         schoolWellbeingAverages,
         demographicBreakdown,
-        topInterventions,
+        interventionAnalysis,
         fastestWinSuggestions,
         brightSpotThemes,
         tensionAnalysis
@@ -334,30 +346,95 @@ export class AnalyticsService {
     return counts;
   }
 
-  private static analyzeInterventions(data: any[]) {
-    const interventions: any = {};
-    
-    data.forEach(module => {
+  private static analyzeEnablersBarriers(enablersBarriersData: any[], domainData: any[]) {
+    // Create a map of domain keys to domain names
+    const domainMap = new Map();
+    domainData.forEach(domain => {
+      domainMap.set(domain.domain_key, domain);
+    });
+
+    const enablerCounts: any = {};
+    const barrierCounts: any = {};
+    const domainAnalysis: any = {};
+
+    // Process each user's enablers and barriers selections
+    enablersBarriersData.forEach(userResponse => {
+      const domain = domainMap.get(userResponse.domain_key);
+      if (!domain) return;
+
+      // Initialize domain analysis if not exists
+      if (!domainAnalysis[userResponse.domain_key]) {
+        domainAnalysis[userResponse.domain_key] = {
+          domainName: domain.domain_name,
+          enablerSelections: 0,
+          barrierSelections: 0,
+          topEnablers: {},
+          topBarriers: {},
+          averageEnablerCount: 0,
+          averageBarrierCount: 0
+        };
+      }
+
+      const domainStats = domainAnalysis[userResponse.domain_key];
+
       // Count enabler selections
-      if (module.enabler_selections && Array.isArray(module.enabler_selections)) {
-        module.enabler_selections.forEach((enabler: string) => {
-          if (!interventions[enabler]) {
-            interventions[enabler] = { frequency: 0, impact: 7.5 }; // Default impact score
-          }
-          interventions[enabler].frequency++;
+      if (userResponse.selected_enablers && Array.isArray(userResponse.selected_enablers)) {
+        domainStats.enablerSelections += userResponse.selected_enablers.length;
+        userResponse.selected_enablers.forEach((enabler: string) => {
+          enablerCounts[enabler] = (enablerCounts[enabler] || 0) + 1;
+          domainStats.topEnablers[enabler] = (domainStats.topEnablers[enabler] || 0) + 1;
+        });
+      }
+
+      // Count barrier selections
+      if (userResponse.selected_barriers && Array.isArray(userResponse.selected_barriers)) {
+        domainStats.barrierSelections += userResponse.selected_barriers.length;
+        userResponse.selected_barriers.forEach((barrier: string) => {
+          barrierCounts[barrier] = (barrierCounts[barrier] || 0) + 1;
+          domainStats.topBarriers[barrier] = (domainStats.topBarriers[barrier] || 0) + 1;
         });
       }
     });
 
-    // Convert to array and sort by frequency
-    return Object.entries(interventions)
-      .map(([name, data]: [string, any]) => ({
+    // Calculate averages for each domain
+    const totalResponses = enablersBarriersData.length;
+    Object.keys(domainAnalysis).forEach(domainKey => {
+      const domainResponses = enablersBarriersData.filter(r => r.domain_key === domainKey).length;
+      if (domainResponses > 0) {
+        domainAnalysis[domainKey].averageEnablerCount = Math.round((domainAnalysis[domainKey].enablerSelections / domainResponses) * 10) / 10;
+        domainAnalysis[domainKey].averageBarrierCount = Math.round((domainAnalysis[domainKey].barrierSelections / domainResponses) * 10) / 10;
+      }
+    });
+
+    // Get top enablers and barriers overall
+    const topEnablers = Object.entries(enablerCounts)
+      .map(([name, count]: [string, any]) => ({
         name,
-        frequency: data.frequency,
-        impact: data.impact
+        frequency: count,
+        percentage: Math.round((count / totalResponses) * 100),
+        impact: 7.5 // Default impact score - could be enhanced with user ratings
       }))
       .sort((a, b) => b.frequency - a.frequency)
-      .slice(0, 5);
+      .slice(0, 10);
+
+    const topBarriers = Object.entries(barrierCounts)
+      .map(([name, count]: [string, any]) => ({
+        name,
+        frequency: count,
+        percentage: Math.round((count / totalResponses) * 100),
+        impact: 7.5 // Default impact score
+      }))
+      .sort((a, b) => b.frequency - a.frequency)
+      .slice(0, 10);
+
+    return {
+      topEnablers,
+      topBarriers,
+      domainAnalysis,
+      totalResponses,
+      // Legacy compatibility - use top enablers as interventions for existing charts
+      topInterventions: topEnablers.slice(0, 5)
+    };
   }
 
   private static analyzeFastestWins(data: any[]) {
@@ -390,7 +467,7 @@ export class AnalyticsService {
     return brightSpots.slice(0, 8);
   }
 
-  private static analyzeTensions(tensionsData: any[], flourishingData: any[], wellbeingData: any[]) {
+  private static analyzeTensions(tensionsData: any[], flourishingData: any[], wellbeingData: any[], enablersBarriersData: any[], domainData: any[]) {
     if (tensionsData.length === 0) return null;
 
     // Calculate tension averages
@@ -423,7 +500,7 @@ export class AnalyticsService {
     });
 
     // Create cross-domain analysis by matching session IDs
-    const crossDomainAnalysis = this.createCrossDomainAnalysis(tensionsData, flourishingData, wellbeingData);
+    const crossDomainAnalysis = this.createCrossDomainAnalysis(tensionsData, flourishingData, wellbeingData, enablersBarriersData, domainData);
 
     return {
       tensionAverages,
@@ -432,13 +509,26 @@ export class AnalyticsService {
     };
   }
 
-  private static createCrossDomainAnalysis(tensionsData: any[], flourishingData: any[], wellbeingData: any[]) {
+  private static createCrossDomainAnalysis(tensionsData: any[], flourishingData: any[], wellbeingData: any[], enablersBarriersData: any[], domainData: any[]) {
     // Map data by session_id for cross-referencing
     const flourishingMap = new Map();
     flourishingData.forEach(f => flourishingMap.set(f.session_id, f));
     
     const wellbeingMap = new Map();
     wellbeingData.forEach(w => wellbeingMap.set(w.session_id, w));
+
+    // Map enablers and barriers by session_id and domain_key
+    const enablersBarriersMap = new Map();
+    enablersBarriersData.forEach(eb => {
+      const key = `${eb.session_id}_${eb.domain_key}`;
+      enablersBarriersMap.set(key, eb);
+    });
+
+    // Create domain reference map
+    const domainMap = new Map();
+    domainData.forEach(domain => {
+      domainMap.set(domain.domain_key, domain);
+    });
 
     const heatmapData: any[] = [];
 
@@ -523,30 +613,70 @@ export class AnalyticsService {
             });
           }
 
-          if (flourishingCount > 0 || wellbeingCount > 0) {
+          // Calculate actual enabler support score using enablers/barriers data
+          let enablerScore = 5; // Default neutral score
+          let hasEnablersBarriersData = false;
+
+          // Check all relevant domains for this tension mapping
+          const relevantDomains = [...mapping.flourishingKeys];
+          let totalEnablerScore = 0;
+          let domainCount = 0;
+
+          relevantDomains.forEach(domainKey => {
+            const ebKey = `${sessionId}_${domainKey}`;
+            const enablersBarriersData = enablersBarriersMap.get(ebKey);
+            
+            if (enablersBarriersData) {
+              hasEnablersBarriersData = true;
+              domainCount++;
+              
+              // Calculate enabler strength (number of enablers selected)
+              const enablerCount = enablersBarriersData.selected_enablers?.length || 0;
+              const barrierCount = enablersBarriersData.selected_barriers?.length || 0;
+              
+              // Score based on enabler-to-barrier ratio
+              // More enablers = higher score, more barriers = lower score
+              const maxPossibleEnablers = domainMap.get(domainKey)?.enablers?.length || 6;
+              const maxPossibleBarriers = domainMap.get(domainKey)?.barriers?.length || 6;
+              
+              const enablerRatio = enablerCount / maxPossibleEnablers;
+              const barrierRatio = barrierCount / maxPossibleBarriers;
+              
+              // Score from 1-10: high enablers and low barriers = high score
+              const domainScore = Math.max(1, Math.min(10, 
+                5 + (enablerRatio * 5) - (barrierRatio * 4)
+              ));
+              
+              totalEnablerScore += domainScore;
+            }
+          });
+
+          // If we have enablers/barriers data, use it; otherwise fall back to flourishing/wellbeing proxy
+          if (hasEnablersBarriersData && domainCount > 0) {
+            enablerScore = totalEnablerScore / domainCount;
+          } else if (flourishingCount > 0 || wellbeingCount > 0) {
             const avgFlourishingScore = flourishingCount > 0 ? flourishingScore / flourishingCount : 5;
             const avgWellbeingScore = wellbeingCount > 0 ? wellbeingScore / wellbeingCount : 5;
-            
-            // Calculate combined enabler score (what supports this area)
-            const enablerScore = (avgFlourishingScore + avgWellbeingScore) / 2;
-            
-            // Calculate gap: tension indicates need, enabler indicates support
-            // Higher tension score (0-100) = more balanced, lower = leaning to one side
-            // We want to identify where there's high need but low enablers
-            const normalizedTension = Math.abs(tensionScore - 50) / 50; // 0 = balanced, 1 = extreme
-            const normalizedEnabler = (enablerScore - 1) / 9; // Convert 1-10 to 0-1
-            
-            const gapScore = normalizedTension - normalizedEnabler; // Positive = gap exists
-            
-            analysisData.gapAnalysis.push({
-              sessionId,
-              tensionScore,
-              enablerScore,
-              gapScore,
-              normalizedTension,
-              normalizedEnabler
-            });
+            enablerScore = (avgFlourishingScore + avgWellbeingScore) / 2;
           }
+
+          // Calculate gap: tension indicates need, enabler indicates support
+          // Higher tension score (0-100) = more balanced, lower = leaning to one side
+          // We want to identify where there's high need but low enablers
+          const normalizedTension = Math.abs(tensionScore - 50) / 50; // 0 = balanced, 1 = extreme
+          const normalizedEnabler = (enablerScore - 1) / 9; // Convert 1-10 to 0-1
+          
+          const gapScore = normalizedTension - normalizedEnabler; // Positive = gap exists
+          
+          analysisData.gapAnalysis.push({
+            sessionId,
+            tensionScore,
+            enablerScore,
+            gapScore,
+            normalizedTension,
+            normalizedEnabler,
+            hasActualEnablersData: hasEnablersBarriersData
+          });
         }
       });
 

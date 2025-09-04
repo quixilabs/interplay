@@ -11,6 +11,7 @@ import ActionableInsights from './ActionableInsights';
 import SchoolWellbeingTrends from './SchoolWellbeingTrends';
 import TensionHeatmap from './TensionHeatmap';
 import InsightTiles from './InsightTiles';
+import EnablersBarriersBreakdown from './EnablersBarriersBreakdown';
 import { AnalyticsService } from '../../services/analyticsService';
 import { DemographicsFilters, DEFAULT_FILTERS } from '../../types/filters';
 
@@ -166,10 +167,15 @@ export default function Dashboard() {
           <ActionableInsights data={filteredData || surveyData} />
         </div>
 
-        {/* School Wellbeing Trends */}
+        {/* Enablers & Barriers Detailed Analysis */}
+        <div className="mb-8">
+          <EnablersBarriersBreakdown data={filteredData || surveyData} />
+        </div>
+
+        {/* School Wellbeing Trends
         <div className="mb-8">
           <SchoolWellbeingTrends data={filteredData || surveyData} />
-        </div>
+        </div> */}
       </main>
     </div>
   );
