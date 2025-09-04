@@ -2,21 +2,59 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { useAuthStore } from '../../stores/authStore';
 import DashboardHeader from './DashboardHeader';
+import DashboardFilters from './DashboardFilters';
 import MetricsOverview from './MetricsOverview';
 import FlourishingChart from './FlourishingChart';
 import DemographicsAnalysis from './DemographicsAnalysis';
 import InterventionMatrix from './InterventionMatrix';
 import ActionableInsights from './ActionableInsights';
 import SchoolWellbeingTrends from './SchoolWellbeingTrends';
+import TensionHeatmap from './TensionHeatmap';
+import InsightTiles from './InsightTiles';
 import { AnalyticsService } from '../../services/analyticsService';
+import { DemographicsFilters, DEFAULT_FILTERS } from '../../types/filters';
 
 export default function Dashboard() {
   const { adminUser } = useAuthStore();
   const [dateRange, setDateRange] = useState('semester');
   const [selectedDemographic, setSelectedDemographic] = useState('all');
+  const [filters, setFilters] = useState<DemographicsFilters>(DEFAULT_FILTERS);
   const [surveyData, setSurveyData] = useState<any>(null);
+  const [filteredData, setFilteredData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Function to filter data based on selected filters
+  const filterSurveyData = (data: any, filters: DemographicsFilters) => {
+    if (!data?.responses) return data;
+
+    const hasActiveFilters = Object.values(filters).some(filterArray => filterArray.length > 0);
+    if (!hasActiveFilters) return data;
+
+    const filteredResponses = data.responses.filter((response: any) => {
+      const demographics = response.demographics || {};
+
+      return Object.entries(filters).every(([filterKey, selectedValues]) => {
+        if (selectedValues.length === 0) return true; // No filter applied for this field
+
+        const responseValue = demographics[filterKey];
+
+        // Handle array fields (like raceEthnicity)
+        if (Array.isArray(responseValue)) {
+          return selectedValues.some((selectedValue: string) => responseValue.includes(selectedValue));
+        }
+
+        // Handle single value fields
+        return selectedValues.includes(responseValue);
+      });
+    });
+
+    return {
+      ...data,
+      responses: filteredResponses,
+      totalResponses: filteredResponses.length
+    };
+  };
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -40,6 +78,14 @@ export default function Dashboard() {
 
     fetchAnalytics();
   }, [dateRange, adminUser?.universitySlug]);
+
+  // Apply filters whenever surveyData or filters change
+  useEffect(() => {
+    if (surveyData) {
+      const filtered = filterSurveyData(surveyData, filters);
+      setFilteredData(filtered);
+    }
+  }, [surveyData, filters]);
 
   if (loading) {
     return (
@@ -85,27 +131,44 @@ export default function Dashboard() {
           </div>
         )}
 
+        {/* Dashboard Filters */}
+        <DashboardFilters
+          filters={filters}
+          onFiltersChange={setFilters}
+          data={surveyData}
+        />
+
         {/* Key Metrics Overview */}
-        <MetricsOverview data={surveyData} />
+        <MetricsOverview data={filteredData || surveyData} />
 
         {/* Primary Visualizations */}
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
-          <FlourishingChart data={surveyData} />
+          <FlourishingChart data={filteredData || surveyData} />
           <DemographicsAnalysis
-            data={surveyData}
+            data={filteredData || surveyData}
             selectedDemographic={selectedDemographic}
             onDemographicChange={setSelectedDemographic}
           />
         </div>
 
+        {/* Tension Heatmap - Our IP Highlight */}
+        <div className="mb-8">
+          <TensionHeatmap data={filteredData || surveyData} />
+        </div>
+
+        {/* Research Insights - Why It Matters */}
+        <div className="mb-8">
+          <InsightTiles data={filteredData || surveyData} />
+        </div>
+
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
-          <InterventionMatrix data={surveyData} />
-          <ActionableInsights data={surveyData} />
+          <InterventionMatrix data={filteredData || surveyData} />
+          <ActionableInsights data={filteredData || surveyData} />
         </div>
 
         {/* School Wellbeing Trends */}
         <div className="mb-8">
-          <SchoolWellbeingTrends data={surveyData} />
+          <SchoolWellbeingTrends data={filteredData || surveyData} />
         </div>
       </main>
     </div>

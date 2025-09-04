@@ -102,6 +102,23 @@ export class AnalyticsService {
 
       if (textResponsesError) throw textResponsesError;
 
+      // Get tensions assessment data
+      let tensionsQuery = supabase
+        .from('tensions_assessment')
+        .select(`
+          *,
+          survey_sessions!inner(university_slug, is_completed)
+        `)
+        .eq('survey_sessions.is_completed', true);
+      
+      if (universitySlug) {
+        tensionsQuery = tensionsQuery.eq('survey_sessions.university_slug', universitySlug);
+      }
+
+      const { data: tensionsData, error: tensionsError } = await tensionsQuery;
+
+      if (tensionsError) throw tensionsError;
+
       // Calculate analytics
       const completedSessions = sessions?.filter(s => s.is_completed) || [];
       const totalResponses = completedSessions.length;
@@ -129,6 +146,9 @@ export class AnalyticsService {
       const fastestWinSuggestions = this.analyzeFastestWins(textResponsesData || []);
       const brightSpotThemes = this.analyzeBrightSpots(textResponsesData || []);
 
+      // Analyze tension data
+      const tensionAnalysis = this.analyzeTensions(tensionsData || [], flourishingData || [], wellbeingData || []);
+
       return {
         totalResponses,
         completionRate: Math.round(completionRate * 10) / 10,
@@ -139,7 +159,8 @@ export class AnalyticsService {
         demographicBreakdown,
         topInterventions,
         fastestWinSuggestions,
-        brightSpotThemes
+        brightSpotThemes,
+        tensionAnalysis
       };
     } catch (error) {
       console.error('Error fetching survey analytics:', error);
@@ -367,5 +388,185 @@ export class AnalyticsService {
     });
 
     return brightSpots.slice(0, 8);
+  }
+
+  private static analyzeTensions(tensionsData: any[], flourishingData: any[], wellbeingData: any[]) {
+    if (tensionsData.length === 0) return null;
+
+    // Calculate tension averages
+    const tensionAverages = {
+      performance_wellbeing: 0,
+      ambition_contribution: 0,
+      selfreliance_connection: 0,
+      stability_growth: 0,
+      academic_creative: 0
+    };
+
+    const tensionCounts = { ...tensionAverages };
+
+    tensionsData.forEach(tension => {
+      Object.keys(tensionAverages).forEach(key => {
+        if (tension[key] !== null && tension[key] !== undefined) {
+          tensionAverages[key as keyof typeof tensionAverages] += tension[key];
+          tensionCounts[key as keyof typeof tensionCounts]++;
+        }
+      });
+    });
+
+    // Calculate averages
+    Object.keys(tensionAverages).forEach(key => {
+      const count = tensionCounts[key as keyof typeof tensionCounts];
+      if (count > 0) {
+        tensionAverages[key as keyof typeof tensionAverages] = 
+          Math.round((tensionAverages[key as keyof typeof tensionAverages] / count) * 10) / 10;
+      }
+    });
+
+    // Create cross-domain analysis by matching session IDs
+    const crossDomainAnalysis = this.createCrossDomainAnalysis(tensionsData, flourishingData, wellbeingData);
+
+    return {
+      tensionAverages,
+      crossDomainAnalysis,
+      totalTensionResponses: tensionsData.length
+    };
+  }
+
+  private static createCrossDomainAnalysis(tensionsData: any[], flourishingData: any[], wellbeingData: any[]) {
+    // Map data by session_id for cross-referencing
+    const flourishingMap = new Map();
+    flourishingData.forEach(f => flourishingMap.set(f.session_id, f));
+    
+    const wellbeingMap = new Map();
+    wellbeingData.forEach(w => wellbeingMap.set(w.session_id, w));
+
+    const heatmapData: any[] = [];
+
+    // Define the cross-domain relationships we want to analyze
+    const crossDomainMappings = [
+      {
+        tensionKey: 'performance_wellbeing',
+        tensionLabel: 'Performance vs Well-being',
+        flourishingKeys: ['happiness_satisfaction', 'mental_physical_health'],
+        wellbeingKeys: ['manage_emotions', 'feel_safe'],
+        description: 'High performance drive vs mental/physical health'
+      },
+      {
+        tensionKey: 'ambition_contribution',
+        tensionLabel: 'Personal Ambition vs Contribution',
+        flourishingKeys: ['meaning_purpose', 'character_virtue'],
+        wellbeingKeys: ['contribute_bigger_purpose', 'kind_to_others'],
+        description: 'Individual goals vs helping others'
+      },
+      {
+        tensionKey: 'selfreliance_connection',
+        tensionLabel: 'Self-reliance vs Connection',
+        flourishingKeys: ['social_relationships'],
+        wellbeingKeys: ['belonging_score', 'supportive_friends', 'trusted_adult'],
+        description: 'Independence vs community connection'
+      },
+      {
+        tensionKey: 'stability_growth',
+        tensionLabel: 'Stability vs Growth',
+        flourishingKeys: ['financial_stability'],
+        wellbeingKeys: ['work_connected_goals'],
+        description: 'Security vs new opportunities'
+      },
+      {
+        tensionKey: 'academic_creative',
+        tensionLabel: 'Academic vs Creative',
+        flourishingKeys: ['meaning_purpose'],
+        wellbeingKeys: ['enjoy_school_days'],
+        description: 'Academic achievement vs creative exploration'
+      }
+    ];
+
+    crossDomainMappings.forEach(mapping => {
+      const analysisData = {
+        tensionKey: mapping.tensionKey,
+        tensionLabel: mapping.tensionLabel,
+        description: mapping.description,
+        gapAnalysis: [] as any[]
+      };
+
+      tensionsData.forEach(tension => {
+        const sessionId = tension.session_id;
+        const tensionScore = tension[mapping.tensionKey];
+        
+        if (tensionScore === null || tensionScore === undefined) return;
+
+        const flourishing = flourishingMap.get(sessionId);
+        const wellbeing = wellbeingMap.get(sessionId);
+
+        if (flourishing || wellbeing) {
+          // Calculate flourishing scores for this mapping
+          let flourishingScore = 0;
+          let flourishingCount = 0;
+          
+          if (flourishing) {
+            mapping.flourishingKeys.forEach(key => {
+              const score1 = flourishing[`${key}_1`];
+              const score2 = flourishing[`${key}_2`];
+              if (score1 !== null) { flourishingScore += score1; flourishingCount++; }
+              if (score2 !== null) { flourishingScore += score2; flourishingCount++; }
+            });
+          }
+
+          // Calculate wellbeing scores for this mapping
+          let wellbeingScore = 0;
+          let wellbeingCount = 0;
+          
+          if (wellbeing) {
+            mapping.wellbeingKeys.forEach(key => {
+              const score = wellbeing[key];
+              if (score !== null) { wellbeingScore += score; wellbeingCount++; }
+            });
+          }
+
+          if (flourishingCount > 0 || wellbeingCount > 0) {
+            const avgFlourishingScore = flourishingCount > 0 ? flourishingScore / flourishingCount : 5;
+            const avgWellbeingScore = wellbeingCount > 0 ? wellbeingScore / wellbeingCount : 5;
+            
+            // Calculate combined enabler score (what supports this area)
+            const enablerScore = (avgFlourishingScore + avgWellbeingScore) / 2;
+            
+            // Calculate gap: tension indicates need, enabler indicates support
+            // Higher tension score (0-100) = more balanced, lower = leaning to one side
+            // We want to identify where there's high need but low enablers
+            const normalizedTension = Math.abs(tensionScore - 50) / 50; // 0 = balanced, 1 = extreme
+            const normalizedEnabler = (enablerScore - 1) / 9; // Convert 1-10 to 0-1
+            
+            const gapScore = normalizedTension - normalizedEnabler; // Positive = gap exists
+            
+            analysisData.gapAnalysis.push({
+              sessionId,
+              tensionScore,
+              enablerScore,
+              gapScore,
+              normalizedTension,
+              normalizedEnabler
+            });
+          }
+        }
+      });
+
+      // Calculate summary statistics for this cross-domain analysis
+      if (analysisData.gapAnalysis.length > 0) {
+        const gapScores = analysisData.gapAnalysis.map(g => g.gapScore);
+        const avgGap = gapScores.reduce((a, b) => a + b, 0) / gapScores.length;
+        const studentsWithGap = gapScores.filter(g => g > 0.2).length; // Threshold for significant gap
+        const gapPercentage = (studentsWithGap / gapScores.length) * 100;
+
+        heatmapData.push({
+          ...analysisData,
+          avgGapScore: Math.round(avgGap * 100) / 100,
+          studentsWithGap,
+          gapPercentage: Math.round(gapPercentage),
+          totalStudents: gapScores.length
+        });
+      }
+    });
+
+    return heatmapData;
   }
 }

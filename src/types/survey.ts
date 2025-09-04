@@ -56,11 +56,19 @@ export interface TensionsAssessment {
   academic_creative?: number;
 }
 
-export interface GrowthModule {
-  domainName: string;
-  enablerSelections: string[];
-  barrierSelection: string;
-  additionalComments?: string;
+export interface EnablersBarriers {
+  domainKey: string;
+  selectedEnablers: string[];
+  selectedBarriers: string[];
+  enablerOtherText?: string;
+  barrierOtherText?: string;
+}
+
+export interface DomainEnablersBarriers {
+  domain_key: string;
+  domain_name: string;
+  enablers: string[];
+  barriers: string[];
 }
 
 export interface SurveyState {
@@ -74,7 +82,7 @@ export interface SurveyState {
   schoolWellbeing: SchoolWellbeing;
   textResponses: TextResponses;
   tensionsAssessment: TensionsAssessment;
-  growthModules: GrowthModule[];
+  enablersBarriers: EnablersBarriers[];
   consentGiven: boolean;
   emailForResults: string;
   isInitialized: boolean;
@@ -87,7 +95,7 @@ export type SurveyAction =
   | { type: 'SET_SCHOOL_WELLBEING'; payload: Partial<SchoolWellbeing> }
   | { type: 'SET_TEXT_RESPONSES'; payload: Partial<TextResponses> }
   | { type: 'SET_TENSIONS_ASSESSMENT'; payload: Partial<TensionsAssessment> }
-  | { type: 'ADD_GROWTH_MODULE'; payload: GrowthModule }
+  | { type: 'SET_ENABLERS_BARRIERS'; payload: EnablersBarriers[] }
   | { type: 'SET_CONSENT'; payload: boolean }
   | { type: 'SET_EMAIL'; payload: string }
   | { type: 'INITIALIZE_SURVEY'; payload: { sessionId: string; universitySlug: string } }

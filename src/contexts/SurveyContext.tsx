@@ -13,7 +13,7 @@ const initialState: SurveyState = {
   schoolWellbeing: {},
   textResponses: {},
   tensionsAssessment: {},
-  growthModules: [],
+  enablersBarriers: [],
   consentGiven: false,
   emailForResults: '',
   isInitialized: false
@@ -58,21 +58,12 @@ function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
         SurveyService.saveTensionsAssessment(state.sessionId, newTensionsAssessment).catch(console.error);
       }
       return { ...state, tensionsAssessment: newTensionsAssessment };
-    case 'ADD_GROWTH_MODULE':
-      const existingIndex = state.growthModules.findIndex(gm => gm.domainName === action.payload.domainName);
-      let updatedGrowthModules;
-      if (existingIndex >= 0) {
-        const updated = [...state.growthModules];
-        updated[existingIndex] = action.payload;
-        updatedGrowthModules = updated;
-      } else {
-        updatedGrowthModules = [...state.growthModules, action.payload];
-      }
+    case 'SET_ENABLERS_BARRIERS':
       // Save to database (only if initialized)
       if (state.sessionId && state.isInitialized) {
-        SurveyService.saveGrowthModule(state.sessionId, action.payload).catch(console.error);
+        SurveyService.saveEnablersBarriers(state.sessionId, action.payload).catch(console.error);
       }
-      return { ...state, growthModules: updatedGrowthModules };
+      return { ...state, enablersBarriers: action.payload };
     case 'SET_CONSENT':
       return { ...state, consentGiven: action.payload };
     case 'SET_EMAIL':

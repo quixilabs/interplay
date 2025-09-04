@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSurvey } from '../../../contexts/SurveyContext';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import GrowthModuleModal from '../GrowthModuleModal';
+import { SurveyService } from '../../../services/surveyService';
+import { DomainEnablersBarriers } from '../../../types/survey';
 
 const FLOURISHING_DOMAINS = [
   {
@@ -9,11 +10,11 @@ const FLOURISHING_DOMAINS = [
     name: 'Happiness & Life Satisfaction',
     questions: [
       {
-        text: 'Overall, how satisfied am I with my life as a whole these days?',
-        scaleLabels: { left: 'Not Satisfied at all', right: 'Completely Satisfied' }
+        text: 'Overall, I am satisfied with my life as a whole these days.',
+        scaleLabels: { left: 'Not Satisfied at All', right: 'Completely Satisfied' }
       },
       {
-        text: 'In general, how happy or unhappy do I usually feel?',
+        text: 'In general, I feel happy.',
         scaleLabels: { left: 'Extremely Unhappy', right: 'Extremely Happy' }
       }
     ]
@@ -23,11 +24,11 @@ const FLOURISHING_DOMAINS = [
     name: 'Mental & Physical Health',
     questions: [
       {
-        text: 'In general, how would I rate my physical health?',
+        text: 'In general, I would rate my physical health as…',
         scaleLabels: { left: 'Poor', right: 'Excellent' }
       },
       {
-        text: 'How would I rate my overall mental health?',
+        text: 'I would rate my overall mental health as…',
         scaleLabels: { left: 'Poor', right: 'Excellent' }
       }
     ]
@@ -37,26 +38,26 @@ const FLOURISHING_DOMAINS = [
     name: 'Meaning & Purpose',
     questions: [
       {
-        text: 'Overall, to what extent do I feel the things I do in my life are worthwhile?',
-        scaleLabels: { left: 'Not at all worthwhile', right: 'Completely worthwhile' }
+        text: 'The things I do in my life feel worthwhile.',
+        scaleLabels: { left: 'Not at All Worthwhile', right: 'Completely Worthwhile' }
       },
       {
         text: 'I understand my purpose in life.',
-        scaleLabels: { left: 'Strongly disagree', right: 'Strongly agree' }
+        scaleLabels: { left: 'Strongly Disagree', right: 'Strongly Agree' }
       }
     ]
   },
   {
     key: 'character_virtue',
-    name: 'Character & Virtue',
+    name: 'Character & Growth',
     questions: [
       {
         text: 'I try to do what is right in all circumstances, even when it is difficult.',
-        scaleLabels: { left: 'Not true of me', right: 'Completely true of me' }
+        scaleLabels: { left: 'Not True of Me', right: 'Completely True of Me' }
       },
       {
         text: 'I am willing to give up some happiness now for greater happiness later.',
-        scaleLabels: { left: 'Not true of me', right: 'Completely true of me' }
+        scaleLabels: { left: 'Not True of Me', right: 'Completely True of Me' }
       }
     ]
   },
@@ -95,13 +96,33 @@ export default function FlourishingSection() {
   const [currentDomain, setCurrentDomain] = useState(0);
   const [scores, setScores] = useState(state.flourishingScores);
   const [brightSpots, setBrightSpots] = useState(state.textResponses.brightSpots || {});
-  const [showGrowthModal, setShowGrowthModal] = useState(false);
-  const [growthDomain, setGrowthDomain] = useState<string>('');
+  const [domainEnablersBarriers, setDomainEnablersBarriers] = useState<DomainEnablersBarriers[]>([]);
+  const [selectedEnablers, setSelectedEnablers] = useState<string[]>([]);
+  const [selectedBarriers, setSelectedBarriers] = useState<string[]>([]);
+  const [enablerOtherText, setEnablerOtherText] = useState('');
+  const [barrierOtherText, setBarrierOtherText] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  // Load enablers and barriers data on component mount
+  useEffect(() => {
+    const loadEnablersBarriers = async () => {
+      try {
+        const data = await SurveyService.getDomainEnablersBarriers();
+        setDomainEnablersBarriers(data);
+      } catch (error) {
+        console.error('Failed to load enablers and barriers:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadEnablersBarriers();
+  }, []);
 
   const domain = FLOURISHING_DOMAINS[currentDomain];
   const questionKeys = [`${domain.key}_1`, `${domain.key}_2`];
   const score1 = scores[questionKeys[0] as keyof typeof scores];
   const score2 = scores[questionKeys[1] as keyof typeof scores];
+  const currentDomainData = domainEnablersBarriers.find(d => d.domain_key === domain.key);
 
   const handleScoreChange = (questionKey: string, value: number) => {
     setScores(prev => ({ ...prev, [questionKey]: value }));
@@ -111,33 +132,66 @@ export default function FlourishingSection() {
     setBrightSpots(prev => ({ ...prev, [domain.name]: value }));
   };
 
-  const shouldShowGrowthModule = () => {
-    return (score1 !== undefined && score1 <= 6) || (score2 !== undefined && score2 <= 6);
+  const isQuestionsComplete = () => {
+    return score1 !== undefined && score2 !== undefined && brightSpots[domain.name];
+  };
+
+  const isEnablersBarriersComplete = () => {
+    // Check if "Other" selections have required text
+    const enablerOtherValid = !selectedEnablers.includes('Other') || enablerOtherText.trim().length > 0;
+    const barrierOtherValid = !selectedBarriers.includes('Other') || barrierOtherText.trim().length > 0;
+
+    // Allow form to be complete even with no selections (enablers/barriers are optional)
+    return enablerOtherValid && barrierOtherValid;
   };
 
   const handleNext = () => {
-    if (shouldShowGrowthModule()) {
-      setGrowthDomain(domain.name);
-      setShowGrowthModal(true);
-    } else {
-      continueToNext();
-    }
+    continueToNext();
   };
 
   const continueToNext = () => {
     dispatch({ type: 'SET_FLOURISHING_SCORES', payload: scores });
     dispatch({ type: 'SET_TEXT_RESPONSES', payload: { brightSpots } });
 
+    // Save enablers and barriers
+    const existingData = state.enablersBarriers || [];
+    const updatedData = existingData.filter(item => item.domainKey !== domain.key);
+    const newEntry = {
+      domainKey: domain.key,
+      selectedEnablers,
+      selectedBarriers,
+      enablerOtherText: selectedEnablers.includes('Other') ? enablerOtherText : undefined,
+      barrierOtherText: selectedBarriers.includes('Other') ? barrierOtherText : undefined
+    };
+
+    updatedData.push(newEntry);
+    dispatch({ type: 'SET_ENABLERS_BARRIERS', payload: updatedData });
+
     if (currentDomain < FLOURISHING_DOMAINS.length - 1) {
       setCurrentDomain(currentDomain + 1);
+      setSelectedEnablers([]);
+      setSelectedBarriers([]);
+      setEnablerOtherText('');
+      setBarrierOtherText('');
     } else {
       dispatch({ type: 'SET_SECTION', payload: 5 }); // Go to Well-Being Intro
     }
   };
 
-  const handleGrowthModuleComplete = () => {
-    setShowGrowthModal(false);
-    continueToNext();
+  const handleEnablerToggle = (enabler: string) => {
+    setSelectedEnablers(prev =>
+      prev.includes(enabler)
+        ? prev.filter(e => e !== enabler)
+        : [...prev, enabler]
+    );
+  };
+
+  const handleBarrierToggle = (barrier: string) => {
+    setSelectedBarriers(prev =>
+      prev.includes(barrier)
+        ? prev.filter(b => b !== barrier)
+        : [...prev, barrier]
+    );
   };
 
   const handleBack = () => {
@@ -148,7 +202,17 @@ export default function FlourishingSection() {
     }
   };
 
-  const isComplete = score1 !== undefined && score2 !== undefined && brightSpots[domain.name];
+  const isComplete = isQuestionsComplete() && isEnablersBarriersComplete();
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-xl shadow-lg p-8 max-w-3xl mx-auto">
+        <div className="text-center">
+          <p className="text-slate-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -214,12 +278,93 @@ export default function FlourishingSection() {
             />
           </div>
 
-          {/* Low Score Warning */}
-          {shouldShowGrowthModule() && (
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-              <p className="text-orange-800 font-medium">
-                Based on your responses, we'll ask some additional questions about growth opportunities in this area.
-              </p>
+          {/* Enablers and Barriers Section */}
+          {currentDomainData && (
+            <div className="space-y-6 border-t border-slate-200 pt-8">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-blue-800 font-medium mb-2">
+                  Help us understand what supports or challenges your {domain.name.toLowerCase()}.
+                </p>
+                <p className="text-blue-700 text-sm">
+                  Select all that apply for each category.
+                </p>
+              </div>
+
+              {/* Enablers */}
+              <div>
+                <h4 className="text-lg font-semibold text-slate-800 mb-3">
+                  What helps me feel {domain.name.toLowerCase().includes('happiness') ? 'happy and satisfied' :
+                    domain.name.toLowerCase().includes('health') ? 'healthy' :
+                      domain.name.toLowerCase().includes('meaning') ? 'purposeful' :
+                        domain.name.toLowerCase().includes('character') ? 'grow in character' :
+                          domain.name.toLowerCase().includes('social') ? 'connected' :
+                            'secure'}:
+                </h4>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-1 gap-3">
+                    {currentDomainData.enablers.map((enabler, index) => (
+                      <label key={index} className="flex items-start space-x-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedEnablers.includes(enabler)}
+                          onChange={() => handleEnablerToggle(enabler)}
+                          className="w-4 h-4 text-blue-600 bg-slate-100 border-slate-300 rounded focus:ring-blue-500 focus:ring-2 mt-1"
+                        />
+                        <span className="text-slate-700 flex-1">{enabler}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {selectedEnablers.includes('Other') && (
+                    <div className="ml-7">
+                      <input
+                        type="text"
+                        value={enablerOtherText}
+                        onChange={(e) => setEnablerOtherText(e.target.value)}
+                        placeholder="Please specify..."
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Barriers */}
+              <div>
+                <h4 className="text-lg font-semibold text-slate-800 mb-3">
+                  What gets in the way of my {domain.name.toLowerCase().includes('happiness') ? 'happiness and satisfaction' :
+                    domain.name.toLowerCase().includes('health') ? 'health' :
+                      domain.name.toLowerCase().includes('meaning') ? 'feeling purposeful' :
+                        domain.name.toLowerCase().includes('character') ? 'growth' :
+                          domain.name.toLowerCase().includes('social') ? 'relationships' :
+                            'security'}:
+                </h4>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-1 gap-3">
+                    {currentDomainData.barriers.map((barrier, index) => (
+                      <label key={index} className="flex items-start space-x-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedBarriers.includes(barrier)}
+                          onChange={() => handleBarrierToggle(barrier)}
+                          className="w-4 h-4 text-red-600 bg-slate-100 border-slate-300 rounded focus:ring-red-500 focus:ring-2 mt-1"
+                        />
+                        <span className="text-slate-700 flex-1">{barrier}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {selectedBarriers.includes('Other') && (
+                    <div className="ml-7">
+                      <input
+                        type="text"
+                        value={barrierOtherText}
+                        onChange={(e) => setBarrierOtherText(e.target.value)}
+                        placeholder="Please specify..."
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -244,14 +389,6 @@ export default function FlourishingSection() {
         </div>
       </div>
 
-      {/* Growth Module Modal */}
-      {showGrowthModal && (
-        <GrowthModuleModal
-          domainName={growthDomain}
-          onComplete={handleGrowthModuleComplete}
-          onClose={() => setShowGrowthModal(false)}
-        />
-      )}
     </>
   );
 }

@@ -114,17 +114,24 @@ export class SurveyService {
           }
         }
         
-        // Update the remaining/first record
+        // Update the remaining/first record using all match columns
         console.log(`🔄 [DEBUG] Updating existing ${debugLabel.toLowerCase()} record for session ${sessionId}`);
         
         // Remove session_id from data to avoid updating it
         const updateData = { ...data };
         delete updateData.session_id;
         
-        result = await supabase
-          .from(tableName)
-          .update(updateData)
-          .eq('session_id', sessionId);
+        // Build update query with all match columns to ensure we update the right record
+        let updateQuery = supabase.from(tableName).update(updateData);
+        matchColumns.forEach(col => {
+          if (col === 'session_id') {
+            updateQuery = updateQuery.eq(col, sessionId);
+          } else if (data[col] !== undefined) {
+            updateQuery = updateQuery.eq(col, data[col]);
+          }
+        });
+        
+        result = await updateQuery;
           
       } else {
         // Insert new record
@@ -142,20 +149,26 @@ export class SurveyService {
       
       console.log(`✅ [DEBUG] ${debugLabel} saved successfully for session ${sessionId}`);
       
-      // Final verification - check that we have exactly one record for this session
-      const { data: finalCheck, error: finalError } = await supabase
-        .from(tableName)
-        .select('id')
-        .eq('session_id', sessionId);
+      // Final verification - check that we have exactly one record for this specific combination
+      let verifyQuery = supabase.from(tableName).select('id');
+      matchColumns.forEach(col => {
+        if (col === 'session_id') {
+          verifyQuery = verifyQuery.eq(col, sessionId);
+        } else if (data[col] !== undefined) {
+          verifyQuery = verifyQuery.eq(col, data[col]);
+        }
+      });
+      
+      const { data: finalCheck, error: finalError } = await verifyQuery;
         
       if (finalError) {
         console.warn(`⚠️ [DEBUG] Could not verify final record count:`, finalError);
       } else if (finalCheck && finalCheck.length > 1) {
-        console.error(`❌ [DEBUG] CRITICAL: Still have ${finalCheck.length} records for session ${sessionId} after upsert!`);
+        console.error(`❌ [DEBUG] CRITICAL: Still have ${finalCheck.length} records after upsert!`);
       } else if (finalCheck && finalCheck.length === 1) {
-        console.log(`✅ [DEBUG] Verified: Exactly 1 record exists for session ${sessionId}`);
+        console.log(`✅ [DEBUG] Verified: Exactly 1 record exists for the match criteria`);
       } else {
-        console.warn(`⚠️ [DEBUG] Warning: No records found after upsert for session ${sessionId}`);
+        console.warn(`⚠️ [DEBUG] Warning: No records found after upsert`);
       }
       
     } catch (error) {
@@ -250,18 +263,48 @@ export class SurveyService {
     await this.upsertRecord('school_wellbeing', wellbeingData, ['session_id'], sessionId, 'School Wellbeing');
   }
 
-  // Save growth module data
-  static async saveGrowthModule(sessionId: string, growthModule: any): Promise<void> {
-    const growthModuleData = {
-      session_id: sessionId,
-      domain_name: growthModule.domainName,
-      enabler_selections: growthModule.enablerSelections || [],
-      barrier_selection: growthModule.barrierSelection,
-      additional_comments: growthModule.additionalComments
-    };
+  // Save enablers and barriers data
+  static async saveEnablersBarriers(sessionId: string, enablersBarriers: any[]): Promise<void> {
+    console.log(`🔄 [DEBUG] Starting saveEnablersBarriers for session: ${sessionId}`, enablersBarriers);
+    
+    for (const item of enablersBarriers) {
+      const enablersBarriersData = {
+        session_id: sessionId,
+        domain_key: item.domainKey,
+        selected_enablers: item.selectedEnablers || [],
+        selected_barriers: item.selectedBarriers || [],
+        enabler_other_text: item.enablerOtherText || null,
+        barrier_other_text: item.barrierOtherText || null
+      };
 
-    // Growth modules can have multiple entries per session (one per domain), so we match on both session_id and domain_name
-    await this.upsertRecord('growth_modules', growthModuleData, ['session_id', 'domain_name'], sessionId, 'Growth Module');
+      console.log(`💿 [DEBUG] Saving data for domain: ${item.domainKey}`, enablersBarriersData);
+      console.log(`🔑 [DEBUG] Match columns: session_id=${sessionId}, domain_key=${item.domainKey}`);
+
+      // Enablers and barriers can have multiple entries per session (one per domain), so we match on both session_id and domain_key
+      await this.upsertRecord('user_enablers_barriers', enablersBarriersData, ['session_id', 'domain_key'], sessionId, `Enablers Barriers for ${item.domainKey}`);
+    }
+    
+    console.log(`✅ [DEBUG] Completed saveEnablersBarriers for session: ${sessionId}`);
+  }
+
+  // Get domain enablers and barriers reference data
+  static async getDomainEnablersBarriers(): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('domain_enablers_barriers')
+        .select('*')
+        .order('domain_key');
+
+      if (error) {
+        console.error('Error fetching domain enablers and barriers:', error);
+        throw error;
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Failed to fetch domain enablers and barriers:', error);
+      throw error;
+    }
   }
 
   // Save text responses
@@ -327,10 +370,8 @@ export class SurveyService {
         await this.saveSchoolWellbeing(surveyState.sessionId, surveyState.schoolWellbeing);
       }
 
-      if (surveyState.growthModules.length > 0) {
-        for (const module of surveyState.growthModules) {
-          await this.saveGrowthModule(surveyState.sessionId, module);
-        }
+      if (surveyState.enablersBarriers.length > 0) {
+        await this.saveEnablersBarriers(surveyState.sessionId, surveyState.enablersBarriers);
       }
 
       if (Object.keys(surveyState.textResponses).length > 0) {
