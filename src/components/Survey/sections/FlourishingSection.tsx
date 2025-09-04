@@ -118,6 +118,28 @@ export default function FlourishingSection() {
     loadEnablersBarriers();
   }, []);
 
+  // Restore enablers and barriers when domain changes
+  useEffect(() => {
+    const domain = FLOURISHING_DOMAINS[currentDomain];
+    const savedData = state.enablersBarriers?.find(item => item.domainKey === domain.key);
+
+    if (savedData) {
+      // Restore previously saved selections
+      console.log(`🔄 [DEBUG] Restoring selections for domain: ${domain.key}`, savedData);
+      setSelectedEnablers(savedData.selectedEnablers || []);
+      setSelectedBarriers(savedData.selectedBarriers || []);
+      setEnablerOtherText(savedData.enablerOtherText || '');
+      setBarrierOtherText(savedData.barrierOtherText || '');
+    } else {
+      // Clear selections for new domain
+      console.log(`🆕 [DEBUG] No saved data for domain: ${domain.key}, clearing selections`);
+      setSelectedEnablers([]);
+      setSelectedBarriers([]);
+      setEnablerOtherText('');
+      setBarrierOtherText('');
+    }
+  }, [currentDomain, state.enablersBarriers]);
+
   const domain = FLOURISHING_DOMAINS[currentDomain];
   const questionKeys = [`${domain.key}_1`, `${domain.key}_2`];
   const score1 = scores[questionKeys[0] as keyof typeof scores];
@@ -169,10 +191,7 @@ export default function FlourishingSection() {
 
     if (currentDomain < FLOURISHING_DOMAINS.length - 1) {
       setCurrentDomain(currentDomain + 1);
-      setSelectedEnablers([]);
-      setSelectedBarriers([]);
-      setEnablerOtherText('');
-      setBarrierOtherText('');
+      // State will be restored/cleared by useEffect when currentDomain changes
     } else {
       dispatch({ type: 'SET_SECTION', payload: 5 }); // Go to Well-Being Intro
     }
