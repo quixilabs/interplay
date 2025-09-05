@@ -99,9 +99,9 @@ export default function DemographicsSection() {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-8 max-w-3xl mx-auto">
+    <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-3xl mx-auto">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">About You</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">About You</h2>
         <p className="text-slate-600">
           These questions help us understand different student experiences and ensure all voices are represented.
         </p>
@@ -367,17 +367,17 @@ export default function DemographicsSection() {
       </div>
 
       {/* Navigation */}
-      <div className="flex justify-between mt-12">
+      <div className="flex flex-col sm:flex-row justify-between mt-8 sm:mt-12 space-y-4 sm:space-y-0">
         <button
           onClick={handleBack}
-          className="flex items-center px-6 py-3 text-slate-600 hover:text-slate-800 transition-colors"
+          className="flex items-center justify-center sm:justify-start px-6 py-3 text-slate-600 hover:text-slate-800 transition-colors"
         >
           <ChevronLeft className="h-5 w-5 mr-1" />
           Back
         </button>
         <button
           onClick={handleNext}
-          className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+          className="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold transition-colors"
         >
           Continue
           <ChevronRight className="h-5 w-5 ml-1" />

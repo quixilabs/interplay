@@ -91,9 +91,9 @@ export default function SchoolWellbeingSection() {
   );
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-8 max-w-3xl mx-auto">
+    <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-3xl mx-auto">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">School-Influenced Well-Being</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">School-Influenced Well-Being</h2>
         <p className="text-slate-600">
           These questions focus specifically on your experience at this institution and how it impacts your overall well-being.
         </p>
@@ -106,17 +106,24 @@ export default function SchoolWellbeingSection() {
 
           return (
             <div key={item.key}>
-              <label className="block text-lg font-medium text-slate-800 mb-4">
+              <label className="block text-base sm:text-lg font-medium text-slate-800 mb-4">
                 {item.question}
               </label>
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-slate-500 w-16">Not at all</span>
-                <div className="flex space-x-2">
+              {/* Mobile-first responsive scale */}
+              <div className="space-y-3">
+                {/* Scale labels */}
+                <div className="flex justify-between text-xs sm:text-sm text-slate-500 px-1">
+                  <span className="text-left">Not at all</span>
+                  <span className="text-right">Completely</span>
+                </div>
+                
+                {/* Rating buttons */}
+                <div className="grid grid-cols-11 gap-1 sm:gap-2">
                   {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
                     <button
                       key={num}
                       onClick={() => handleScoreChange(item.key, num)}
-                      className={`w-10 h-10 rounded-lg font-medium transition-colors ${score === num
+                      className={`aspect-square text-xs sm:text-sm font-medium rounded-md sm:rounded-lg transition-colors ${score === num
                         ? 'bg-teal-600 text-white'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                         }`}
@@ -125,7 +132,6 @@ export default function SchoolWellbeingSection() {
                     </button>
                   ))}
                 </div>
-                <span className="text-sm text-slate-500 w-16">Completely</span>
               </div>
             </div>
           );
@@ -156,10 +162,10 @@ export default function SchoolWellbeingSection() {
       </div>
 
       {/* Navigation */}
-      <div className="flex justify-between mt-12">
+      <div className="flex flex-col sm:flex-row justify-between mt-8 sm:mt-12 space-y-4 sm:space-y-0">
         <button
           onClick={handleBack}
-          className="flex items-center px-6 py-3 text-slate-600 hover:text-slate-800 transition-colors"
+          className="flex items-center justify-center sm:justify-start px-6 py-3 text-slate-600 hover:text-slate-800 transition-colors"
         >
           <ChevronLeft className="h-5 w-5 mr-1" />
           Back
@@ -167,7 +173,7 @@ export default function SchoolWellbeingSection() {
         <button
           onClick={handleNext}
           disabled={!allQuestionsAnswered}
-          className="flex items-center bg-teal-600 hover:bg-teal-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+          className="flex items-center justify-center bg-teal-600 hover:bg-teal-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white px-6 sm:px-8 py-3 rounded-lg font-semibold transition-colors"
         >
           Continue
           <ChevronRight className="h-5 w-5 ml-1" />

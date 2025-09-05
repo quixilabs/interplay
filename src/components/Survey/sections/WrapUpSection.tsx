@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useSurvey } from '../../../contexts/SurveyContext';
 import { CheckCircle, Mail, Heart, TrendingUp } from 'lucide-react';
 
@@ -30,21 +30,21 @@ export default function WrapUpSection() {
   const completionTime = calculateCompletionTime();
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-8 max-w-3xl mx-auto">
+    <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-3xl mx-auto">
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6">
           <CheckCircle className="h-12 w-12 text-green-600" />
         </div>
-        <h1 className="text-3xl font-bold text-slate-900 mb-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">
           Thank you for sharing your voice! 🎉
         </h1>
-        <p className="text-xl text-slate-600 leading-relaxed">
+        <p className="text-lg sm:text-xl text-slate-600 leading-relaxed">
           Interplay translates your feedback into a research-based measure of flourishing, highlighting what’s working and where support is needed. Your input helps your university act quickly and wisely so every student has the best chance to thrive.
         </p>
       </div>
 
       {/* Survey Stats */}
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8">
         <div className="text-center p-4 bg-blue-50 rounded-lg">
           <TrendingUp className="h-8 w-8 text-blue-600 mx-auto mb-2" />
           <div className="text-2xl font-bold text-blue-800">{completionTime} min</div>

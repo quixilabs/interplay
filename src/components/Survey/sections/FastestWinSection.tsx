@@ -22,13 +22,13 @@ export default function FastestWinSection() {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-8 max-w-3xl mx-auto">
+    <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-3xl mx-auto">
       <div className="mb-8">
         <div className="flex items-center space-x-3 mb-4">
-          <Lightbulb className="h-8 w-8 text-orange-500" />
-          <h2 className="text-2xl font-bold text-slate-900">Your Fastest Win Suggestion</h2>
+          <Lightbulb className="h-6 w-6 sm:h-8 sm:w-8 text-orange-500" />
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Your Fastest Win Suggestion</h2>
         </div>
-        <p className="text-slate-600 text-lg leading-relaxed">
+        <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
           Based on your responses, you've shared insights about your flourishing experience.
           Now we'd love to hear your ideas for improvement.
         </p>
@@ -46,7 +46,7 @@ export default function FastestWinSection() {
 
       <div className="space-y-6">
         <div>
-          <label className="block text-xl font-semibold text-slate-900 mb-4">
+          <label className="block text-lg sm:text-xl font-semibold text-slate-900 mb-4">
             If the school could change ONE thing to help you improve your well-being the fastest, what should it be?
           </label>
           <textarea
@@ -76,10 +76,10 @@ export default function FastestWinSection() {
       </div>
 
       {/* Navigation */}
-      <div className="flex justify-between mt-12">
+      <div className="flex flex-col sm:flex-row justify-between mt-8 sm:mt-12 space-y-4 sm:space-y-0">
         <button
           onClick={handleBack}
-          className="flex items-center px-6 py-3 text-slate-600 hover:text-slate-800 transition-colors"
+          className="flex items-center justify-center sm:justify-start px-6 py-3 text-slate-600 hover:text-slate-800 transition-colors"
         >
           <ChevronLeft className="h-5 w-5 mr-1" />
           Back
@@ -87,7 +87,7 @@ export default function FastestWinSection() {
         <button
           onClick={handleNext}
           disabled={suggestion.trim().length === 0}
-          className="flex items-center bg-orange-600 hover:bg-orange-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+          className="flex items-center justify-center bg-orange-600 hover:bg-orange-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white px-6 sm:px-8 py-3 rounded-lg font-semibold transition-colors"
         >
           Continue
           <ChevronRight className="h-5 w-5 ml-1" />

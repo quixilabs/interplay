@@ -135,7 +135,7 @@ export default function SurveyFlow() {
         </div>
 
         {/* Content */}
-        <main className="max-w-4xl mx-auto px-4 py-8">
+        <main className="max-w-4xl mx-auto px-4 py-4 sm:py-8">
           {currentSectionData.type === 'intro' ? (
             <SectionIntro
               title={SECTION_INTROS[currentSectionData.introKey as keyof typeof SECTION_INTROS].title}

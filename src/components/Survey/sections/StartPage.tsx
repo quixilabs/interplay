@@ -14,18 +14,18 @@ export default function StartPage() {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-8 max-w-3xl mx-auto">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 mb-4">
+    <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-3xl mx-auto">
+      <div className="text-center mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">
           Your Voice Powers Youth Flourishing
         </h1>
-        <p className="text-lg text-slate-600 leading-relaxed">
+        <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
           Interplay™ is the first Flourishing Intelligence™ platform built for colleges and universities. We capture authentic student perspectives, map them across Harvard’s six validated domains of well-being, and deliver actionable, research-backed strategies to improve engagement, retention, and student success.
         </p>
       </div>
 
       {/* Key Information Cards */}
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <div className="flex items-start space-x-3 p-4 bg-blue-50 rounded-lg">
           <Clock className="h-6 w-6 text-blue-600 mt-1" />
           <div>
@@ -53,7 +53,7 @@ export default function StartPage() {
 
       {/* Survey Description */}
       <div className="bg-slate-50 rounded-lg p-6 mb-8">
-        <h2 className="text-xl font-semibold text-slate-900 mb-4">What to Expect</h2>
+        <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-4">What to Expect</h2>
         <div className="space-y-3 text-slate-700">
           <p>• <strong>Your Story ⎯</strong> Share a bit about yourself and your student journey.</p>
           <p>• <strong>Flourishing Check-In ⎯</strong> Evidence-based questions across six domains of well-being: happiness, health, purpose, character, relationships, and financial stability.</p>
