@@ -297,21 +297,18 @@ export interface Database {
         Row: {
           id: string;
           session_id: string;
-          bright_spots: Record<string, string> | null;
           fastest_win_suggestion: string | null;
           created_at: string;
         };
         Insert: {
           id?: string;
           session_id: string;
-          bright_spots?: Record<string, string> | null;
           fastest_win_suggestion?: string | null;
           created_at?: string;
         };
         Update: {
           id?: string;
           session_id?: string;
-          bright_spots?: Record<string, string> | null;
           fastest_win_suggestion?: string | null;
           created_at?: string;
         };

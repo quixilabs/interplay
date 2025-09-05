@@ -44,7 +44,6 @@ export interface SchoolWellbeing {
 }
 
 export interface TextResponses {
-  brightSpots?: { [domain: string]: string };
   fastestWinSuggestion?: string;
 }
 

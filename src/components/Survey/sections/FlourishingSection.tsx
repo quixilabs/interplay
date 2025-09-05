@@ -95,7 +95,6 @@ export default function FlourishingSection() {
   const { state, dispatch } = useSurvey();
   const [currentDomain, setCurrentDomain] = useState(0);
   const [scores, setScores] = useState(state.flourishingScores);
-  const [brightSpots, setBrightSpots] = useState(state.textResponses.brightSpots || {});
   const [domainEnablersBarriers, setDomainEnablersBarriers] = useState<DomainEnablersBarriers[]>([]);
   const [selectedEnablers, setSelectedEnablers] = useState<string[]>([]);
   const [selectedBarriers, setSelectedBarriers] = useState<string[]>([]);
@@ -150,12 +149,9 @@ export default function FlourishingSection() {
     setScores(prev => ({ ...prev, [questionKey]: value }));
   };
 
-  const handleBrightSpotChange = (value: string) => {
-    setBrightSpots(prev => ({ ...prev, [domain.name]: value }));
-  };
 
   const isQuestionsComplete = () => {
-    return score1 !== undefined && score2 !== undefined && brightSpots[domain.name];
+    return score1 !== undefined && score2 !== undefined;
   };
 
   const isEnablersBarriersComplete = () => {
@@ -173,7 +169,6 @@ export default function FlourishingSection() {
 
   const continueToNext = () => {
     dispatch({ type: 'SET_FLOURISHING_SCORES', payload: scores });
-    dispatch({ type: 'SET_TEXT_RESPONSES', payload: { brightSpots } });
 
     // Save enablers and barriers
     const existingData = state.enablersBarriers || [];
@@ -283,19 +278,6 @@ export default function FlourishingSection() {
             );
           })}
 
-          {/* Bright Spot Question */}
-          <div>
-            <label className="block text-lg font-medium text-slate-800 mb-4">
-              What's going well for you in {domain.name.toLowerCase()}?
-            </label>
-            <textarea
-              value={brightSpots[domain.name] || ''}
-              onChange={(e) => handleBrightSpotChange(e.target.value)}
-              placeholder="Share what's working well in this area of your life..."
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-              rows={3}
-            />
-          </div>
 
           {/* Enablers and Barriers Section */}
           {currentDomainData && (

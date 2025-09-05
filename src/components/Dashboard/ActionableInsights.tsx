@@ -11,7 +11,6 @@ export default function ActionableInsights({ data }: ActionableInsightsProps) {
   const topBarrier = interventionAnalysis?.topBarriers?.[0];
   const flourishingDomains = data?.flourishingDomainAverages || {};
   const studentsAtRisk = data?.studentsAtRisk || 0;
-  const brightSpots = data?.brightSpotThemes || [];
 
   // Find strongest and weakest domains
   const domainEntries = Object.entries(flourishingDomains);
@@ -60,11 +59,11 @@ export default function ActionableInsights({ data }: ActionableInsightsProps) {
     {
       type: 'positive',
       icon: Star,
-      title: 'Bright Spot Highlight',
-      content: brightSpots.length > 0
-        ? `"${brightSpots[0]}" - This theme appears in student positive feedback, showing what's working well on campus.`
-        : 'Collect more survey responses to identify what students appreciate most about campus life.',
-      action: brightSpots.length > 0 ? 'Expand and promote similar programs' : 'Encourage more detailed survey feedback',
+      title: 'Enabler Success',
+      content: topIntervention
+        ? `Students consistently identify "${topIntervention.name}" as a key enabler supporting their flourishing.`
+        : 'Collect more survey responses to identify what students value most for their well-being.',
+      action: topIntervention ? 'Continue to strengthen and expand this enabler' : 'Encourage more survey participation',
       urgency: 'medium'
     }
   ];

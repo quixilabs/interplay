@@ -156,7 +156,7 @@ export class AnalyticsService {
 
       // Analyze text responses
       const fastestWinSuggestions = this.analyzeFastestWins(textResponsesData || []);
-      const brightSpotThemes = this.analyzeBrightSpots(textResponsesData || []);
+      const brightSpotThemes: string[] = []; // Removed bright spots functionality
 
       // Analyze tension data
       const tensionAnalysis = this.analyzeTensions(tensionsData || [], flourishingData || [], wellbeingData || [], enablersBarriersData || [], domainData || []);
@@ -451,21 +451,6 @@ export class AnalyticsService {
     return suggestions.slice(0, 10);
   }
 
-  private static analyzeBrightSpots(data: any[]) {
-    const brightSpots: string[] = [];
-    
-    data.forEach(response => {
-      if (response.bright_spots) {
-        Object.values(response.bright_spots).forEach((spot: any) => {
-          if (typeof spot === 'string' && spot.trim()) {
-            brightSpots.push(spot);
-          }
-        });
-      }
-    });
-
-    return brightSpots.slice(0, 8);
-  }
 
   private static analyzeTensions(tensionsData: any[], flourishingData: any[], wellbeingData: any[], enablersBarriersData: any[], domainData: any[]) {
     if (tensionsData.length === 0) return null;

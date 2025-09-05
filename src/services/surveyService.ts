@@ -311,7 +311,6 @@ export class SurveyService {
   static async saveTextResponses(sessionId: string, textResponses: any): Promise<void> {
     const textResponsesData = {
       session_id: sessionId,
-      bright_spots: textResponses.brightSpots || {},
       fastest_win_suggestion: textResponses.fastestWinSuggestion
     };
 
