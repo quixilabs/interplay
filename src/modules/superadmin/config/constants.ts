@@ -5,8 +5,8 @@ export const SUPER_ADMIN_CONFIG = {
   
   // Super admin credentials - in production, use environment variables
   CREDENTIALS: {
-    username: process.env.VITE_SUPER_ADMIN_USERNAME || 'superadmin',
-    password: process.env.VITE_SUPER_ADMIN_PASSWORD || 'SuperSecure2024!@#'
+    username: import.meta.env.VITE_SUPER_ADMIN_USERNAME || 'superadmin',
+    password: import.meta.env.VITE_SUPER_ADMIN_PASSWORD || 'SuperSecure2024!@#'
   },
   
   // Session timeout (in minutes)
