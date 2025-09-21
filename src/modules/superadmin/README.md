@@ -94,7 +94,7 @@ src/modules/superadmin/
 
 ## Extracting to Separate Project
 
-To extract this module to a separate project:
+When ready to extract to a separate project:
 
 1. **Copy the entire `superadmin` folder**
 2. **Install dependencies**:
