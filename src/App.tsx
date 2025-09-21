@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard/Dashboard';
 import AdminLogin from './components/Admin/AdminLogin';
 import LandingPage from './components/LandingPage';
 import { useAuthStore } from './stores/authStore';
+import { SuperAdminRouter, SUPER_ADMIN_CONFIG } from './modules/superadmin';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path="/survey/:universitySlug" element={<SurveyFlow />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path={`${SUPER_ADMIN_CONFIG.ADMIN_PATH}/*`} element={<SuperAdminRouter />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
