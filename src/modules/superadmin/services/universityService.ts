@@ -54,8 +54,7 @@ export class SuperAdminUniversityService {
         .eq('university_slug', universitySlug)
         .eq('is_completed', true)
         .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
+        .limit(1);
 
       // Get active sessions (started but not completed in last 24 hours)
       const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
@@ -76,7 +75,7 @@ export class SuperAdminUniversityService {
         total_responses: total,
         completed_responses: completed,
         completion_rate: completionRate,
-        last_response_date: lastResponse?.created_at || null,
+        last_response_date: lastResponse && lastResponse.length > 0 ? lastResponse[0].created_at : null,
         active_sessions: activeSessions || 0
       };
     } catch (error) {
