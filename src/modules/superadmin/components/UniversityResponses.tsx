@@ -56,7 +56,7 @@ export default function UniversityResponses({ onNavigate, university }: Universi
     try {
       setLoading(true);
       const [responsesData, analyticsData] = await Promise.all([
-        SuperAdminUniversityService.getUniversityResponses(university.slug),
+        SuperAdminUniversityService.getUniversityResponses(university.slug, true), // Include incomplete responses
         SuperAdminUniversityService.getUniversityAnalytics(university.slug)
       ]);
       
@@ -592,6 +592,11 @@ function StudentResponseRow({
                   <p className="font-medium text-slate-900">
                     Session: {response.session_id.substring(0, 12)}...
                   </p>
+                  {!response.completion_time && (
+                    <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">
+                      Incomplete
+                    </span>
+                  )}
                   {isAtRisk && (
                     <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">
                       At Risk
@@ -604,7 +609,7 @@ function StudentResponseRow({
                   )}
                 </div>
                 <p className="text-sm text-slate-600">
-                  Completed: {formatDate(response.completion_time)}
+                  {response.completion_time ? `Completed: ${formatDate(response.completion_time)}` : 'Started but not completed'}
                 </p>
               </div>
               
@@ -723,7 +728,7 @@ function StudentResponseRow({
             )}
 
             {/* Complete Flourishing Scores */}
-            {flourishing && (
+            {flourishing && Object.keys(flourishing).length > 1 && (
               <div className="bg-slate-50 rounded-lg p-6">
                 <div className="flex items-center mb-4">
                   <Heart className="h-5 w-5 text-red-500 mr-2" />
@@ -741,8 +746,12 @@ function StudentResponseRow({
                   ].map(domain => {
                     const score1 = flourishing[`${domain.key}_1`];
                     const score2 = flourishing[`${domain.key}_2`];
-                    const avg = (score1 !== null && score2 !== null) ? ((score1 + score2) / 2).toFixed(1) : 'N/A';
-                    const isLow = (score1 !== null && score1 < 6) || (score2 !== null && score2 < 6);
+                    const hasScore1 = score1 !== null && score1 !== undefined;
+                    const hasScore2 = score2 !== null && score2 !== undefined;
+                    const avg = (hasScore1 && hasScore2) ? ((score1 + score2) / 2).toFixed(1) : 
+                               hasScore1 ? score1.toFixed(1) : 
+                               hasScore2 ? score2.toFixed(1) : 'Not answered';
+                    const isLow = (hasScore1 && score1 < 6) || (hasScore2 && score2 < 6);
                     
                     return (
                       <div key={domain.key} className={`p-4 rounded-lg border-2 ${isLow ? 'border-red-200 bg-red-50' : 'border-green-200 bg-green-50'}`}>
@@ -756,8 +765,8 @@ function StudentResponseRow({
                           </span>
                         </div>
                         <div className="flex justify-between text-sm text-slate-600">
-                          <span>Q1: {score1 !== null ? `${score1}/10` : 'N/A'}</span>
-                          <span>Q2: {score2 !== null ? `${score2}/10` : 'N/A'}</span>
+                          <span>Q1: {hasScore1 ? `${score1}/10` : 'Not answered'}</span>
+                          <span>Q2: {hasScore2 ? `${score2}/10` : 'Not answered'}</span>
                         </div>
                       </div>
                     );
@@ -766,8 +775,19 @@ function StudentResponseRow({
               </div>
             )}
 
+            {/* Show message if no flourishing data */}
+            {(!flourishing || Object.keys(flourishing).length <= 1) && (
+              <div className="bg-slate-50 rounded-lg p-6">
+                <div className="flex items-center mb-2">
+                  <Heart className="h-5 w-5 text-slate-400 mr-2" />
+                  <h4 className="font-semibold text-slate-600">Flourishing Scores</h4>
+                </div>
+                <p className="text-slate-500 italic">Student has not completed the flourishing assessment yet</p>
+              </div>
+            )}
+
             {/* Complete School Wellbeing */}
-            {wellbeing && (
+            {wellbeing && Object.keys(wellbeing).length > 1 && (
               <div className="bg-slate-50 rounded-lg p-6">
                 <div className="flex items-center mb-4">
                   <Shield className="h-5 w-5 text-blue-500 mr-2" />
@@ -817,8 +837,19 @@ function StudentResponseRow({
               </div>
             )}
 
+            {/* Show message if no wellbeing data */}
+            {(!wellbeing || Object.keys(wellbeing).length <= 1) && (
+              <div className="bg-slate-50 rounded-lg p-6">
+                <div className="flex items-center mb-2">
+                  <Shield className="h-5 w-5 text-slate-400 mr-2" />
+                  <h4 className="font-semibold text-slate-600">School Wellbeing</h4>
+                </div>
+                <p className="text-slate-500 italic">Student has not completed the school wellbeing section yet</p>
+              </div>
+            )}
+
             {/* Complete Tension Assessment */}
-            {tensions && (
+            {tensions && Object.keys(tensions).length > 1 && (
               <div className="bg-slate-50 rounded-lg p-6">
                 <div className="flex items-center mb-4">
                   <Zap className="h-5 w-5 text-purple-500 mr-2" />
@@ -833,22 +864,23 @@ function StudentResponseRow({
                     { key: 'academic_creative', label: 'Academic vs Creative', left: 'Academic Focus', right: 'Creative Exploration' }
                   ].map(tension => {
                     const score = tensions[tension.key];
+                    const hasScore = score !== null && score !== undefined;
                     
                     return (
                       <div key={tension.key} className="p-4 bg-white rounded-lg border">
                         <div className="flex justify-between items-center mb-2">
                           <span className="font-medium text-slate-900">{tension.label}</span>
                           <span className="text-lg font-bold text-purple-600">
-                            {score !== null ? `${score}%` : 'N/A'}
+                            {hasScore ? `${score}%` : 'Not answered'}
                           </span>
                         </div>
-                        {score !== null && (
+                        {hasScore && (
                           <div className="flex justify-between text-sm text-slate-600 mb-2">
                             <span>{tension.left}</span>
                             <span>{tension.right}</span>
                           </div>
                         )}
-                        {score !== null && (
+                        {hasScore && (
                           <div className="w-full bg-slate-200 rounded-full h-2">
                             <div 
                               className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
@@ -860,6 +892,17 @@ function StudentResponseRow({
                     );
                   })}
                 </div>
+              </div>
+            )}
+
+            {/* Show message if no tension data */}
+            {(!tensions || Object.keys(tensions).length <= 1) && (
+              <div className="bg-slate-50 rounded-lg p-6">
+                <div className="flex items-center mb-2">
+                  <Zap className="h-5 w-5 text-slate-400 mr-2" />
+                  <h4 className="font-semibold text-slate-600">Tension Assessment</h4>
+                </div>
+                <p className="text-slate-500 italic">Student has not completed the tension assessment yet</p>
               </div>
             )}
 
@@ -936,6 +979,17 @@ function StudentResponseRow({
               </div>
             )}
 
+            {/* Show message if no enablers/barriers data */}
+            {response.user_enablers_barriers.length === 0 && (
+              <div className="bg-slate-50 rounded-lg p-6">
+                <div className="flex items-center mb-2">
+                  <Target className="h-5 w-5 text-slate-400 mr-2" />
+                  <h4 className="font-semibold text-slate-600">Enablers & Barriers</h4>
+                </div>
+                <p className="text-slate-500 italic">Student has not completed the enablers and barriers section yet</p>
+              </div>
+            )}
+
             {/* Student Feedback */}
             {textResponses?.fastest_win_suggestion && (
               <div className="bg-slate-50 rounded-lg p-6">
@@ -947,6 +1001,17 @@ function StudentResponseRow({
                   <h5 className="font-medium text-slate-900 mb-2">Fastest Win Suggestion:</h5>
                   <p className="text-slate-700 italic">"{textResponses.fastest_win_suggestion}"</p>
                 </div>
+              </div>
+            )}
+
+            {/* Show message if no text feedback */}
+            {!textResponses?.fastest_win_suggestion && (
+              <div className="bg-slate-50 rounded-lg p-6">
+                <div className="flex items-center mb-2">
+                  <Brain className="h-5 w-5 text-slate-400 mr-2" />
+                  <h4 className="font-semibold text-slate-600">Student Feedback</h4>
+                </div>
+                <p className="text-slate-500 italic">Student has not provided feedback suggestions yet</p>
               </div>
             )}
 
@@ -963,7 +1028,9 @@ function StudentResponseRow({
                 </div>
                 <div className="bg-white rounded-lg p-3 border">
                   <p className="text-sm text-slate-600">Completed:</p>
-                  <p className="text-sm text-slate-900">{formatDate(response.completion_time)}</p>
+                  <p className="text-sm text-slate-900">
+                    {response.completion_time ? formatDate(response.completion_time) : 'In Progress'}
+                  </p>
                 </div>
                 <div className="bg-white rounded-lg p-3 border">
                   <p className="text-sm text-slate-600">Results Requested:</p>

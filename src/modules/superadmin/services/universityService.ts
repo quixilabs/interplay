@@ -255,9 +255,9 @@ export class SuperAdminUniversityService {
   }
 
   // Get detailed survey responses for a university
-  static async getUniversityResponses(universitySlug: string): Promise<any[]> {
+  static async getUniversityResponses(universitySlug: string, includeIncomplete: boolean = true): Promise<any[]> {
     try {
-      const { data: sessions, error: sessionsError } = await supabase
+      let query = supabase
         .from('survey_sessions')
         .select(`
           *,
@@ -268,8 +268,14 @@ export class SuperAdminUniversityService {
           tensions_assessment(*),
           user_enablers_barriers(*)
         `)
-        .eq('university_slug', universitySlug)
-        .eq('is_completed', true)
+        .eq('university_slug', universitySlug);
+      
+      // Only filter by completion status if we don't want incomplete responses
+      if (!includeIncomplete) {
+        query = query.eq('is_completed', true);
+      }
+      
+      const { data: sessions, error: sessionsError } = await query
         .order('completion_time', { ascending: false });
 
       if (sessionsError) throw sessionsError;
