@@ -114,7 +114,7 @@ export default function UniversityForm({ onNavigate, university, mode }: Univers
 
     try {
       if (mode === 'create') {
-        await SuperAdminUniversityService.createUniversity(formData);
+        const newUniversity = await SuperAdminUniversityService.createUniversity(formData);
         setSuccessMessage(`University "${newUniversity.name}" created successfully! Admin dashboard is now available at /admin/login with email: ${newUniversity.admin_email}`);
       } else {
         await SuperAdminUniversityService.updateUniversity(university!.id!, formData);
