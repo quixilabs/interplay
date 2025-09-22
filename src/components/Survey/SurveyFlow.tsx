@@ -120,12 +120,18 @@ export default function SurveyFlow() {
     return <Navigate to="/" replace />;
   }
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleNext = () => {
     dispatch({ type: 'SET_SECTION', payload: state.currentSection + 1 });
+    scrollToTop();
   };
 
   const handleBack = () => {
     dispatch({ type: 'SET_SECTION', payload: state.currentSection - 1 });
+    scrollToTop();
   };
 
   // Calculate progress based on content sections only (excluding intro pages)
@@ -148,7 +154,7 @@ export default function SurveyFlow() {
                 <p className="text-sm text-warm-gray font-primary">Student Success Survey</p>
               </div>
             )}
-            
+
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 {!universityName && (

@@ -77,13 +77,19 @@ export default function SchoolWellbeingSection() {
     );
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleNext = () => {
     dispatch({ type: 'SET_SCHOOL_WELLBEING', payload: { ...scores, wellbeingChecklist: checklist } });
     dispatch({ type: 'SET_SECTION', payload: 7 }); // Go to Tensions Intro
+    scrollToTop();
   };
 
   const handleBack = () => {
     dispatch({ type: 'SET_SECTION', payload: 5 }); // Go back to Well-Being Intro
+    scrollToTop();
   };
 
   const allQuestionsAnswered = SCHOOL_WELLBEING_QUESTIONS.every(q =>
@@ -116,7 +122,7 @@ export default function SchoolWellbeingSection() {
                   <span className="text-left">Not at all</span>
                   <span className="text-right">Completely</span>
                 </div>
-                
+
                 {/* Rating buttons */}
                 <div className="grid grid-cols-11 gap-1 sm:gap-2">
                   {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (

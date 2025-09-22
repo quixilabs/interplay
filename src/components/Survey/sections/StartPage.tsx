@@ -6,10 +6,15 @@ export default function StartPage() {
   const { state, dispatch } = useSurvey();
   const [consentChecked, setConsentChecked] = useState(state.consentGiven);
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleNext = () => {
     if (consentChecked) {
       dispatch({ type: 'SET_CONSENT', payload: true });
       dispatch({ type: 'SET_SECTION', payload: 1 });
+      scrollToTop();
     }
   };
 

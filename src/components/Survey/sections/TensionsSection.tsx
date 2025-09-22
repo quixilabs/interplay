@@ -43,13 +43,19 @@ export default function TensionsSection() {
     setValues(prev => ({ ...prev, [key]: value }));
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleNext = () => {
     dispatch({ type: 'SET_TENSIONS_ASSESSMENT', payload: values });
     dispatch({ type: 'SET_SECTION', payload: 9 }); // Go to Fastest Win
+    scrollToTop();
   };
 
   const handleBack = () => {
     dispatch({ type: 'SET_SECTION', payload: 7 }); // Go back to Tensions Intro
+    scrollToTop();
   };
 
   const allTensionsAnswered = TENSION_PAIRS.every(pair =>

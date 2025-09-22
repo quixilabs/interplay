@@ -4,8 +4,13 @@ import { CheckCircle, Heart, TrendingUp } from 'lucide-react';
 export default function WrapUpSection() {
   const { state, dispatch } = useSurvey();
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleComplete = () => {
     dispatch({ type: 'COMPLETE_SURVEY' });
+    scrollToTop();
 
     // Here you would typically submit the survey data to your backend
     console.log('Survey completed:', state);

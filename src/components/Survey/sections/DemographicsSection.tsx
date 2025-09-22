@@ -89,13 +89,19 @@ export default function DemographicsSection() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleNext = () => {
     dispatch({ type: 'SET_DEMOGRAPHICS', payload: formData });
     dispatch({ type: 'SET_SECTION', payload: 3 }); // Go to Flourishing Intro
+    scrollToTop();
   };
 
   const handleBack = () => {
     dispatch({ type: 'SET_SECTION', payload: 1 }); // Go back to Demographics Intro
+    scrollToTop();
   };
 
   return (

@@ -163,6 +163,10 @@ export default function FlourishingSection() {
     return enablerOtherValid && barrierOtherValid;
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleNext = () => {
     continueToNext();
   };
@@ -186,9 +190,11 @@ export default function FlourishingSection() {
 
     if (currentDomain < FLOURISHING_DOMAINS.length - 1) {
       setCurrentDomain(currentDomain + 1);
+      scrollToTop();
       // State will be restored/cleared by useEffect when currentDomain changes
     } else {
       dispatch({ type: 'SET_SECTION', payload: 5 }); // Go to Well-Being Intro
+      scrollToTop();
     }
   };
 
@@ -211,8 +217,10 @@ export default function FlourishingSection() {
   const handleBack = () => {
     if (currentDomain > 0) {
       setCurrentDomain(currentDomain - 1);
+      scrollToTop();
     } else {
       dispatch({ type: 'SET_SECTION', payload: 3 }); // Go back to Flourishing Intro
+      scrollToTop();
     }
   };
 

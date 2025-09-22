@@ -6,6 +6,10 @@ export default function FastestWinSection() {
   const { state, dispatch } = useSurvey();
   const [suggestion, setSuggestion] = useState(state.textResponses.fastestWinSuggestion || '');
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleNext = () => {
     dispatch({
       type: 'SET_TEXT_RESPONSES',
@@ -15,10 +19,12 @@ export default function FastestWinSection() {
       }
     });
     dispatch({ type: 'SET_SECTION', payload: 10 }); // Go to Complete
+    scrollToTop();
   };
 
   const handleBack = () => {
     dispatch({ type: 'SET_SECTION', payload: 8 }); // Go back to Tensions Assessment
+    scrollToTop();
   };
 
   return (
