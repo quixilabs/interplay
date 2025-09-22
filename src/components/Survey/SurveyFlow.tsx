@@ -13,6 +13,8 @@ import FastestWinSection from './sections/FastestWinSection';
 import WrapUpSection from './sections/WrapUpSection';
 import { generateSessionId } from '../../utils/helpers';
 import { SurveyService } from '../../services/surveyService';
+import { UniversityService } from '../../services/universityService';
+import { useState } from 'react';
 
 // Section intro texts
 const SECTION_INTROS = {
@@ -52,6 +54,7 @@ export default function SurveyFlow() {
   const { universitySlug } = useParams<{ universitySlug: string }>();
   const { state, dispatch } = useSurvey();
   const initializingRef = useRef(false);
+  const [universityName, setUniversityName] = useState<string>('');
 
   useEffect(() => {
     if (universitySlug && !state.sessionId && !initializingRef.current) {
@@ -83,6 +86,24 @@ export default function SurveyFlow() {
   // Reset initialization ref when university slug changes
   useEffect(() => {
     initializingRef.current = false;
+  }, [universitySlug]);
+
+  // Load university name for display
+  useEffect(() => {
+    const loadUniversityName = async () => {
+      if (universitySlug) {
+        try {
+          const university = await UniversityService.getUniversityBySlug(universitySlug);
+          if (university) {
+            setUniversityName(university.name);
+          }
+        } catch (error) {
+          console.error('Failed to load university name:', error);
+        }
+      }
+    };
+
+    loadUniversityName();
   }, [universitySlug]);
 
   if (!universitySlug) {
@@ -118,10 +139,24 @@ export default function SurveyFlow() {
         {/* Header */}
         <div className="bg-white/90 backdrop-blur-md shadow-brand border-b border-gray-200/50">
           <div className="max-w-4xl mx-auto px-4 py-4">
+            {/* University Name Display */}
+            {universityName && (
+              <div className="text-center mb-4">
+                <h1 className="text-lg sm:text-xl font-bold text-navy font-primary">
+                  {universityName}
+                </h1>
+                <p className="text-sm text-warm-gray font-primary">Student Success Survey</p>
+              </div>
+            )}
+            
             <div className="flex items-center justify-between">
-              <h1 className="text-xl font-semibold text-navy font-primary">
-                Student Success Survey
-              </h1>
+              <div className="flex-1">
+                {!universityName && (
+                  <h1 className="text-xl font-semibold text-navy font-primary">
+                    Student Success Survey
+                  </h1>
+                )}
+              </div>
               <div className="text-sm text-warm-gray font-primary">
                 Section {Math.max(1, currentContentSectionIndex + 1)} of {contentSections.length}
               </div>
