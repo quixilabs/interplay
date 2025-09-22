@@ -102,6 +102,14 @@ export default function SuperAdminRouter() {
         // You can implement a detailed view component here
         return <UniversityList onNavigate={handleNavigate} />;
       
+      case 'view-responses':
+        return (
+          <UniversityResponses 
+            onNavigate={handleNavigate} 
+            university={selectedUniversity} 
+          />
+        );
+      
       default:
         return <SuperAdminDashboard onLogout={handleLogout} onNavigate={handleNavigate} />;
     }

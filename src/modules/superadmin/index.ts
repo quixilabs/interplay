@@ -1,5 +1,6 @@
 // Super Admin Module Entry Point
 export { default as SuperAdminRouter } from './components/SuperAdminRouter';
+export { default as UniversityResponses } from './components/UniversityResponses';
 export { SUPER_ADMIN_CONFIG } from './config/constants';
 export { superAdminAuth } from './services/superAdminAuth';
 export { SuperAdminUniversityService } from './services/universityService';

@@ -172,6 +172,13 @@ export default function UniversityList({ onNavigate }: UniversityListProps) {
                         <span>View Details</span>
                       </button>
                       <button
+                        onClick={() => onNavigate('view-responses', university)}
+                        className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                      >
+                        <BarChart3 className="h-4 w-4" />
+                        <span>View Survey Results</span>
+                      </button>
+                      <button
                         onClick={() => onNavigate('edit-university', university)}
                         className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
                       >

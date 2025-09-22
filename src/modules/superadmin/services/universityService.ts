@@ -254,4 +254,143 @@ export class SuperAdminUniversityService {
       .replace(/-+/g, '-')
       .trim();
   }
+
+  // Get detailed survey responses for a university
+  static async getUniversityResponses(universitySlug: string): Promise<any[]> {
+    try {
+      const { data: sessions, error: sessionsError } = await supabase
+        .from('survey_sessions')
+        .select(`
+          *,
+          demographics(*),
+          flourishing_scores(*),
+          school_wellbeing(*),
+          text_responses(*),
+          tensions_assessment(*),
+          user_enablers_barriers(*)
+        `)
+        .eq('university_slug', universitySlug)
+        .eq('is_completed', true)
+        .order('completion_time', { ascending: false });
+
+      if (sessionsError) throw sessionsError;
+
+      return sessions || [];
+    } catch (error) {
+      console.error('Error fetching university responses:', error);
+      throw error;
+    }
+  }
+
+  // Get aggregated response data for a university
+  static async getUniversityAnalytics(universitySlug: string): Promise<any> {
+    try {
+      const responses = await this.getUniversityResponses(universitySlug);
+      
+      if (responses.length === 0) {
+        return {
+          totalResponses: 0,
+          completionRate: 0,
+          averageCompletionTime: 0,
+          domainAverages: {},
+          demographicBreakdown: {},
+          topEnablers: [],
+          topBarriers: [],
+          fastestWinSuggestions: []
+        };
+      }
+
+      // Calculate domain averages
+      const domainAverages: any = {};
+      const domains = [
+        'happiness_satisfaction',
+        'mental_physical_health',
+        'meaning_purpose',
+        'character_virtue',
+        'social_relationships',
+        'financial_stability'
+      ];
+
+      domains.forEach(domain => {
+        const scores: number[] = [];
+        responses.forEach(response => {
+          const flourishing = response.flourishing_scores?.[0];
+          if (flourishing) {
+            const score1 = flourishing[`${domain}_1`];
+            const score2 = flourishing[`${domain}_2`];
+            if (score1 !== null) scores.push(score1);
+            if (score2 !== null) scores.push(score2);
+          }
+        });
+        
+        if (scores.length > 0) {
+          domainAverages[domain] = Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10;
+        }
+      });
+
+      // Calculate demographic breakdown
+      const demographicBreakdown: any = {};
+      const demographics = responses.map(r => r.demographics?.[0]).filter(Boolean);
+      
+      // Year in school breakdown
+      demographicBreakdown.yearInSchool = {};
+      demographics.forEach(demo => {
+        const year = demo.year_in_school;
+        if (year) {
+          demographicBreakdown.yearInSchool[year] = (demographicBreakdown.yearInSchool[year] || 0) + 1;
+        }
+      });
+
+      // Gender breakdown
+      demographicBreakdown.genderIdentity = {};
+      demographics.forEach(demo => {
+        const gender = demo.gender_identity;
+        if (gender) {
+          demographicBreakdown.genderIdentity[gender] = (demographicBreakdown.genderIdentity[gender] || 0) + 1;
+        }
+      });
+
+      // Analyze enablers and barriers
+      const enablerCounts: any = {};
+      const barrierCounts: any = {};
+      
+      responses.forEach(response => {
+        response.user_enablers_barriers?.forEach((eb: any) => {
+          eb.selected_enablers?.forEach((enabler: string) => {
+            enablerCounts[enabler] = (enablerCounts[enabler] || 0) + 1;
+          });
+          eb.selected_barriers?.forEach((barrier: string) => {
+            barrierCounts[barrier] = (barrierCounts[barrier] || 0) + 1;
+          });
+        });
+      });
+
+      const topEnablers = Object.entries(enablerCounts)
+        .map(([name, count]: [string, any]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
+
+      const topBarriers = Object.entries(barrierCounts)
+        .map(([name, count]: [string, any]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
+
+      // Get fastest win suggestions
+      const fastestWinSuggestions = responses
+        .map(r => r.text_responses?.[0]?.fastest_win_suggestion)
+        .filter(Boolean);
+
+      return {
+        totalResponses: responses.length,
+        domainAverages,
+        demographicBreakdown,
+        topEnablers,
+        topBarriers,
+        fastestWinSuggestions
+      };
+    } catch (error) {
+      console.error('Error fetching university analytics:', error);
+      throw error;
+    }
+  }
 }
