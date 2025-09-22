@@ -1,16 +1,10 @@
-import { useState } from 'react';
 import { useSurvey } from '../../../contexts/SurveyContext';
-import { CheckCircle, Mail, Heart, TrendingUp } from 'lucide-react';
+import { CheckCircle, Heart, TrendingUp } from 'lucide-react';
 
 export default function WrapUpSection() {
   const { state, dispatch } = useSurvey();
-  const [email, setEmail] = useState(state.emailForResults);
-  const [wantsResults, setWantsResults] = useState(false);
 
   const handleComplete = () => {
-    if (wantsResults && email) {
-      dispatch({ type: 'SET_EMAIL', payload: email });
-    }
     dispatch({ type: 'COMPLETE_SURVEY' });
 
     // Here you would typically submit the survey data to your backend
@@ -80,48 +74,12 @@ export default function WrapUpSection() {
         </ul>
       </div>
 
-      {/* Optional Email Collection */}
-      <div className="border border-slate-200 rounded-lg p-6 mb-8">
-        <div className="flex items-center space-x-3 mb-4">
-          <Mail className="h-6 w-6 text-slate-600" />
-          <h3 className="text-lg font-semibold text-slate-900">Get Your Personal Results</h3>
-        </div>
-        <p className="text-slate-600 mb-4">
-          “Would you like to receive your personal results once the survey is complete?”
-        </p>
-
-        <label className="flex items-center cursor-pointer mb-4">
-          <input
-            type="checkbox"
-            checked={wantsResults}
-            onChange={(e) => setWantsResults(e.target.checked)}
-            className="h-5 w-5 text-blue-600 border-slate-300 rounded focus:ring-2 focus:ring-blue-500"
-          />
-          <span className="ml-3 text-slate-700">Yes, send me my personal results</span>
-        </label>
-
-        {wantsResults && (
-          <div className="mt-4">
-            <input
-              type="email"
-              placeholder="Enter your email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <p className="text-sm text-slate-500 mt-2">
-              Results will be sent within 24 hours. You can unsubscribe at any time.
-            </p>
-          </div>
-        )}
-      </div>
-
       {/* Privacy Reminder */}
       <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-8">
         <h4 className="font-semibold text-green-800 mb-2">Privacy Protection</h4>
         <p className="text-sm text-green-700">
-          Your survey responses remain completely anonymous. Even if you provide your email,
-          it will not be linked to your answers in any way that could identify you.
+          Your survey responses remain completely anonymous. Your answers will not be linked
+          to any personally identifiable information.
         </p>
       </div>
 
