@@ -21,33 +21,33 @@ dotenv.config({ path: join(__dirname, '.env.local') });
 console.log('🔧 [FIX] Fixing missing university_ids in survey_sessions table...\n');
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const serviceRoleKey = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl) {
     console.error('❌ [FIX] Missing VITE_SUPABASE_URL in environment variables!');
     process.exit(1);
 }
 
-if (!serviceRoleKey) {
-    console.error('❌ [FIX] Missing VITE_SUPABASE_SERVICE_ROLE_KEY in environment variables!');
+if (!supabaseKey) {
+    console.error('❌ [FIX] Missing VITE_SUPABASE_ANON_KEY in environment variables!');
     console.error('');
-    console.error('📋 To get your service role key:');
+    console.error('📋 To get your anon key:');
     console.error('   1. Go to your Supabase project dashboard');
     console.error('   2. Go to Settings → API');
-    console.error('   3. Copy the "service_role" key');
+    console.error('   3. Copy the "anon/public" key');
     console.error('   4. Add it to your .env file:');
-    console.error('      VITE_SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here');
+    console.error('      VITE_SUPABASE_ANON_KEY=your_anon_key_here');
     process.exit(1);
 }
 
-// Create admin client with service role key
-const supabase = createClient(supabaseUrl, serviceRoleKey);
+// Create client with anon key
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function fixUniversityIds() {
     try {
-        console.log('🔐 [FIX] Using service role key for admin access...');
+        console.log('🔐 [FIX] Using anon key for database access...');
         console.log(`🔗 [FIX] Supabase URL: ${supabaseUrl}`);
-        console.log(`🔑 [FIX] Service key: ${serviceRoleKey.substring(0, 20)}...\n`);
+        console.log(`🔑 [FIX] Anon key: ${supabaseKey.substring(0, 20)}...\n`);
 
         // Step 1: Get all universities to create a slug-to-id mapping
         console.log('📋 [FIX] Fetching all universities...');
