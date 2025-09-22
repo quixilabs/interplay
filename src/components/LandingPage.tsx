@@ -35,19 +35,12 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/survey/saint-louis-university"
+              to="/survey/demo-university"
               className="btn-primary px-8 py-4 rounded-brand flex items-center justify-center text-lg font-semibold"
             >
-              Saint Louis University Demo Survey
+              Take a demo survey
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
-            {/* <Link
-              to="/survey/demo-university"
-              className="btn-secondary px-8 py-4 rounded-brand flex items-center justify-center"
-            >
-              Try Demo Survey
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link> */}
             <Link
               to="/admin/login"
               className="btn-subtle px-6 py-3 rounded-brand"
@@ -110,19 +103,12 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/survey/saint-louis-university"
+              to="/survey/demo-university"
               className="bg-white hover:bg-gray-100 text-navy px-8 py-4 rounded-brand font-semibold inline-flex items-center transition-colors"
             >
-              Saint Louis University Survey
+              Take a demo survey
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
-            {/* <Link
-              to="/survey/demo-university"
-              className="bg-white/80 hover:bg-white text-navy px-8 py-4 rounded-brand font-semibold inline-flex items-center transition-colors"
-            >
-              Try Demo Survey
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link> */}
           </div>
         </div>
       </section>
