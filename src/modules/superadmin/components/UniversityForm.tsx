@@ -31,6 +31,7 @@ export default function UniversityForm({ onNavigate, university, mode }: Univers
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   const [slugValid, setSlugValid] = useState(true);
   const [checkingSlug, setCheckingSlug] = useState(false);
 
@@ -114,8 +115,10 @@ export default function UniversityForm({ onNavigate, university, mode }: Univers
     try {
       if (mode === 'create') {
         await SuperAdminUniversityService.createUniversity(formData);
+        setSuccessMessage(`University "${newUniversity.name}" created successfully! Admin dashboard is now available at /admin/login with email: ${newUniversity.admin_email}`);
       } else {
         await SuperAdminUniversityService.updateUniversity(university!.id!, formData);
+        setSuccessMessage(`University "${formData.name}" updated successfully!`);
       }
       
       setSuccess(true);
@@ -140,6 +143,26 @@ export default function UniversityForm({ onNavigate, university, mode }: Univers
           <h2 className="text-xl font-semibold text-slate-900 mb-2">
             University {mode === 'create' ? 'Created' : 'Updated'} Successfully!
           </h2>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+            <p className="text-blue-800 text-sm">{successMessage}</p>
+            {mode === 'create' && (
+              <div className="mt-3 space-y-2 text-left">
+                <p className="text-blue-700 font-medium">Admin Dashboard Access:</p>
+                <p className="text-blue-600 text-sm">• URL: /admin/login</p>
+                <p className="text-blue-600 text-sm">• Email: {formData.admin_email}</p>
+                <p className="text-blue-600 text-sm">• Survey URL: /survey/{formData.slug}</p>
+                <p className="text-blue-600 text-sm">• Password: demo123 (update in production)</p>
+                <div className="mt-2 p-2 bg-blue-100 rounded">
+                  <p className="text-blue-800 text-xs font-medium">
+                    ✅ Admin dashboard automatically configured for this university
+                  </p>
+                  <p className="text-blue-700 text-xs">
+                    The admin can now login and view student analytics for their institution only
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
           <p className="text-slate-600">Redirecting to universities list...</p>
         </div>
       </div>
