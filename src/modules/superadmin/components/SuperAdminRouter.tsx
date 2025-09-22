@@ -6,6 +6,7 @@ import SuperAdminLogin from './SuperAdminLogin';
 import SuperAdminDashboard from './SuperAdminDashboard';
 import UniversityList from './UniversityList';
 import UniversityForm from './UniversityForm';
+import UniversityResponses from './UniversityResponses';
 
 export default function SuperAdminRouter() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
