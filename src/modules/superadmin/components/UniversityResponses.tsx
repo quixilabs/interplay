@@ -74,11 +74,11 @@ export default function UniversityResponses({ onNavigate, university }: Universi
   const exportData = () => {
     // Create comprehensive CSV export
     const csvData = responses.map(response => {
-      const demographics = response.demographics[0] || {};
-      const flourishing = response.flourishing_scores[0] || {};
-      const wellbeing = response.school_wellbeing[0] || {};
-      const tensions = response.tensions_assessment[0] || {};
-      const textResponse = response.text_responses[0] || {};
+      const demographics = (response.demographics || [])[0] || {};
+      const flourishing = (response.flourishing_scores || [])[0] || {};
+      const wellbeing = (response.school_wellbeing || [])[0] || {};
+      const tensions = (response.tensions_assessment || [])[0] || {};
+      const textResponse = (response.text_responses || [])[0] || {};
       
       return {
         session_id: response.session_id,
@@ -138,7 +138,7 @@ export default function UniversityResponses({ onNavigate, university }: Universi
         fastest_win_suggestion: textResponse.fastest_win_suggestion || '',
         
         // Enablers and Barriers (flattened)
-        enablers_barriers: response.user_enablers_barriers.map((eb: any) => 
+        enablers_barriers: (response.user_enablers_barriers || []).map((eb: any) => 
           `${eb.domain_key}: E[${eb.selected_enablers?.join(', ') || ''}] B[${eb.selected_barriers?.join(', ') || ''}]`
         ).join(' | ')
       };
@@ -173,9 +173,9 @@ export default function UniversityResponses({ onNavigate, university }: Universi
 
   const filteredResponses = responses.filter(response => {
     const searchLower = searchTerm.toLowerCase();
-    const demographics = response.demographics[0];
+    const demographics = (response.demographics || [])[0];
     const sessionId = response.session_id.toLowerCase();
-    const textResponse = response.text_responses[0];
+    const textResponse = (response.text_responses || [])[0];
     
     return sessionId.includes(searchLower) ||
            demographics?.year_in_school?.toLowerCase().includes(searchLower) ||
@@ -517,11 +517,11 @@ function StudentResponseRow({
   isSelected: boolean; 
   onSelect: () => void; 
 }) {
-  const demographics = response.demographics[0];
-  const flourishing = response.flourishing_scores[0];
-  const wellbeing = response.school_wellbeing[0];
-  const textResponses = response.text_responses[0];
-  const tensions = response.tensions_assessment[0];
+  const demographics = (response.demographics || [])[0];
+  const flourishing = (response.flourishing_scores || [])[0];
+  const wellbeing = (response.school_wellbeing || [])[0];
+  const textResponses = (response.text_responses || [])[0];
+  const tensions = (response.tensions_assessment || [])[0];
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -658,7 +658,7 @@ function StudentResponseRow({
         <div className="mt-6 pt-6 border-t border-slate-200">
           <div className="space-y-6">
             {/* Complete Demographics */}
-            {demographics && (
+            {demographics && Object.keys(demographics).length > 0 && (
               <div className="bg-slate-50 rounded-lg p-6">
                 <div className="flex items-center mb-4">
                   <User className="h-5 w-5 text-slate-600 mr-2" />
@@ -728,7 +728,7 @@ function StudentResponseRow({
             )}
 
             {/* Complete Flourishing Scores */}
-            {flourishing && Object.keys(flourishing).length > 1 && (
+            {flourishing && Object.keys(flourishing).length > 0 && (
               <div className="bg-slate-50 rounded-lg p-6">
                 <div className="flex items-center mb-4">
                   <Heart className="h-5 w-5 text-red-500 mr-2" />
@@ -776,7 +776,7 @@ function StudentResponseRow({
             )}
 
             {/* Show message if no flourishing data */}
-            {(!flourishing || Object.keys(flourishing).length <= 1) && (
+            {(!flourishing || Object.keys(flourishing).length === 0) && (
               <div className="bg-slate-50 rounded-lg p-6">
                 <div className="flex items-center mb-2">
                   <Heart className="h-5 w-5 text-slate-400 mr-2" />
@@ -787,7 +787,7 @@ function StudentResponseRow({
             )}
 
             {/* Complete School Wellbeing */}
-            {wellbeing && Object.keys(wellbeing).length > 1 && (
+            {wellbeing && Object.keys(wellbeing).length > 0 && (
               <div className="bg-slate-50 rounded-lg p-6">
                 <div className="flex items-center mb-4">
                   <Shield className="h-5 w-5 text-blue-500 mr-2" />
@@ -821,11 +821,11 @@ function StudentResponseRow({
                   })}
                 </div>
                 
-                {wellbeing.wellbeing_checklist && wellbeing.wellbeing_checklist.length > 0 && (
+                {wellbeing.wellbeing_checklist && (wellbeing.wellbeing_checklist || []).length > 0 && (
                   <div className="mt-4 p-4 bg-white rounded-lg border">
                     <h5 className="font-medium text-slate-900 mb-2">Wellbeing Checklist Items Selected:</h5>
                     <ul className="text-sm text-slate-700 space-y-1">
-                      {wellbeing.wellbeing_checklist.map((item: string, index: number) => (
+                      {(wellbeing.wellbeing_checklist || []).map((item: string, index: number) => (
                         <li key={index} className="flex items-center">
                           <span className="text-green-600 mr-2">✓</span>
                           {item}
@@ -838,7 +838,7 @@ function StudentResponseRow({
             )}
 
             {/* Show message if no wellbeing data */}
-            {(!wellbeing || Object.keys(wellbeing).length <= 1) && (
+            {(!wellbeing || Object.keys(wellbeing).length === 0) && (
               <div className="bg-slate-50 rounded-lg p-6">
                 <div className="flex items-center mb-2">
                   <Shield className="h-5 w-5 text-slate-400 mr-2" />
@@ -849,7 +849,7 @@ function StudentResponseRow({
             )}
 
             {/* Complete Tension Assessment */}
-            {tensions && Object.keys(tensions).length > 1 && (
+            {tensions && Object.keys(tensions).length > 0 && (
               <div className="bg-slate-50 rounded-lg p-6">
                 <div className="flex items-center mb-4">
                   <Zap className="h-5 w-5 text-purple-500 mr-2" />
@@ -896,7 +896,7 @@ function StudentResponseRow({
             )}
 
             {/* Show message if no tension data */}
-            {(!tensions || Object.keys(tensions).length <= 1) && (
+            {(!tensions || Object.keys(tensions).length === 0) && (
               <div className="bg-slate-50 rounded-lg p-6">
                 <div className="flex items-center mb-2">
                   <Zap className="h-5 w-5 text-slate-400 mr-2" />
@@ -907,28 +907,28 @@ function StudentResponseRow({
             )}
 
             {/* Complete Enablers and Barriers by Domain */}
-            {response.user_enablers_barriers.length > 0 && (
+            {(response.user_enablers_barriers || []).length > 0 && (
               <div className="bg-slate-50 rounded-lg p-6">
                 <div className="flex items-center mb-4">
                   <Target className="h-5 w-5 text-orange-500 mr-2" />
                   <h4 className="font-semibold text-slate-900">Enablers & Barriers by Domain</h4>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  {response.user_enablers_barriers.map((eb: any, index: number) => (
+                  {(response.user_enablers_barriers || []).map((eb: any, index: number) => (
                     <div key={index} className="bg-white rounded-lg p-4 border">
                       <h5 className="font-medium text-slate-800 mb-3 flex items-center">
                         <span className="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
                         {eb.domain_key.split('_').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' & ')}
                       </h5>
                       
-                      {eb.selected_enablers?.length > 0 && (
+                      {(eb.selected_enablers || []).length > 0 && (
                         <div className="mb-3">
                           <p className="text-sm font-medium text-green-700 mb-2 flex items-center">
                             <span className="text-green-600 mr-1">+</span>
-                            Enablers Selected ({eb.selected_enablers.length}):
+                            Enablers Selected ({(eb.selected_enablers || []).length}):
                           </p>
                           <ul className="text-sm text-slate-700 space-y-1">
-                            {eb.selected_enablers.map((enabler: string, i: number) => (
+                            {(eb.selected_enablers || []).map((enabler: string, i: number) => (
                               <li key={i} className="flex items-start">
                                 <span className="text-green-500 mr-2 mt-0.5">•</span>
                                 {enabler}
@@ -945,14 +945,14 @@ function StudentResponseRow({
                         </div>
                       )}
                       
-                      {eb.selected_barriers?.length > 0 && (
+                      {(eb.selected_barriers || []).length > 0 && (
                         <div>
                           <p className="text-sm font-medium text-red-700 mb-2 flex items-center">
                             <span className="text-red-600 mr-1">-</span>
-                            Barriers Selected ({eb.selected_barriers.length}):
+                            Barriers Selected ({(eb.selected_barriers || []).length}):
                           </p>
                           <ul className="text-sm text-slate-700 space-y-1">
-                            {eb.selected_barriers.map((barrier: string, i: number) => (
+                            {(eb.selected_barriers || []).map((barrier: string, i: number) => (
                               <li key={i} className="flex items-start">
                                 <span className="text-red-500 mr-2 mt-0.5">•</span>
                                 {barrier}
@@ -969,8 +969,8 @@ function StudentResponseRow({
                         </div>
                       )}
                       
-                      {(!eb.selected_enablers || eb.selected_enablers.length === 0) && 
-                       (!eb.selected_barriers || eb.selected_barriers.length === 0) && (
+                      {(!(eb.selected_enablers || []).length) && 
+                       (!(eb.selected_barriers || []).length) && (
                         <p className="text-sm text-slate-500 italic">No enablers or barriers selected for this domain</p>
                       )}
                     </div>
@@ -980,7 +980,7 @@ function StudentResponseRow({
             )}
 
             {/* Show message if no enablers/barriers data */}
-            {response.user_enablers_barriers.length === 0 && (
+            {(response.user_enablers_barriers || []).length === 0 && (
               <div className="bg-slate-50 rounded-lg p-6">
                 <div className="flex items-center mb-2">
                   <Target className="h-5 w-5 text-slate-400 mr-2" />
