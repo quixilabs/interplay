@@ -99,10 +99,7 @@ export default function TensionsSection() {
                     max="100"
                     value={value}
                     onChange={(e) => handleSliderChange(pair.key, parseInt(e.target.value))}
-                    className="w-full h-3 bg-gradient-to-r from-blue-200 via-purple-200 to-teal-200 rounded-lg appearance-none cursor-pointer slider"
-                    style={{
-                      background: `linear-gradient(to right, #dbeafe 0%, #e879f9 ${value}%, #a7f3d0 100%)`
-                    }}
+                    className="w-full h-3 bg-slate-200 rounded-lg appearance-none cursor-pointer slider"
                   />
                   <div
                     className="absolute top-1/2 transform -translate-y-1/2 w-6 h-6 bg-white border-2 border-slate-400 rounded-full shadow-lg pointer-events-none"
@@ -117,9 +114,15 @@ export default function TensionsSection() {
                 </div>
 
                 <div className="text-center mt-3">
-                  <span className="inline-block px-3 py-1 bg-slate-200 rounded-full text-sm text-slate-700">
-                    Current balance: {value}%
-                  </span>
+                  {value === 50 ? (
+                    <span className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                      Balanced (50% | 50%)
+                    </span>
+                  ) : (
+                    <span className="inline-block px-3 py-1 bg-slate-200 rounded-full text-sm text-slate-700">
+                      {pair.left}: {100 - value}% | {pair.right}: {value}%
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
