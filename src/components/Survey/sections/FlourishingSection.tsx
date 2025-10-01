@@ -49,7 +49,7 @@ const FLOURISHING_DOMAINS = [
   },
   {
     key: 'character_virtue',
-    name: 'Character & Growth',
+    name: 'Character & Virtue',
     questions: [
       {
         text: 'I try to do what is right in all circumstances, even when it is difficult.',
