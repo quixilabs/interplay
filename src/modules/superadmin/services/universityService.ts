@@ -254,6 +254,115 @@ export class SuperAdminUniversityService {
       .trim();
   }
 
+  // Get complete student session data using optimized SQL query
+  static async getStudentSessionData(sessionId: string): Promise<any> {
+    try {
+      // Get main session data with all joins
+      const { data: sessionData, error: sessionError } = await supabase.rpc('get_complete_session_data', {
+        p_session_id: sessionId
+      });
+
+      if (sessionError) {
+        // Fallback to manual query if RPC doesn't exist
+        const { data, error } = await supabase
+          .from('survey_sessions')
+          .select(`
+            session_id,
+            university_slug,
+            start_time,
+            completion_time,
+            is_completed,
+            email_for_results,
+            demographics (
+              year_in_school,
+              enrollment_status,
+              age_range,
+              gender_identity,
+              gender_self_describe,
+              race_ethnicity,
+              is_international,
+              employment_status,
+              has_caregiving_responsibilities,
+              in_greek_organization,
+              study_mode,
+              transfer_student
+            ),
+            flourishing_scores (
+              happiness_satisfaction_1,
+              happiness_satisfaction_2,
+              mental_physical_health_1,
+              mental_physical_health_2,
+              meaning_purpose_1,
+              meaning_purpose_2,
+              character_virtue_1,
+              character_virtue_2,
+              social_relationships_1,
+              social_relationships_2,
+              financial_stability_1,
+              financial_stability_2
+            ),
+            school_wellbeing (
+              belonging_score,
+              enjoy_school_days,
+              physical_activity,
+              feel_safe,
+              work_connected_goals,
+              contribute_bigger_purpose,
+              kind_to_others,
+              manage_emotions,
+              trusted_adult,
+              supportive_friends,
+              resources_participation,
+              wellbeing_checklist
+            ),
+            tensions_assessment (
+              performance_wellbeing,
+              ambition_contribution,
+              selfreliance_connection,
+              stability_growth,
+              academic_creative
+            ),
+            text_responses (
+              fastest_win_suggestion
+            )
+          `)
+          .eq('session_id', sessionId)
+          .single();
+
+        if (error) throw error;
+
+        // Get user enablers/barriers separately
+        const { data: enablersBarriers, error: ebError } = await supabase
+          .from('user_enablers_barriers')
+          .select('domain_key, selected_enablers, selected_barriers, enabler_other_text, barrier_other_text, created_at')
+          .eq('session_id', sessionId)
+          .order('created_at', { ascending: true });
+
+        if (ebError) throw ebError;
+
+        // Get growth modules separately
+        const { data: growthModules, error: gmError } = await supabase
+          .from('growth_modules')
+          .select('domain_name, enabler_selections, barrier_selection, additional_comments, created_at')
+          .eq('session_id', sessionId)
+          .order('created_at', { ascending: true });
+
+        if (gmError) throw gmError;
+
+        return {
+          ...data,
+          user_enablers_barriers: enablersBarriers || [],
+          growth_modules: growthModules || []
+        };
+      }
+
+      return sessionData;
+    } catch (error) {
+      console.error('Error fetching student session data:', error);
+      throw error;
+    }
+  }
+
   // Get detailed survey responses for a university
   static async getUniversityResponses(universitySlug: string, includeIncomplete: boolean = true): Promise<any[]> {
     try {
@@ -276,7 +385,7 @@ export class SuperAdminUniversityService {
       }
       
       const { data: sessions, error: sessionsError } = await query
-        .order('completion_time', { ascending: false });
+        .order('completion_time', { ascending: false, nullsFirst: false });
 
       if (sessionsError) throw sessionsError;
 
@@ -285,6 +394,87 @@ export class SuperAdminUniversityService {
       console.error('Error fetching university responses:', error);
       throw error;
     }
+  }
+
+  // Export single session as CSV-ready object
+  static formatSessionForExport(session: any): any {
+    const demographics = Array.isArray(session.demographics) ? session.demographics[0] : session.demographics;
+    const flourishing = Array.isArray(session.flourishing_scores) ? session.flourishing_scores[0] : session.flourishing_scores;
+    const wellbeing = Array.isArray(session.school_wellbeing) ? session.school_wellbeing[0] : session.school_wellbeing;
+    const tensions = Array.isArray(session.tensions_assessment) ? session.tensions_assessment[0] : session.tensions_assessment;
+    const textResponse = Array.isArray(session.text_responses) ? session.text_responses[0] : session.text_responses;
+    
+    return {
+      // Session Info
+      session_id: session.session_id,
+      university_slug: session.university_slug,
+      start_time: session.start_time,
+      completion_time: session.completion_time,
+      is_completed: session.is_completed,
+      email_for_results: session.email_for_results || '',
+      
+      // Demographics
+      year_in_school: demographics?.year_in_school || '',
+      enrollment_status: demographics?.enrollment_status || '',
+      age_range: demographics?.age_range || '',
+      gender_identity: demographics?.gender_identity || '',
+      gender_self_describe: demographics?.gender_self_describe || '',
+      race_ethnicity: demographics?.race_ethnicity?.join('; ') || '',
+      is_international: demographics?.is_international || '',
+      employment_status: demographics?.employment_status || '',
+      has_caregiving_responsibilities: demographics?.has_caregiving_responsibilities || '',
+      in_greek_organization: demographics?.in_greek_organization || '',
+      study_mode: demographics?.study_mode || '',
+      transfer_student: demographics?.transfer_student || '',
+      
+      // Flourishing Scores
+      happiness_satisfaction_1: flourishing?.happiness_satisfaction_1 ?? '',
+      happiness_satisfaction_2: flourishing?.happiness_satisfaction_2 ?? '',
+      mental_physical_health_1: flourishing?.mental_physical_health_1 ?? '',
+      mental_physical_health_2: flourishing?.mental_physical_health_2 ?? '',
+      meaning_purpose_1: flourishing?.meaning_purpose_1 ?? '',
+      meaning_purpose_2: flourishing?.meaning_purpose_2 ?? '',
+      character_virtue_1: flourishing?.character_virtue_1 ?? '',
+      character_virtue_2: flourishing?.character_virtue_2 ?? '',
+      social_relationships_1: flourishing?.social_relationships_1 ?? '',
+      social_relationships_2: flourishing?.social_relationships_2 ?? '',
+      financial_stability_1: flourishing?.financial_stability_1 ?? '',
+      financial_stability_2: flourishing?.financial_stability_2 ?? '',
+      
+      // School Wellbeing
+      belonging_score: wellbeing?.belonging_score ?? '',
+      enjoy_school_days: wellbeing?.enjoy_school_days ?? '',
+      physical_activity: wellbeing?.physical_activity ?? '',
+      feel_safe: wellbeing?.feel_safe ?? '',
+      work_connected_goals: wellbeing?.work_connected_goals ?? '',
+      contribute_bigger_purpose: wellbeing?.contribute_bigger_purpose ?? '',
+      kind_to_others: wellbeing?.kind_to_others ?? '',
+      manage_emotions: wellbeing?.manage_emotions ?? '',
+      trusted_adult: wellbeing?.trusted_adult ?? '',
+      supportive_friends: wellbeing?.supportive_friends ?? '',
+      resources_participation: wellbeing?.resources_participation ?? '',
+      wellbeing_checklist: wellbeing?.wellbeing_checklist?.join('; ') || '',
+      
+      // Tensions
+      performance_wellbeing: tensions?.performance_wellbeing ?? '',
+      ambition_contribution: tensions?.ambition_contribution ?? '',
+      selfreliance_connection: tensions?.selfreliance_connection ?? '',
+      stability_growth: tensions?.stability_growth ?? '',
+      academic_creative: tensions?.academic_creative ?? '',
+      
+      // Text Responses
+      fastest_win_suggestion: textResponse?.fastest_win_suggestion || '',
+      
+      // Enablers and Barriers (flattened)
+      enablers_barriers: (session.user_enablers_barriers || []).map((eb: any) => 
+        `${eb.domain_key}: E[${(eb.selected_enablers || []).join(', ')}] B[${(eb.selected_barriers || []).join(', ')}]${eb.enabler_other_text ? ` E_OTHER[${eb.enabler_other_text}]` : ''}${eb.barrier_other_text ? ` B_OTHER[${eb.barrier_other_text}]` : ''}`
+      ).join(' | ') || '',
+      
+      // Growth Modules (if any)
+      growth_modules: (session.growth_modules || []).map((gm: any) =>
+        `${gm.domain_name}: ${gm.enabler_selections || ''} / ${gm.barrier_selection || ''}${gm.additional_comments ? ` (${gm.additional_comments})` : ''}`
+      ).join(' | ') || ''
+    };
   }
 
   // Get aggregated response data for a university
