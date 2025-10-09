@@ -1,26 +1,25 @@
 import { useState, useEffect } from 'react';
-import { 
-  ArrowLeft, 
-  Download, 
-  Search, 
+import {
+  ArrowLeft,
+  Download,
+  Search,
   Filter,
-  Eye,
   BarChart3,
   Users,
-  Calendar,
-  Mail,
-  ChevronDown,
-  ChevronUp,
-  User,
   Heart,
   Brain,
   Target,
   Shield,
-  DollarSign,
-  Zap
+  Zap,
+  AlertCircle,
+  CheckCircle2,
+  TrendingUp,
+  X,
+  ArrowUpDown
 } from 'lucide-react';
 import { SuperAdminUniversityService } from '../services/universityService';
 import { UniversityData } from '../types';
+import SessionRow from './SessionRow';
 
 interface UniversityResponsesProps {
   onNavigate: (view: string) => void;
@@ -39,6 +38,10 @@ interface ResponseData {
   user_enablers_barriers: any[];
 }
 
+type FilterStatus = 'all' | 'complete' | 'incomplete' | 'missing_data';
+type SortField = 'date' | 'session_id' | 'completion';
+type SortDirection = 'asc' | 'desc';
+
 export default function UniversityResponses({ onNavigate, university }: UniversityResponsesProps) {
   const [responses, setResponses] = useState<ResponseData[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
@@ -47,6 +50,11 @@ export default function UniversityResponses({ onNavigate, university }: Universi
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedResponse, setSelectedResponse] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'analytics'>('list');
+  const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
+  const [dateRange, setDateRange] = useState<{ start: string; end: string }>({ start: '', end: '' });
+  const [showFilters, setShowFilters] = useState(false);
+  const [sortField, setSortField] = useState<SortField>('date');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
   useEffect(() => {
     loadData();
@@ -59,7 +67,7 @@ export default function UniversityResponses({ onNavigate, university }: Universi
         SuperAdminUniversityService.getUniversityResponses(university.slug, true), // Include incomplete responses
         SuperAdminUniversityService.getUniversityAnalytics(university.slug)
       ]);
-      
+
       setResponses(responsesData);
       setAnalytics(analyticsData);
       setError(null);
@@ -72,117 +80,150 @@ export default function UniversityResponses({ onNavigate, university }: Universi
   };
 
   const exportData = () => {
-    // Create comprehensive CSV export
-    const csvData = responses.map(response => {
-      const demographics = (response.demographics || [])[0] || {};
-      const flourishing = (response.flourishing_scores || [])[0] || {};
-      const wellbeing = (response.school_wellbeing || [])[0] || {};
-      const tensions = (response.tensions_assessment || [])[0] || {};
-      const textResponse = (response.text_responses || [])[0] || {};
-      
-      return {
-        session_id: response.session_id,
-        completion_time: response.completion_time,
-        email_for_results: response.email_for_results || '',
-        
-        // Demographics
-        year_in_school: demographics.year_in_school || '',
-        enrollment_status: demographics.enrollment_status || '',
-        age_range: demographics.age_range || '',
-        gender_identity: demographics.gender_identity || '',
-        gender_self_describe: demographics.gender_self_describe || '',
-        race_ethnicity: demographics.race_ethnicity?.join('; ') || '',
-        is_international: demographics.is_international || '',
-        employment_status: demographics.employment_status || '',
-        has_caregiving_responsibilities: demographics.has_caregiving_responsibilities || '',
-        in_greek_organization: demographics.in_greek_organization || '',
-        study_mode: demographics.study_mode || '',
-        transfer_student: demographics.transfer_student || '',
-        
-        // Flourishing Scores
-        happiness_satisfaction_1: flourishing.happiness_satisfaction_1 || '',
-        happiness_satisfaction_2: flourishing.happiness_satisfaction_2 || '',
-        mental_physical_health_1: flourishing.mental_physical_health_1 || '',
-        mental_physical_health_2: flourishing.mental_physical_health_2 || '',
-        meaning_purpose_1: flourishing.meaning_purpose_1 || '',
-        meaning_purpose_2: flourishing.meaning_purpose_2 || '',
-        character_virtue_1: flourishing.character_virtue_1 || '',
-        character_virtue_2: flourishing.character_virtue_2 || '',
-        social_relationships_1: flourishing.social_relationships_1 || '',
-        social_relationships_2: flourishing.social_relationships_2 || '',
-        financial_stability_1: flourishing.financial_stability_1 || '',
-        financial_stability_2: flourishing.financial_stability_2 || '',
-        
-        // School Wellbeing
-        belonging_score: wellbeing.belonging_score || '',
-        enjoy_school_days: wellbeing.enjoy_school_days || '',
-        physical_activity: wellbeing.physical_activity || '',
-        feel_safe: wellbeing.feel_safe || '',
-        work_connected_goals: wellbeing.work_connected_goals || '',
-        contribute_bigger_purpose: wellbeing.contribute_bigger_purpose || '',
-        kind_to_others: wellbeing.kind_to_others || '',
-        manage_emotions: wellbeing.manage_emotions || '',
-        trusted_adult: wellbeing.trusted_adult || '',
-        supportive_friends: wellbeing.supportive_friends || '',
-        resources_participation: wellbeing.resources_participation || '',
-        wellbeing_checklist: wellbeing.wellbeing_checklist?.join('; ') || '',
-        
-        // Tensions
-        performance_wellbeing: tensions.performance_wellbeing || '',
-        ambition_contribution: tensions.ambition_contribution || '',
-        selfreliance_connection: tensions.selfreliance_connection || '',
-        stability_growth: tensions.stability_growth || '',
-        academic_creative: tensions.academic_creative || '',
-        
-        // Text Responses
-        fastest_win_suggestion: textResponse.fastest_win_suggestion || '',
-        
-        // Enablers and Barriers (flattened)
-        enablers_barriers: (response.user_enablers_barriers || []).map((eb: any) => 
-          `${eb.domain_key}: E[${eb.selected_enablers?.join(', ') || ''}] B[${eb.selected_barriers?.join(', ') || ''}]`
-        ).join(' | ')
-      };
-    });
+    // Use the service formatting method for consistent export
+    const csvData = responses.map(response =>
+      SuperAdminUniversityService.formatSessionForExport(response)
+    );
+
+    if (csvData.length === 0) {
+      console.warn('No data to export');
+      return;
+    }
 
     // Convert to CSV
-    const headers = Object.keys(csvData[0] || {});
+    const headers = Object.keys(csvData[0]);
     const csvContent = [
       headers.join(','),
-      ...csvData.map(row => headers.map(header => `"${row[header as keyof typeof row]}"`).join(','))
+      ...csvData.map(row => headers.map(header => {
+        const value = row[header as keyof typeof row];
+        // Escape quotes and wrap in quotes
+        const escaped = String(value).replace(/"/g, '""');
+        return `"${escaped}"`;
+      }).join(','))
     ].join('\n');
 
     // Download
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `${university.slug}-survey-responses-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  // Helper to check if response has missing data
+  const hasMissingData = (response: ResponseData) => {
+    const hasFlourishing = response.flourishing_scores && response.flourishing_scores.length > 0;
+    const hasWellbeing = response.school_wellbeing && response.school_wellbeing.length > 0;
+    const hasTensions = response.tensions_assessment && response.tensions_assessment.length > 0;
+    const hasEnablers = response.user_enablers_barriers && response.user_enablers_barriers.length > 0;
+
+    return !hasFlourishing || !hasWellbeing || !hasTensions || !hasEnablers;
   };
 
-  const filteredResponses = responses.filter(response => {
-    const searchLower = searchTerm.toLowerCase();
-    const demographics = (response.demographics || [])[0];
-    const sessionId = response.session_id.toLowerCase();
-    const textResponse = (response.text_responses || [])[0];
-    
-    return sessionId.includes(searchLower) ||
-           demographics?.year_in_school?.toLowerCase().includes(searchLower) ||
-           demographics?.gender_identity?.toLowerCase().includes(searchLower) ||
-           demographics?.employment_status?.toLowerCase().includes(searchLower) ||
-           textResponse?.fastest_win_suggestion?.toLowerCase().includes(searchLower);
-  });
+  // Calculate data quality metrics
+  const dataQualityMetrics = {
+    totalSessions: responses.length,
+    completedSessions: responses.filter(r => r.completion_time).length,
+    incompleteSessions: responses.filter(r => !r.completion_time).length,
+    sessionsWithMissingData: responses.filter(hasMissingData).length,
+    recentSessions: responses.filter(r => {
+      if (!r.completion_time) return false;
+      const completionDate = new Date(r.completion_time);
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      return completionDate >= sevenDaysAgo;
+    }).length,
+    completionRate: responses.length > 0
+      ? Math.round((responses.filter(r => r.completion_time).length / responses.length) * 100)
+      : 0,
+    mostCommonMissingData: (() => {
+      const missing = {
+        flourishing: 0,
+        wellbeing: 0,
+        tensions: 0,
+        enablers: 0
+      };
+      responses.forEach(r => {
+        if (!r.flourishing_scores || r.flourishing_scores.length === 0) missing.flourishing++;
+        if (!r.school_wellbeing || r.school_wellbeing.length === 0) missing.wellbeing++;
+        if (!r.tensions_assessment || r.tensions_assessment.length === 0) missing.tensions++;
+        if (!r.user_enablers_barriers || r.user_enablers_barriers.length === 0) missing.enablers++;
+      });
+      const max = Math.max(...Object.values(missing));
+      const key = Object.keys(missing).find(k => missing[k as keyof typeof missing] === max);
+      return key ? { type: key, count: max } : null;
+    })()
+  };
+
+  // Filter and sort responses
+  const filteredResponses = responses
+    .filter(response => {
+      // Search filter
+      const searchLower = searchTerm.toLowerCase();
+      const demographics = (response.demographics || [])[0];
+      const sessionId = response.session_id.toLowerCase();
+      const textResponse = (response.text_responses || [])[0];
+
+      const matchesSearch = !searchTerm || (
+        sessionId.includes(searchLower) ||
+        demographics?.year_in_school?.toLowerCase().includes(searchLower) ||
+        demographics?.gender_identity?.toLowerCase().includes(searchLower) ||
+        demographics?.employment_status?.toLowerCase().includes(searchLower) ||
+        textResponse?.fastest_win_suggestion?.toLowerCase().includes(searchLower)
+      );
+
+      // Status filter
+      const matchesStatus = (() => {
+        switch (filterStatus) {
+          case 'complete':
+            return !!response.completion_time;
+          case 'incomplete':
+            return !response.completion_time;
+          case 'missing_data':
+            return hasMissingData(response);
+          default:
+            return true;
+        }
+      })();
+
+      // Date range filter
+      const matchesDateRange = (() => {
+        if (!dateRange.start && !dateRange.end) return true;
+        if (!response.completion_time) return false;
+
+        const completionDate = new Date(response.completion_time);
+        if (dateRange.start && new Date(dateRange.start) > completionDate) return false;
+        if (dateRange.end && new Date(dateRange.end) < completionDate) return false;
+        return true;
+      })();
+
+      return matchesSearch && matchesStatus && matchesDateRange;
+    })
+    .sort((a, b) => {
+      let comparison = 0;
+
+      switch (sortField) {
+        case 'date':
+          const dateA = a.completion_time ? new Date(a.completion_time).getTime() : 0;
+          const dateB = b.completion_time ? new Date(b.completion_time).getTime() : 0;
+          comparison = dateA - dateB;
+          break;
+        case 'session_id':
+          comparison = a.session_id.localeCompare(b.session_id);
+          break;
+        case 'completion':
+          const scoreA = a.completion_time ? 1 : 0;
+          const scoreB = b.completion_time ? 1 : 0;
+          comparison = scoreA - scoreB;
+          break;
+      }
+
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
 
   if (loading) {
     return (
@@ -218,29 +259,27 @@ export default function UniversityResponses({ onNavigate, university }: Universi
               <div className="flex bg-slate-100 rounded-lg p-1">
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                    viewMode === 'list' 
-                      ? 'bg-white text-slate-900 shadow-sm' 
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
+                  className={`px-3 py-1 rounded text-sm font-medium transition-colors ${viewMode === 'list'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                    }`}
                 >
                   <Users className="h-4 w-4 mr-1 inline" />
                   Student Responses
                 </button>
                 <button
                   onClick={() => setViewMode('analytics')}
-                  className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                    viewMode === 'analytics' 
-                      ? 'bg-white text-slate-900 shadow-sm' 
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
+                  className={`px-3 py-1 rounded text-sm font-medium transition-colors ${viewMode === 'analytics'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                    }`}
                 >
                   <BarChart3 className="h-4 w-4 mr-1 inline" />
                   Analytics
                 </button>
               </div>
 
-              <button 
+              <button
                 onClick={exportData}
                 className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
               >
@@ -263,15 +302,354 @@ export default function UniversityResponses({ onNavigate, university }: Universi
         {viewMode === 'analytics' ? (
           <AnalyticsView analytics={analytics} />
         ) : (
-          <StudentResponsesView 
-            responses={filteredResponses}
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            selectedResponse={selectedResponse}
-            onResponseSelect={setSelectedResponse}
-          />
+          <>
+            {/* Data Quality Dashboard */}
+            <DataQualityDashboard metrics={dataQualityMetrics} />
+
+            {/* Filters and Search */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex-1 relative mr-4">
+                  <Search className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by session ID, demographics, or feedback..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  />
+                </div>
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg border transition-colors ${showFilters ? 'bg-red-50 border-red-200 text-red-700' : 'border-slate-300 text-slate-700 hover:bg-slate-50'
+                    }`}
+                >
+                  <Filter className="h-4 w-4" />
+                  <span>Filters</span>
+                  {(filterStatus !== 'all' || dateRange.start || dateRange.end) && (
+                    <span className="bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {[filterStatus !== 'all', dateRange.start, dateRange.end].filter(Boolean).length}
+                    </span>
+                  )}
+                </button>
+              </div>
+
+              {/* Filter Panel */}
+              {showFilters && (
+                <div className="pt-4 border-t border-slate-200 grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Completion Status
+                    </label>
+                    <select
+                      value={filterStatus}
+                      onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                    >
+                      <option value="all">All Sessions</option>
+                      <option value="complete">Complete Only</option>
+                      <option value="incomplete">Incomplete Only</option>
+                      <option value="missing_data">Has Missing Data</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Start Date
+                    </label>
+                    <input
+                      type="date"
+                      value={dateRange.start}
+                      onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      End Date
+                    </label>
+                    <input
+                      type="date"
+                      value={dateRange.end}
+                      onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Active Filters Display */}
+              {(filterStatus !== 'all' || dateRange.start || dateRange.end) && (
+                <div className="flex items-center flex-wrap gap-2 pt-4 border-t border-slate-200">
+                  <span className="text-sm text-slate-600 font-medium">Active filters:</span>
+                  {filterStatus !== 'all' && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-red-100 text-red-700">
+                      Status: {filterStatus.replace('_', ' ')}
+                      <button
+                        onClick={() => setFilterStatus('all')}
+                        className="ml-2 hover:text-red-900"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  )}
+                  {dateRange.start && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-700">
+                      From: {dateRange.start}
+                      <button
+                        onClick={() => setDateRange({ ...dateRange, start: '' })}
+                        className="ml-2 hover:text-blue-900"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  )}
+                  {dateRange.end && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-700">
+                      To: {dateRange.end}
+                      <button
+                        onClick={() => setDateRange({ ...dateRange, end: '' })}
+                        className="ml-2 hover:text-blue-900"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  )}
+                  <button
+                    onClick={() => {
+                      setFilterStatus('all');
+                      setDateRange({ start: '', end: '' });
+                    }}
+                    className="text-sm text-slate-600 hover:text-slate-900 underline"
+                  >
+                    Clear all
+                  </button>
+                </div>
+              )}
+
+              <div className="text-sm text-slate-600">
+                Showing {filteredResponses.length} of {responses.length} sessions
+              </div>
+            </div>
+
+            {/* Sessions Table */}
+            <SessionsTable
+              responses={filteredResponses}
+              selectedResponse={selectedResponse}
+              onResponseSelect={setSelectedResponse}
+              sortField={sortField}
+              onSort={(field) => {
+                if (field === sortField) {
+                  setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+                } else {
+                  setSortField(field);
+                  setSortDirection('desc');
+                }
+              }}
+            />
+          </>
         )}
       </main>
+    </div>
+  );
+}
+
+// Data Quality Dashboard Component
+function DataQualityDashboard({ metrics }: { metrics: any }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      {/* Total Sessions */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-slate-600">Total Sessions</p>
+            <p className="text-3xl font-bold text-slate-900 mt-2">{metrics.totalSessions}</p>
+            <p className="text-xs text-slate-500 mt-1">
+              {metrics.recentSessions} in last 7 days
+            </p>
+          </div>
+          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <Users className="h-6 w-6 text-blue-600" />
+          </div>
+        </div>
+      </div>
+
+      {/* Completion Rate */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-slate-600">Completion Rate</p>
+            <p className="text-3xl font-bold text-slate-900 mt-2">{metrics.completionRate}%</p>
+            <p className="text-xs text-slate-500 mt-1">
+              {metrics.completedSessions} complete, {metrics.incompleteSessions} incomplete
+            </p>
+          </div>
+          <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${metrics.completionRate >= 80 ? 'bg-green-100' : 'bg-orange-100'
+            }`}>
+            <CheckCircle2 className={`h-6 w-6 ${metrics.completionRate >= 80 ? 'text-green-600' : 'text-orange-600'
+              }`} />
+          </div>
+        </div>
+      </div>
+
+      {/* Missing Data */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-slate-600">Sessions w/ Missing Data</p>
+            <p className="text-3xl font-bold text-slate-900 mt-2">{metrics.sessionsWithMissingData}</p>
+            {metrics.mostCommonMissingData && (
+              <p className="text-xs text-slate-500 mt-1">
+                Most: {metrics.mostCommonMissingData.type} ({metrics.mostCommonMissingData.count})
+              </p>
+            )}
+          </div>
+          <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+            <AlertCircle className="h-6 w-6 text-red-600" />
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Activity */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-slate-600">Recent Activity</p>
+            <p className="text-3xl font-bold text-slate-900 mt-2">{metrics.recentSessions}</p>
+            <p className="text-xs text-slate-500 mt-1">
+              Last 7 days
+            </p>
+          </div>
+          <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+            <TrendingUp className="h-6 w-6 text-purple-600" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Sessions Table Component
+function SessionsTable({
+  responses,
+  selectedResponse,
+  onResponseSelect,
+  sortField,
+  onSort
+}: {
+  responses: ResponseData[];
+  selectedResponse: string | null;
+  onResponseSelect: (id: string | null) => void;
+  sortField: SortField;
+  onSort: (field: SortField) => void;
+}) {
+  const exportSingleResponse = (response: ResponseData) => {
+    // Use the service formatting method for consistent export
+    const formattedData = SuperAdminUniversityService.formatSessionForExport(response);
+
+    const headers = Object.keys(formattedData);
+    const csvContent = [
+      headers.join(','),
+      headers.map(header => {
+        const value = formattedData[header as keyof typeof formattedData];
+        const escaped = String(value).replace(/"/g, '""');
+        return `"${escaped}"`;
+      }).join(',')
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `session-${response.session_id.substring(0, 20)}-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  };
+
+  const SortButton = ({ field, label }: { field: SortField; label: string }) => (
+    <button
+      onClick={() => onSort(field)}
+      className="flex items-center space-x-1 hover:text-slate-900 transition-colors group"
+    >
+      <span>{label}</span>
+      <ArrowUpDown className={`h-4 w-4 ${sortField === field ? 'text-red-600' : 'text-slate-400 group-hover:text-slate-600'
+        }`} />
+    </button>
+  );
+
+  if (responses.length === 0) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center">
+        <Users className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+        <h3 className="text-lg font-medium text-slate-900 mb-2">No sessions found</h3>
+        <p className="text-slate-600">
+          Try adjusting your filters or search terms.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-slate-200">
+          <thead className="bg-slate-50">
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">
+                <SortButton field="session_id" label="Session ID" />
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">
+                <SortButton field="completion" label="Status" />
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">
+                <div className="flex items-center space-x-1" title="Flourishing Scores">
+                  <Heart className="h-4 w-4 text-red-500" />
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">
+                <div className="flex items-center space-x-1" title="School Wellbeing">
+                  <Shield className="h-4 w-4 text-blue-500" />
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">
+                <div className="flex items-center space-x-1" title="Tensions">
+                  <Zap className="h-4 w-4 text-purple-500" />
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">
+                <div className="flex items-center space-x-1" title="Enablers/Barriers">
+                  <Target className="h-4 w-4 text-orange-500" />
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">
+                <div className="flex items-center space-x-1" title="Feedback">
+                  <Brain className="h-4 w-4 text-indigo-500" />
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">
+                <SortButton field="date" label="Date" />
+              </th>
+              <th className="px-4 py-3 text-right text-xs font-medium text-slate-700 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-slate-200">
+            {responses.map((response) => (
+              <SessionRow
+                key={response.session_id}
+                response={response}
+                isSelected={selectedResponse === response.session_id}
+                onSelect={() => onResponseSelect(
+                  selectedResponse === response.session_id ? null : response.session_id
+                )}
+                exportSingleResponse={exportSingleResponse}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -306,8 +684,8 @@ function AnalyticsView({ analytics }: { analytics: any }) {
             <div>
               <p className="text-sm font-medium text-slate-600">Avg Flourishing</p>
               <p className="text-2xl font-bold text-slate-900 mt-1">
-                {Object.values(analytics.domainAverages).length > 0 
-                  ? (Object.values(analytics.domainAverages).reduce((a: any, b: any) => a + b, 0) / Object.values(analytics.domainAverages).length).toFixed(1)
+                {Object.values(analytics.domainAverages).length > 0
+                  ? ((Object.values(analytics.domainAverages) as number[]).reduce((a, b) => a + b, 0) / Object.values(analytics.domainAverages).length).toFixed(1)
                   : 'N/A'
                 }
               </p>
@@ -365,7 +743,7 @@ function AnalyticsView({ analytics }: { analytics: any }) {
                 <span className="text-sm text-slate-500">/10</span>
               </div>
               <div className="w-full bg-slate-200 rounded-full h-2 mt-2">
-                <div 
+                <div
                   className="bg-blue-600 h-2 rounded-full transition-all"
                   style={{ width: `${(average / 10) * 100}%` }}
                 ></div>
@@ -385,7 +763,7 @@ function AnalyticsView({ analytics }: { analytics: any }) {
                 <span className="text-slate-700">{year}</span>
                 <div className="flex items-center space-x-2">
                   <div className="w-20 bg-slate-200 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-blue-600 h-2 rounded-full"
                       style={{ width: `${(count / analytics.totalResponses) * 100}%` }}
                     ></div>
@@ -405,7 +783,7 @@ function AnalyticsView({ analytics }: { analytics: any }) {
                 <span className="text-slate-700">{gender}</span>
                 <div className="flex items-center space-x-2">
                   <div className="w-20 bg-slate-200 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-purple-600 h-2 rounded-full"
                       style={{ width: `${(count / analytics.totalResponses) * 100}%` }}
                     ></div>
@@ -432,617 +810,6 @@ function AnalyticsView({ analytics }: { analytics: any }) {
           )}
         </div>
       </div>
-    </div>
-  );
-}
-
-// Enhanced Student Responses List View
-function StudentResponsesView({ 
-  responses, 
-  searchTerm, 
-  onSearchChange, 
-  selectedResponse, 
-  onResponseSelect 
-}: {
-  responses: ResponseData[];
-  searchTerm: string;
-  onSearchChange: (term: string) => void;
-  selectedResponse: string | null;
-  onResponseSelect: (id: string | null) => void;
-}) {
-  return (
-    <div className="space-y-6">
-      {/* Search and Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <div className="flex items-center space-x-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search by session ID, demographics, or student suggestions..."
-              value={searchTerm}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-            />
-          </div>
-          <div className="text-sm text-slate-600">
-            {responses.length} complete responses
-          </div>
-        </div>
-      </div>
-
-      {/* Responses List */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200">
-        <div className="p-6 border-b border-slate-200">
-          <h3 className="text-lg font-semibold text-slate-900">Complete Student Responses</h3>
-          <p className="text-sm text-slate-600 mt-1">
-            Click on any response to view all answers and demographics (for app improvement purposes)
-          </p>
-        </div>
-        
-        <div className="divide-y divide-slate-200">
-          {responses.map((response) => (
-            <StudentResponseRow 
-              key={response.session_id}
-              response={response}
-              isSelected={selectedResponse === response.session_id}
-              onSelect={() => onResponseSelect(
-                selectedResponse === response.session_id ? null : response.session_id
-              )}
-            />
-          ))}
-        </div>
-
-        {responses.length === 0 && (
-          <div className="text-center py-12">
-            <Users className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-900 mb-2">No responses found</h3>
-            <p className="text-slate-600">
-              {searchTerm ? 'Try adjusting your search terms.' : 'No survey responses have been submitted yet.'}
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// Enhanced Individual Student Response Row
-function StudentResponseRow({ 
-  response, 
-  isSelected, 
-  onSelect 
-}: { 
-  response: ResponseData; 
-  isSelected: boolean; 
-  onSelect: () => void; 
-}) {
-  const demographics = (response.demographics || [])[0];
-  const flourishing = (response.flourishing_scores || [])[0];
-  const wellbeing = (response.school_wellbeing || [])[0];
-  const textResponses = (response.text_responses || [])[0];
-  const tensions = (response.tensions_assessment || [])[0];
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const getFlourishingAverage = () => {
-    if (!flourishing) return 'N/A';
-    
-    const domains = [
-      'happiness_satisfaction',
-      'mental_physical_health',
-      'meaning_purpose',
-      'character_virtue',
-      'social_relationships',
-      'financial_stability'
-    ];
-    
-    let total = 0;
-    let count = 0;
-    
-    domains.forEach(domain => {
-      const score1 = flourishing[`${domain}_1`];
-      const score2 = flourishing[`${domain}_2`];
-      if (score1 !== null) { total += score1; count++; }
-      if (score2 !== null) { total += score2; count++; }
-    });
-    
-    return count > 0 ? (total / count).toFixed(1) : 'N/A';
-  };
-
-  const getAtRiskIndicator = () => {
-    if (!flourishing) return false;
-    
-    const domains = [
-      'happiness_satisfaction',
-      'mental_physical_health',
-      'meaning_purpose',
-      'character_virtue',
-      'social_relationships',
-      'financial_stability'
-    ];
-    
-    return domains.some(domain => {
-      const score1 = flourishing[`${domain}_1`];
-      const score2 = flourishing[`${domain}_2`];
-      return (score1 !== null && score1 < 6) || (score2 !== null && score2 < 6);
-    });
-  };
-
-  const isAtRisk = getAtRiskIndicator();
-
-  return (
-    <div className="p-6">
-      <div 
-        className="cursor-pointer"
-        onClick={onSelect}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <div className="flex items-center space-x-4">
-              <div>
-                <div className="flex items-center space-x-2">
-                  <p className="font-medium text-slate-900">
-                    Session: {response.session_id.substring(0, 12)}...
-                  </p>
-                  {!response.completion_time && (
-                    <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">
-                      Incomplete
-                    </span>
-                  )}
-                  {isAtRisk && (
-                    <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">
-                      At Risk
-                    </span>
-                  )}
-                  {response.email_for_results && (
-                    <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
-                      Wants Results
-                    </span>
-                  )}
-                </div>
-                <p className="text-sm text-slate-600">
-                  {response.completion_time ? `Completed: ${formatDate(response.completion_time)}` : 'Started but not completed'}
-                </p>
-              </div>
-              
-              {demographics && (
-                <div className="hidden md:block">
-                  <p className="text-sm text-slate-700">
-                    {demographics.year_in_school} • {demographics.gender_identity}
-                  </p>
-                  <p className="text-sm text-slate-500">
-                    {demographics.age_range} • {demographics.employment_status}
-                  </p>
-                </div>
-              )}
-
-              <div className="hidden lg:block">
-                <p className="text-sm text-slate-700">
-                  Flourishing: <span className={`font-semibold ${isAtRisk ? 'text-red-600' : 'text-green-600'}`}>
-                    {getFlourishingAverage()}/10
-                  </span>
-                </p>
-                {textResponses?.fastest_win_suggestion && (
-                  <p className="text-xs text-slate-500 max-w-48 truncate">
-                    "{textResponses.fastest_win_suggestion}"
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onSelect();
-              }}
-              className="p-2 text-slate-400 hover:text-slate-600 transition-colors"
-            >
-              {isSelected ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Expanded Complete Student Data */}
-      {isSelected && (
-        <div className="mt-6 pt-6 border-t border-slate-200">
-          <div className="space-y-6">
-            {/* Complete Demographics */}
-            {demographics && Object.keys(demographics).length > 0 && (
-              <div className="bg-slate-50 rounded-lg p-6">
-                <div className="flex items-center mb-4">
-                  <User className="h-5 w-5 text-slate-600 mr-2" />
-                  <h4 className="font-semibold text-slate-900">Complete Demographics</h4>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-slate-600 font-medium">Year in School:</span>
-                      <span className="text-slate-900">{demographics.year_in_school || 'Not provided'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-600 font-medium">Enrollment:</span>
-                      <span className="text-slate-900">{demographics.enrollment_status || 'Not provided'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-600 font-medium">Age Range:</span>
-                      <span className="text-slate-900">{demographics.age_range || 'Not provided'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-600 font-medium">Study Mode:</span>
-                      <span className="text-slate-900">{demographics.study_mode || 'Not provided'}</span>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-slate-600 font-medium">Gender:</span>
-                      <span className="text-slate-900">{demographics.gender_identity || 'Not provided'}</span>
-                    </div>
-                    {demographics.gender_self_describe && (
-                      <div className="flex justify-between">
-                        <span className="text-slate-600 font-medium">Self-Describe:</span>
-                        <span className="text-slate-900">{demographics.gender_self_describe}</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between">
-                      <span className="text-slate-600 font-medium">International:</span>
-                      <span className="text-slate-900">{demographics.is_international || 'Not provided'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-600 font-medium">Transfer:</span>
-                      <span className="text-slate-900">{demographics.transfer_student || 'Not provided'}</span>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-slate-600 font-medium">Employment:</span>
-                      <span className="text-slate-900">{demographics.employment_status || 'Not provided'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-600 font-medium">Caregiving:</span>
-                      <span className="text-slate-900">{demographics.has_caregiving_responsibilities || 'Not provided'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-600 font-medium">Greek Org:</span>
-                      <span className="text-slate-900">{demographics.in_greek_organization || 'Not provided'}</span>
-                    </div>
-                    {demographics.race_ethnicity && demographics.race_ethnicity.length > 0 && (
-                      <div className="col-span-full">
-                        <span className="text-slate-600 font-medium">Race/Ethnicity:</span>
-                        <span className="text-slate-900 ml-2">{demographics.race_ethnicity.join(', ')}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Complete Flourishing Scores */}
-            {flourishing && Object.keys(flourishing).length > 0 && (
-              <div className="bg-slate-50 rounded-lg p-6">
-                <div className="flex items-center mb-4">
-                  <Heart className="h-5 w-5 text-red-500 mr-2" />
-                  <h4 className="font-semibold text-slate-900">All Flourishing Scores</h4>
-                  <span className="ml-2 text-sm text-slate-600">(Harvard Validated Framework)</span>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {[
-                    { key: 'happiness_satisfaction', label: 'Happiness & Life Satisfaction', icon: '😊' },
-                    { key: 'mental_physical_health', label: 'Mental & Physical Health', icon: '🧠' },
-                    { key: 'meaning_purpose', label: 'Meaning & Purpose', icon: '🎯' },
-                    { key: 'character_virtue', label: 'Character & Virtue', icon: '⭐' },
-                    { key: 'social_relationships', label: 'Social Relationships', icon: '👥' },
-                    { key: 'financial_stability', label: 'Financial Stability', icon: '💰' }
-                  ].map(domain => {
-                    const score1 = flourishing[`${domain.key}_1`];
-                    const score2 = flourishing[`${domain.key}_2`];
-                    const hasScore1 = score1 !== null && score1 !== undefined;
-                    const hasScore2 = score2 !== null && score2 !== undefined;
-                    const avg = (hasScore1 && hasScore2) ? ((score1 + score2) / 2).toFixed(1) : 
-                               hasScore1 ? score1.toFixed(1) : 
-                               hasScore2 ? score2.toFixed(1) : 'Not answered';
-                    const isLow = (hasScore1 && score1 < 6) || (hasScore2 && score2 < 6);
-                    
-                    return (
-                      <div key={domain.key} className={`p-4 rounded-lg border-2 ${isLow ? 'border-red-200 bg-red-50' : 'border-green-200 bg-green-50'}`}>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium text-slate-900 flex items-center">
-                            <span className="mr-2">{domain.icon}</span>
-                            {domain.label}
-                          </span>
-                          <span className={`text-lg font-bold ${isLow ? 'text-red-600' : 'text-green-600'}`}>
-                            {avg}/10
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-sm text-slate-600">
-                          <span>Q1: {hasScore1 ? `${score1}/10` : 'Not answered'}</span>
-                          <span>Q2: {hasScore2 ? `${score2}/10` : 'Not answered'}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Show message if no flourishing data */}
-            {(!flourishing || Object.keys(flourishing).length === 0) && (
-              <div className="bg-slate-50 rounded-lg p-6">
-                <div className="flex items-center mb-2">
-                  <Heart className="h-5 w-5 text-slate-400 mr-2" />
-                  <h4 className="font-semibold text-slate-600">Flourishing Scores</h4>
-                </div>
-                <p className="text-slate-500 italic">Student has not completed the flourishing assessment yet</p>
-              </div>
-            )}
-
-            {/* Complete School Wellbeing */}
-            {wellbeing && Object.keys(wellbeing).length > 0 && (
-              <div className="bg-slate-50 rounded-lg p-6">
-                <div className="flex items-center mb-4">
-                  <Shield className="h-5 w-5 text-blue-500 mr-2" />
-                  <h4 className="font-semibold text-slate-900">School Wellbeing Scores</h4>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {[
-                    { key: 'belonging_score', label: 'Sense of Belonging' },
-                    { key: 'enjoy_school_days', label: 'Enjoy School Days' },
-                    { key: 'physical_activity', label: 'Physical Activity' },
-                    { key: 'feel_safe', label: 'Feel Safe at School' },
-                    { key: 'work_connected_goals', label: 'Work Connected to Goals' },
-                    { key: 'contribute_bigger_purpose', label: 'Contribute to Purpose' },
-                    { key: 'kind_to_others', label: 'Kind to Others' },
-                    { key: 'manage_emotions', label: 'Manage Emotions' },
-                    { key: 'trusted_adult', label: 'Trusted Adult Available' },
-                    { key: 'supportive_friends', label: 'Supportive Friends' },
-                    { key: 'resources_participation', label: 'Resources for Participation' }
-                  ].map(item => {
-                    const score = wellbeing[item.key];
-                    const isLow = score !== null && score < 6;
-                    
-                    return (
-                      <div key={item.key} className="flex justify-between items-center p-2 bg-white rounded border">
-                        <span className="text-sm text-slate-700">{item.label}:</span>
-                        <span className={`font-bold ${isLow ? 'text-red-600' : score >= 8 ? 'text-green-600' : 'text-slate-900'}`}>
-                          {score !== null ? `${score}/10` : 'N/A'}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-                
-                {wellbeing.wellbeing_checklist && (wellbeing.wellbeing_checklist || []).length > 0 && (
-                  <div className="mt-4 p-4 bg-white rounded-lg border">
-                    <h5 className="font-medium text-slate-900 mb-2">Wellbeing Checklist Items Selected:</h5>
-                    <ul className="text-sm text-slate-700 space-y-1">
-                      {(wellbeing.wellbeing_checklist || []).map((item: string, index: number) => (
-                        <li key={index} className="flex items-center">
-                          <span className="text-green-600 mr-2">✓</span>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Show message if no wellbeing data */}
-            {(!wellbeing || Object.keys(wellbeing).length === 0) && (
-              <div className="bg-slate-50 rounded-lg p-6">
-                <div className="flex items-center mb-2">
-                  <Shield className="h-5 w-5 text-slate-400 mr-2" />
-                  <h4 className="font-semibold text-slate-600">School Wellbeing</h4>
-                </div>
-                <p className="text-slate-500 italic">Student has not completed the school wellbeing section yet</p>
-              </div>
-            )}
-
-            {/* Complete Tension Assessment */}
-            {tensions && Object.keys(tensions).length > 0 && (
-              <div className="bg-slate-50 rounded-lg p-6">
-                <div className="flex items-center mb-4">
-                  <Zap className="h-5 w-5 text-purple-500 mr-2" />
-                  <h4 className="font-semibold text-slate-900">Tension Assessment Results</h4>
-                </div>
-                <div className="space-y-4">
-                  {[
-                    { key: 'performance_wellbeing', label: 'Performance vs Well-being', left: 'Performance Focus', right: 'Well-being Focus' },
-                    { key: 'ambition_contribution', label: 'Personal Ambition vs Contribution', left: 'Personal Ambition', right: 'Helping Others' },
-                    { key: 'selfreliance_connection', label: 'Self-reliance vs Connection', left: 'Independence', right: 'Community Connection' },
-                    { key: 'stability_growth', label: 'Stability vs Growth', left: 'Security/Routine', right: 'Growth/Change' },
-                    { key: 'academic_creative', label: 'Academic vs Creative', left: 'Academic Focus', right: 'Creative Exploration' }
-                  ].map(tension => {
-                    const score = tensions[tension.key];
-                    const hasScore = score !== null && score !== undefined;
-                    
-                    return (
-                      <div key={tension.key} className="p-4 bg-white rounded-lg border">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="font-medium text-slate-900">{tension.label}</span>
-                          <span className="text-lg font-bold text-purple-600">
-                            {hasScore ? `${score}%` : 'Not answered'}
-                          </span>
-                        </div>
-                        {hasScore && (
-                          <div className="flex justify-between text-sm text-slate-600 mb-2">
-                            <span>{tension.left}</span>
-                            <span>{tension.right}</span>
-                          </div>
-                        )}
-                        {hasScore && (
-                          <div className="w-full bg-slate-200 rounded-full h-2">
-                            <div 
-                              className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
-                              style={{ width: `${score}%` }}
-                            ></div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Show message if no tension data */}
-            {(!tensions || Object.keys(tensions).length === 0) && (
-              <div className="bg-slate-50 rounded-lg p-6">
-                <div className="flex items-center mb-2">
-                  <Zap className="h-5 w-5 text-slate-400 mr-2" />
-                  <h4 className="font-semibold text-slate-600">Tension Assessment</h4>
-                </div>
-                <p className="text-slate-500 italic">Student has not completed the tension assessment yet</p>
-              </div>
-            )}
-
-            {/* Complete Enablers and Barriers by Domain */}
-            {(response.user_enablers_barriers || []).length > 0 && (
-              <div className="bg-slate-50 rounded-lg p-6">
-                <div className="flex items-center mb-4">
-                  <Target className="h-5 w-5 text-orange-500 mr-2" />
-                  <h4 className="font-semibold text-slate-900">Enablers & Barriers by Domain</h4>
-                </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  {(response.user_enablers_barriers || []).map((eb: any, index: number) => (
-                    <div key={index} className="bg-white rounded-lg p-4 border">
-                      <h5 className="font-medium text-slate-800 mb-3 flex items-center">
-                        <span className="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
-                        {eb.domain_key.split('_').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' & ')}
-                      </h5>
-                      
-                      {(eb.selected_enablers || []).length > 0 && (
-                        <div className="mb-3">
-                          <p className="text-sm font-medium text-green-700 mb-2 flex items-center">
-                            <span className="text-green-600 mr-1">+</span>
-                            Enablers Selected ({(eb.selected_enablers || []).length}):
-                          </p>
-                          <ul className="text-sm text-slate-700 space-y-1">
-                            {(eb.selected_enablers || []).map((enabler: string, i: number) => (
-                              <li key={i} className="flex items-start">
-                                <span className="text-green-500 mr-2 mt-0.5">•</span>
-                                {enabler}
-                              </li>
-                            ))}
-                          </ul>
-                          {eb.enabler_other_text && (
-                            <div className="mt-2 p-2 bg-green-50 rounded border-l-2 border-green-300">
-                              <p className="text-sm text-green-800">
-                                <strong>Other:</strong> "{eb.enabler_other_text}"
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      
-                      {(eb.selected_barriers || []).length > 0 && (
-                        <div>
-                          <p className="text-sm font-medium text-red-700 mb-2 flex items-center">
-                            <span className="text-red-600 mr-1">-</span>
-                            Barriers Selected ({(eb.selected_barriers || []).length}):
-                          </p>
-                          <ul className="text-sm text-slate-700 space-y-1">
-                            {(eb.selected_barriers || []).map((barrier: string, i: number) => (
-                              <li key={i} className="flex items-start">
-                                <span className="text-red-500 mr-2 mt-0.5">•</span>
-                                {barrier}
-                              </li>
-                            ))}
-                          </ul>
-                          {eb.barrier_other_text && (
-                            <div className="mt-2 p-2 bg-red-50 rounded border-l-2 border-red-300">
-                              <p className="text-sm text-red-800">
-                                <strong>Other:</strong> "{eb.barrier_other_text}"
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      
-                      {(!(eb.selected_enablers || []).length) && 
-                       (!(eb.selected_barriers || []).length) && (
-                        <p className="text-sm text-slate-500 italic">No enablers or barriers selected for this domain</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Show message if no enablers/barriers data */}
-            {(response.user_enablers_barriers || []).length === 0 && (
-              <div className="bg-slate-50 rounded-lg p-6">
-                <div className="flex items-center mb-2">
-                  <Target className="h-5 w-5 text-slate-400 mr-2" />
-                  <h4 className="font-semibold text-slate-600">Enablers & Barriers</h4>
-                </div>
-                <p className="text-slate-500 italic">Student has not completed the enablers and barriers section yet</p>
-              </div>
-            )}
-
-            {/* Student Feedback */}
-            {textResponses?.fastest_win_suggestion && (
-              <div className="bg-slate-50 rounded-lg p-6">
-                <div className="flex items-center mb-4">
-                  <Brain className="h-5 w-5 text-indigo-500 mr-2" />
-                  <h4 className="font-semibold text-slate-900">Student Feedback</h4>
-                </div>
-                <div className="bg-white rounded-lg p-4 border-l-4 border-indigo-500">
-                  <h5 className="font-medium text-slate-900 mb-2">Fastest Win Suggestion:</h5>
-                  <p className="text-slate-700 italic">"{textResponses.fastest_win_suggestion}"</p>
-                </div>
-              </div>
-            )}
-
-            {/* Show message if no text feedback */}
-            {!textResponses?.fastest_win_suggestion && (
-              <div className="bg-slate-50 rounded-lg p-6">
-                <div className="flex items-center mb-2">
-                  <Brain className="h-5 w-5 text-slate-400 mr-2" />
-                  <h4 className="font-semibold text-slate-600">Student Feedback</h4>
-                </div>
-                <p className="text-slate-500 italic">Student has not provided feedback suggestions yet</p>
-              </div>
-            )}
-
-            {/* Session Information */}
-            <div className="bg-slate-50 rounded-lg p-6">
-              <div className="flex items-center mb-4">
-                <Calendar className="h-5 w-5 text-slate-500 mr-2" />
-                <h4 className="font-semibold text-slate-900">Session Information</h4>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-white rounded-lg p-3 border">
-                  <p className="text-sm text-slate-600">Session ID:</p>
-                  <p className="font-mono text-sm text-slate-900">{response.session_id}</p>
-                </div>
-                <div className="bg-white rounded-lg p-3 border">
-                  <p className="text-sm text-slate-600">Completed:</p>
-                  <p className="text-sm text-slate-900">
-                    {response.completion_time ? formatDate(response.completion_time) : 'In Progress'}
-                  </p>
-                </div>
-                <div className="bg-white rounded-lg p-3 border">
-                  <p className="text-sm text-slate-600">Results Requested:</p>
-                  <p className="text-sm text-slate-900">
-                    {response.email_for_results ? 'Yes (email provided)' : 'No'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

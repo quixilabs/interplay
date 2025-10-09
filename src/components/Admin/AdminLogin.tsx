@@ -55,11 +55,6 @@ export default function AdminLogin() {
               <p className="text-sm text-warm-gray font-primary">Email: admin@university.edu</p>
               <p className="text-sm text-warm-gray font-primary">Password: demo123</p>
             </div>
-            <div>
-              <p className="text-sm font-medium text-navy font-primary">Saint Louis University:</p>
-              <p className="text-sm text-warm-gray font-primary">Email: admin@slu.edu</p>
-              <p className="text-sm text-warm-gray font-primary">Password: demo123</p>
-            </div>
           </div>
         </div>
 
