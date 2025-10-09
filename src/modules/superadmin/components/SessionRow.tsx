@@ -7,7 +7,6 @@ import {
     Target,
     Shield,
     Zap,
-    Calendar,
     Mail,
     AlertTriangle
 } from 'lucide-react';
@@ -37,12 +36,43 @@ export default function SessionRow({
     onSelect,
     exportSingleResponse
 }: SessionRowProps) {
-    const demographics = (response.demographics || [])[0];
-    const flourishing = (response.flourishing_scores || [])[0];
-    const wellbeing = (response.school_wellbeing || [])[0];
-    const textResponses = (response.text_responses || [])[0];
-    const tensions = (response.tensions_assessment || [])[0];
-    const enablersBarriers = (response.user_enablers_barriers || []);
+    // Handle both array and object formats from Supabase
+    const demographics = Array.isArray(response.demographics)
+        ? response.demographics[0]
+        : response.demographics;
+
+    const flourishing = Array.isArray(response.flourishing_scores)
+        ? response.flourishing_scores[0]
+        : response.flourishing_scores;
+
+    const wellbeing = Array.isArray(response.school_wellbeing)
+        ? response.school_wellbeing[0]
+        : response.school_wellbeing;
+
+    const textResponses = Array.isArray(response.text_responses)
+        ? response.text_responses[0]
+        : response.text_responses;
+
+    const tensions = Array.isArray(response.tensions_assessment)
+        ? response.tensions_assessment[0]
+        : response.tensions_assessment;
+
+    const enablersBarriers = Array.isArray(response.user_enablers_barriers)
+        ? response.user_enablers_barriers
+        : response.user_enablers_barriers ? [response.user_enablers_barriers] : [];
+
+    // Debug logging (remove after fixing)
+    if (isSelected) {
+        console.log('Session Data Debug:', {
+            session_id: response.session_id,
+            demographics_raw: response.demographics,
+            demographics_processed: demographics,
+            demographics_keys: demographics ? Object.keys(demographics) : 'null',
+            flourishing_raw: response.flourishing_scores,
+            flourishing_processed: flourishing,
+            flourishing_keys: flourishing ? Object.keys(flourishing) : 'null',
+        });
+    }
 
     const formatDate = (dateString: string) => {
         if (!dateString) return 'N/A';
@@ -55,7 +85,17 @@ export default function SessionRow({
 
     // Helper function to check if a section has data
     const getSectionStatus = (data: unknown) => {
+        if (!data || data === null || data === undefined) return false;
+        if (typeof data !== 'object') return false;
+        const keys = Object.keys(data as object);
+        return keys.length > 0;
+    };
+
+    // More robust check for data existence
+    const hasData = (data: unknown): boolean => {
         if (!data) return false;
+        if (typeof data !== 'object') return false;
+        if (Array.isArray(data)) return data.length > 0;
         return Object.keys(data as object).length > 0;
     };
 
@@ -192,122 +232,95 @@ export default function SessionRow({
                                 </div>
                             )}
 
-                            {/* Complete Demographics */}
-                            {demographics && Object.keys(demographics).length > 0 ? (
-                                <div className="bg-white rounded-lg p-6 shadow-sm border border-slate-200">
-                                    <div className="flex items-center mb-4">
-                                        <User className="h-5 w-5 text-slate-600 mr-2" />
-                                        <h4 className="font-semibold text-slate-900">Demographics</h4>
+                            {/* Compact Demographics Display */}
+                            {hasData(demographics) ? (
+                                <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-200">
+                                    <div className="flex items-center mb-3">
+                                        <User className="h-4 w-4 text-slate-600 mr-2" />
+                                        <h4 className="font-semibold text-slate-900 text-sm">Demographics</h4>
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between">
-                                                <span className="text-slate-600 font-medium">Year in School:</span>
-                                                <span className="text-slate-900">{demographics.year_in_school || 'Not provided'}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-slate-600 font-medium">Enrollment:</span>
-                                                <span className="text-slate-900">{demographics.enrollment_status || 'Not provided'}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-slate-600 font-medium">Age Range:</span>
-                                                <span className="text-slate-900">{demographics.age_range || 'Not provided'}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-slate-600 font-medium">Study Mode:</span>
-                                                <span className="text-slate-900">{demographics.study_mode || 'Not provided'}</span>
-                                            </div>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                                        <div className="bg-slate-50 p-2 rounded">
+                                            <div className="text-xs text-slate-500">Year</div>
+                                            <div className="text-sm font-medium text-slate-900">{demographics.year_in_school || '—'}</div>
                                         </div>
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between">
-                                                <span className="text-slate-600 font-medium">Gender:</span>
-                                                <span className="text-slate-900">{demographics.gender_identity || 'Not provided'}</span>
-                                            </div>
-                                            {demographics.gender_self_describe && (
-                                                <div className="flex justify-between">
-                                                    <span className="text-slate-600 font-medium">Self-Describe:</span>
-                                                    <span className="text-slate-900">{demographics.gender_self_describe}</span>
-                                                </div>
-                                            )}
-                                            <div className="flex justify-between">
-                                                <span className="text-slate-600 font-medium">International:</span>
-                                                <span className="text-slate-900">{demographics.is_international || 'Not provided'}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-slate-600 font-medium">Transfer:</span>
-                                                <span className="text-slate-900">{demographics.transfer_student || 'Not provided'}</span>
-                                            </div>
+                                        <div className="bg-slate-50 p-2 rounded">
+                                            <div className="text-xs text-slate-500">Age</div>
+                                            <div className="text-sm font-medium text-slate-900">{demographics.age_range || '—'}</div>
                                         </div>
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between">
-                                                <span className="text-slate-600 font-medium">Employment:</span>
-                                                <span className="text-slate-900">{demographics.employment_status || 'Not provided'}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-slate-600 font-medium">Caregiving:</span>
-                                                <span className="text-slate-900">{demographics.has_caregiving_responsibilities || 'Not provided'}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-slate-600 font-medium">Greek Org:</span>
-                                                <span className="text-slate-900">{demographics.in_greek_organization || 'Not provided'}</span>
-                                            </div>
+                                        <div className="bg-slate-50 p-2 rounded">
+                                            <div className="text-xs text-slate-500">Gender</div>
+                                            <div className="text-sm font-medium text-slate-900">{demographics.gender_identity || '—'}</div>
+                                        </div>
+                                        <div className="bg-slate-50 p-2 rounded">
+                                            <div className="text-xs text-slate-500">Enrollment</div>
+                                            <div className="text-sm font-medium text-slate-900">{demographics.enrollment_status || '—'}</div>
+                                        </div>
+                                        <div className="bg-slate-50 p-2 rounded">
+                                            <div className="text-xs text-slate-500">Employment</div>
+                                            <div className="text-sm font-medium text-slate-900">{demographics.employment_status || '—'}</div>
+                                        </div>
+                                        <div className="bg-slate-50 p-2 rounded">
+                                            <div className="text-xs text-slate-500">International</div>
+                                            <div className="text-sm font-medium text-slate-900">{demographics.is_international || '—'}</div>
                                         </div>
                                     </div>
-                                    {demographics.race_ethnicity && demographics.race_ethnicity.length > 0 && (
-                                        <div className="mt-4 pt-4 border-t border-slate-200">
-                                            <span className="text-slate-600 font-medium">Race/Ethnicity:</span>
-                                            <span className="text-slate-900 ml-2">{demographics.race_ethnicity.join(', ')}</span>
-                                        </div>
-                                    )}
                                 </div>
                             ) : (
-                                <div className="bg-white rounded-lg p-6 shadow-sm border border-slate-200">
+                                <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-200">
                                     <div className="flex items-center">
-                                        <User className="h-5 w-5 text-slate-400 mr-2" />
-                                        <p className="text-slate-500 italic">No demographic data available</p>
+                                        <User className="h-4 w-4 text-slate-400 mr-2" />
+                                        <p className="text-slate-500 italic text-sm">No demographic data available</p>
                                     </div>
                                 </div>
                             )}
 
-                            {/* Complete Flourishing Scores */}
-                            {flourishing && Object.keys(flourishing).length > 0 ? (
-                                <div className="bg-white rounded-lg p-6 shadow-sm border border-slate-200">
-                                    <div className="flex items-center mb-4">
-                                        <Heart className="h-5 w-5 text-red-500 mr-2" />
-                                        <h4 className="font-semibold text-slate-900">Flourishing Scores</h4>
+                            {/* Compact Flourishing Scores with Visual Bars */}
+                            {hasData(flourishing) ? (
+                                <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-200">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className="flex items-center">
+                                            <Heart className="h-4 w-4 text-red-500 mr-2" />
+                                            <h4 className="font-semibold text-slate-900 text-sm">Flourishing Scores</h4>
+                                        </div>
+                                        <span className="text-xs text-slate-500">(1-10 scale)</span>
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
                                         {[
-                                            { key: 'happiness_satisfaction', label: 'Happiness & Satisfaction', icon: '😊' },
-                                            { key: 'mental_physical_health', label: 'Mental & Physical Health', icon: '🧠' },
-                                            { key: 'meaning_purpose', label: 'Meaning & Purpose', icon: '🎯' },
-                                            { key: 'character_virtue', label: 'Character & Virtue', icon: '⭐' },
-                                            { key: 'social_relationships', label: 'Social Relationships', icon: '👥' },
-                                            { key: 'financial_stability', label: 'Financial Stability', icon: '💰' }
+                                            { key: 'happiness_satisfaction', label: 'Happiness', icon: '😊' },
+                                            { key: 'mental_physical_health', label: 'Mental/Physical', icon: '🧠' },
+                                            { key: 'meaning_purpose', label: 'Meaning', icon: '🎯' },
+                                            { key: 'character_virtue', label: 'Character', icon: '⭐' },
+                                            { key: 'social_relationships', label: 'Social', icon: '👥' },
+                                            { key: 'financial_stability', label: 'Financial', icon: '💰' }
                                         ].map(domain => {
                                             const score1 = flourishing[`${domain.key}_1`];
                                             const score2 = flourishing[`${domain.key}_2`];
                                             const hasScore1 = score1 !== null && score1 !== undefined;
                                             const hasScore2 = score2 !== null && score2 !== undefined;
-                                            const avg = (hasScore1 && hasScore2) ? ((score1 + score2) / 2).toFixed(1) :
-                                                hasScore1 ? score1.toFixed(1) :
-                                                    hasScore2 ? score2.toFixed(1) : 'N/A';
+                                            const avg = (hasScore1 && hasScore2) ? ((score1 + score2) / 2) :
+                                                hasScore1 ? score1 : hasScore2 ? score2 : 0;
                                             const isLow = (hasScore1 && score1 < 6) || (hasScore2 && score2 < 6);
+                                            const avgDisplay = avg > 0 ? avg.toFixed(1) : 'N/A';
 
                                             return (
-                                                <div key={domain.key} className={`p-4 rounded-lg border-2 ${isLow ? 'border-red-300 bg-red-50' : 'border-green-300 bg-green-50'}`}>
-                                                    <div className="flex items-center justify-between mb-2">
-                                                        <span className="font-medium text-slate-900 flex items-center text-sm">
-                                                            <span className="mr-2">{domain.icon}</span>
-                                                            {domain.label}
-                                                        </span>
-                                                        <span className={`text-xl font-bold ${isLow ? 'text-red-600' : 'text-green-600'}`}>
-                                                            {avg}/10
+                                                <div key={domain.key} className="flex items-center gap-3">
+                                                    <span className="text-sm w-6">{domain.icon}</span>
+                                                    <span className="text-xs font-medium text-slate-700 w-24">{domain.label}</span>
+                                                    <div className="flex-1 flex items-center gap-2">
+                                                        <div className="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden">
+                                                            <div
+                                                                className={`h-full transition-all ${isLow ? 'bg-red-500' : avg >= 8 ? 'bg-green-500' : 'bg-yellow-500'}`}
+                                                                style={{ width: `${(avg / 10) * 100}%` }}
+                                                            ></div>
+                                                        </div>
+                                                        <span className={`text-sm font-bold w-10 text-right ${isLow ? 'text-red-600' : avg >= 8 ? 'text-green-600' : 'text-yellow-600'}`}>
+                                                            {avgDisplay}
                                                         </span>
                                                     </div>
-                                                    <div className="flex justify-between text-xs text-slate-600">
-                                                        <span>Q1: {hasScore1 ? `${score1}/10` : 'N/A'}</span>
-                                                        <span>Q2: {hasScore2 ? `${score2}/10` : 'N/A'}</span>
+                                                    <div className="text-xs text-slate-500 flex gap-2">
+                                                        <span>Q1:{hasScore1 ? score1 : '—'}</span>
+                                                        <span>Q2:{hasScore2 ? score2 : '—'}</span>
                                                     </div>
                                                 </div>
                                             );
@@ -315,102 +328,118 @@ export default function SessionRow({
                                     </div>
                                 </div>
                             ) : (
-                                <div className="bg-white rounded-lg p-6 shadow-sm border border-slate-200">
+                                <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-200">
                                     <div className="flex items-center">
-                                        <Heart className="h-5 w-5 text-slate-400 mr-2" />
-                                        <p className="text-slate-500 italic">No flourishing data available</p>
+                                        <Heart className="h-4 w-4 text-slate-400 mr-2" />
+                                        <p className="text-slate-500 italic text-sm">No flourishing data available</p>
                                     </div>
                                 </div>
                             )}
 
-                            {/* Complete School Wellbeing */}
-                            {wellbeing && Object.keys(wellbeing).length > 0 ? (
-                                <div className="bg-white rounded-lg p-6 shadow-sm border border-slate-200">
-                                    <div className="flex items-center mb-4">
-                                        <Shield className="h-5 w-5 text-blue-500 mr-2" />
-                                        <h4 className="font-semibold text-slate-900">School Wellbeing</h4>
+                            {/* Compact School Wellbeing with Mini Bars */}
+                            {hasData(wellbeing) ? (
+                                <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-200">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className="flex items-center">
+                                            <Shield className="h-4 w-4 text-blue-500 mr-2" />
+                                            <h4 className="font-semibold text-slate-900 text-sm">School Wellbeing</h4>
+                                        </div>
+                                        <span className="text-xs text-slate-500">(0-10 scale)</span>
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                                         {[
-                                            { key: 'belonging_score', label: 'Sense of Belonging' },
-                                            { key: 'enjoy_school_days', label: 'Enjoy School Days' },
+                                            { key: 'belonging_score', label: 'Belonging' },
+                                            { key: 'enjoy_school_days', label: 'Enjoy School' },
                                             { key: 'physical_activity', label: 'Physical Activity' },
                                             { key: 'feel_safe', label: 'Feel Safe' },
-                                            { key: 'work_connected_goals', label: 'Connected to Goals' },
+                                            { key: 'work_connected_goals', label: 'Goal Connection' },
                                             { key: 'contribute_bigger_purpose', label: 'Bigger Purpose' },
-                                            { key: 'kind_to_others', label: 'Kind to Others' },
-                                            { key: 'manage_emotions', label: 'Manage Emotions' },
-                                            { key: 'trusted_adult', label: 'Trusted Adult' },
-                                            { key: 'supportive_friends', label: 'Supportive Friends' },
-                                            { key: 'resources_participation', label: 'Resources Available' }
+                                            { key: 'kind_to_others', label: 'Kindness' },
+                                            { key: 'manage_emotions', label: 'Emotions' },
+                                            { key: 'trusted_adult', label: 'Adult Support' },
+                                            { key: 'supportive_friends', label: 'Friend Support' },
+                                            { key: 'resources_participation', label: 'Resources' }
                                         ].map(item => {
                                             const score = wellbeing[item.key];
                                             const isLow = score !== null && score < 6;
+                                            const hasScore = score !== null && score !== undefined;
 
                                             return (
-                                                <div key={item.key} className="flex justify-between items-center p-2 bg-slate-50 rounded border">
-                                                    <span className="text-xs text-slate-700">{item.label}:</span>
-                                                    <span className={`font-bold text-sm ${isLow ? 'text-red-600' : score >= 8 ? 'text-green-600' : 'text-slate-900'}`}>
-                                                        {score !== null ? `${score}/10` : 'N/A'}
-                                                    </span>
+                                                <div key={item.key} className="bg-slate-50 p-2 rounded border">
+                                                    <div className="text-xs text-slate-600 mb-1 truncate" title={item.label}>{item.label}</div>
+                                                    <div className="flex items-center gap-1">
+                                                        <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
+                                                            {hasScore && (
+                                                                <div
+                                                                    className={`h-full ${isLow ? 'bg-red-500' : score >= 8 ? 'bg-green-500' : 'bg-yellow-500'}`}
+                                                                    style={{ width: `${(score / 10) * 100}%` }}
+                                                                ></div>
+                                                            )}
+                                                        </div>
+                                                        <span className={`text-xs font-bold ${isLow ? 'text-red-600' : score >= 8 ? 'text-green-600' : 'text-slate-900'}`}>
+                                                            {hasScore ? score : '—'}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             );
                                         })}
                                     </div>
                                     {wellbeing.wellbeing_checklist && wellbeing.wellbeing_checklist.length > 0 && (
-                                        <div className="mt-4 p-4 bg-slate-50 rounded-lg border">
-                                            <h5 className="font-medium text-slate-900 mb-2 text-sm">Wellbeing Checklist:</h5>
-                                            <ul className="text-xs text-slate-700 space-y-1">
+                                        <div className="mt-3 p-3 bg-blue-50 rounded border border-blue-200">
+                                            <h5 className="font-medium text-blue-900 mb-2 text-xs">Wellbeing Checklist ({wellbeing.wellbeing_checklist.length} selected):</h5>
+                                            <div className="flex flex-wrap gap-1">
                                                 {wellbeing.wellbeing_checklist.map((item: string, index: number) => (
-                                                    <li key={index} className="flex items-center">
-                                                        <span className="text-green-600 mr-2">✓</span>
+                                                    <span key={index} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
                                                         {item}
-                                                    </li>
+                                                    </span>
                                                 ))}
-                                            </ul>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
                             ) : (
-                                <div className="bg-white rounded-lg p-6 shadow-sm border border-slate-200">
+                                <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-200">
                                     <div className="flex items-center">
-                                        <Shield className="h-5 w-5 text-slate-400 mr-2" />
-                                        <p className="text-slate-500 italic">No wellbeing data available</p>
+                                        <Shield className="h-4 w-4 text-slate-400 mr-2" />
+                                        <p className="text-slate-500 italic text-sm">No wellbeing data available</p>
                                     </div>
                                 </div>
                             )}
 
-                            {/* Tensions Assessment */}
-                            {tensions && Object.keys(tensions).length > 0 ? (
-                                <div className="bg-white rounded-lg p-6 shadow-sm border border-slate-200">
-                                    <div className="flex items-center mb-4">
-                                        <Zap className="h-5 w-5 text-purple-500 mr-2" />
-                                        <h4 className="font-semibold text-slate-900">Tension Assessment</h4>
+                            {/* Compact Tensions Assessment */}
+                            {hasData(tensions) ? (
+                                <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-200">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className="flex items-center">
+                                            <Zap className="h-4 w-4 text-purple-500 mr-2" />
+                                            <h4 className="font-semibold text-slate-900 text-sm">Tensions (0=Left, 100=Right)</h4>
+                                        </div>
                                     </div>
-                                    <div className="space-y-3">
+                                    <div className="space-y-2">
                                         {[
-                                            { key: 'performance_wellbeing', label: 'Performance vs Well-being' },
-                                            { key: 'ambition_contribution', label: 'Ambition vs Contribution' },
-                                            { key: 'selfreliance_connection', label: 'Self-reliance vs Connection' },
-                                            { key: 'stability_growth', label: 'Stability vs Growth' },
-                                            { key: 'academic_creative', label: 'Academic vs Creative' }
+                                            { key: 'performance_wellbeing', left: 'Performance', right: 'Well-being' },
+                                            { key: 'ambition_contribution', left: 'Ambition', right: 'Contribution' },
+                                            { key: 'selfreliance_connection', left: 'Self-reliance', right: 'Connection' },
+                                            { key: 'stability_growth', left: 'Stability', right: 'Growth' },
+                                            { key: 'academic_creative', left: 'Academic', right: 'Creative' }
                                         ].map(tension => {
                                             const score = tensions[tension.key];
                                             const hasScore = score !== null && score !== undefined;
 
                                             return (
-                                                <div key={tension.key} className="p-3 bg-slate-50 rounded-lg border">
-                                                    <div className="flex justify-between items-center mb-2">
-                                                        <span className="font-medium text-slate-900 text-sm">{tension.label}</span>
-                                                        <span className="text-sm font-bold text-purple-600">
-                                                            {hasScore ? `${score}%` : 'N/A'}
+                                                <div key={tension.key} className="bg-slate-50 p-2 rounded border">
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <span className="text-xs font-medium text-blue-700">{tension.left}</span>
+                                                        <span className="text-xs font-bold text-purple-600">
+                                                            {hasScore ? `${score}%` : '—'}
                                                         </span>
+                                                        <span className="text-xs font-medium text-purple-700">{tension.right}</span>
                                                     </div>
                                                     {hasScore && (
-                                                        <div className="w-full bg-slate-200 rounded-full h-2">
+                                                        <div className="relative w-full bg-gradient-to-r from-blue-200 via-purple-200 to-purple-400 rounded-full h-2">
                                                             <div
-                                                                className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
-                                                                style={{ width: `${score}%` }}
+                                                                className="absolute top-0 h-2 w-1 bg-slate-900 rounded-full shadow-md"
+                                                                style={{ left: `${score}%`, transform: 'translateX(-50%)' }}
                                                             ></div>
                                                         </div>
                                                     )}
@@ -420,105 +449,89 @@ export default function SessionRow({
                                     </div>
                                 </div>
                             ) : (
-                                <div className="bg-white rounded-lg p-6 shadow-sm border border-slate-200">
+                                <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-200">
                                     <div className="flex items-center">
-                                        <Zap className="h-5 w-5 text-slate-400 mr-2" />
-                                        <p className="text-slate-500 italic">No tension data available</p>
+                                        <Zap className="h-4 w-4 text-slate-400 mr-2" />
+                                        <p className="text-slate-500 italic text-sm">No tension data available</p>
                                     </div>
                                 </div>
                             )}
 
-                            {/* Enablers and Barriers */}
+                            {/* Compact Enablers and Barriers */}
                             {enablersBarriers.length > 0 ? (
-                                <div className="bg-white rounded-lg p-6 shadow-sm border border-slate-200">
-                                    <div className="flex items-center mb-4">
-                                        <Target className="h-5 w-5 text-orange-500 mr-2" />
-                                        <h4 className="font-semibold text-slate-900">Enablers & Barriers</h4>
+                                <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-200">
+                                    <div className="flex items-center mb-3">
+                                        <Target className="h-4 w-4 text-orange-500 mr-2" />
+                                        <h4 className="font-semibold text-slate-900 text-sm">Enablers & Barriers by Domain</h4>
                                     </div>
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                         {enablersBarriers.map((eb: any, index: number) => (
-                                            <div key={index} className="bg-slate-50 rounded-lg p-4 border">
-                                                <h5 className="font-medium text-slate-800 mb-3 text-sm">
+                                            <div key={index} className="bg-slate-50 rounded-lg p-3 border">
+                                                <h5 className="font-medium text-slate-800 mb-2 text-xs flex items-center">
+                                                    <span className="w-2 h-2 bg-orange-500 rounded-full mr-1"></span>
                                                     {eb.domain_key.split('_').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' & ')}
                                                 </h5>
-                                                {(eb.selected_enablers || []).length > 0 && (
-                                                    <div className="mb-2">
-                                                        <p className="text-xs font-medium text-green-700 mb-1">✓ Enablers ({(eb.selected_enablers || []).length}):</p>
-                                                        <ul className="text-xs text-slate-700 space-y-1">
-                                                            {(eb.selected_enablers || []).map((enabler: string, i: number) => (
-                                                                <li key={i}>• {enabler}</li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
-                                                )}
-                                                {(eb.selected_barriers || []).length > 0 && (
-                                                    <div>
-                                                        <p className="text-xs font-medium text-red-700 mb-1">✗ Barriers ({(eb.selected_barriers || []).length}):</p>
-                                                        <ul className="text-xs text-slate-700 space-y-1">
-                                                            {(eb.selected_barriers || []).map((barrier: string, i: number) => (
-                                                                <li key={i}>• {barrier}</li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
-                                                )}
+                                                <div className="space-y-2">
+                                                    {(eb.selected_enablers || []).length > 0 && (
+                                                        <div>
+                                                            <p className="text-xs font-medium text-green-700 mb-1">+ {(eb.selected_enablers || []).length} Enabler{(eb.selected_enablers || []).length > 1 ? 's' : ''}</p>
+                                                            <div className="flex flex-wrap gap-1">
+                                                                {(eb.selected_enablers || []).map((enabler: string, i: number) => (
+                                                                    <span key={i} className="text-xs bg-green-100 text-green-800 px-1.5 py-0.5 rounded">
+                                                                        {enabler}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    {(eb.selected_barriers || []).length > 0 && (
+                                                        <div>
+                                                            <p className="text-xs font-medium text-red-700 mb-1">- {(eb.selected_barriers || []).length} Barrier{(eb.selected_barriers || []).length > 1 ? 's' : ''}</p>
+                                                            <div className="flex flex-wrap gap-1">
+                                                                {(eb.selected_barriers || []).map((barrier: string, i: number) => (
+                                                                    <span key={i} className="text-xs bg-red-100 text-red-800 px-1.5 py-0.5 rounded">
+                                                                        {barrier}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    {(eb.selected_enablers || []).length === 0 && (eb.selected_barriers || []).length === 0 && (
+                                                        <p className="text-xs text-slate-500 italic">No selections</p>
+                                                    )}
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
                             ) : (
-                                <div className="bg-white rounded-lg p-6 shadow-sm border border-slate-200">
+                                <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-200">
                                     <div className="flex items-center">
-                                        <Target className="h-5 w-5 text-slate-400 mr-2" />
-                                        <p className="text-slate-500 italic">No enablers/barriers data available</p>
+                                        <Target className="h-4 w-4 text-slate-400 mr-2" />
+                                        <p className="text-slate-500 italic text-sm">No enablers/barriers data available</p>
                                     </div>
                                 </div>
                             )}
 
-                            {/* Student Feedback */}
+                            {/* Student Feedback - Compact */}
                             {textResponses?.fastest_win_suggestion ? (
-                                <div className="bg-white rounded-lg p-6 shadow-sm border border-slate-200">
-                                    <div className="flex items-center mb-4">
-                                        <Brain className="h-5 w-5 text-indigo-500 mr-2" />
-                                        <h4 className="font-semibold text-slate-900">Student Feedback</h4>
+                                <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-200">
+                                    <div className="flex items-center mb-2">
+                                        <Brain className="h-4 w-4 text-indigo-500 mr-2" />
+                                        <h4 className="font-semibold text-slate-900 text-sm">Student Suggestion</h4>
                                     </div>
-                                    <div className="bg-indigo-50 rounded-lg p-4 border-l-4 border-indigo-500">
+                                    <div className="bg-indigo-50 rounded-lg p-3 border-l-2 border-indigo-400">
                                         <p className="text-sm text-slate-700 italic">"{textResponses.fastest_win_suggestion}"</p>
                                     </div>
                                 </div>
                             ) : (
-                                <div className="bg-white rounded-lg p-6 shadow-sm border border-slate-200">
+                                <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-200">
                                     <div className="flex items-center">
-                                        <Brain className="h-5 w-5 text-slate-400 mr-2" />
-                                        <p className="text-slate-500 italic">No feedback provided</p>
+                                        <Brain className="h-4 w-4 text-slate-400 mr-2" />
+                                        <p className="text-slate-500 italic text-sm">No feedback provided</p>
                                     </div>
                                 </div>
                             )}
-
-                            {/* Session Information */}
-                            <div className="bg-white rounded-lg p-6 shadow-sm border border-slate-200">
-                                <div className="flex items-center mb-4">
-                                    <Calendar className="h-5 w-5 text-slate-500 mr-2" />
-                                    <h4 className="font-semibold text-slate-900">Session Information</h4>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div className="bg-slate-50 rounded-lg p-3 border">
-                                        <p className="text-xs text-slate-600 mb-1">Session ID:</p>
-                                        <p className="font-mono text-xs text-slate-900">{response.session_id}</p>
-                                    </div>
-                                    <div className="bg-slate-50 rounded-lg p-3 border">
-                                        <p className="text-xs text-slate-600 mb-1">Completed:</p>
-                                        <p className="text-xs text-slate-900">
-                                            {response.completion_time ? formatDate(response.completion_time) : 'In Progress'}
-                                        </p>
-                                    </div>
-                                    <div className="bg-slate-50 rounded-lg p-3 border">
-                                        <p className="text-xs text-slate-600 mb-1">Email Requested:</p>
-                                        <p className="text-xs text-slate-900">
-                                            {response.email_for_results ? 'Yes' : 'No'}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </td>
                 </tr>
