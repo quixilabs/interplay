@@ -28,7 +28,7 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-navy font-primary mb-6">
             Your Voice
-            <span className="block text-navy font-secondary">Powers Youth Flourishing</span>
+            <span className="block text-navy font-primary">Matters</span>
           </h1>
           <p className="text-xl text-warm-gray font-primary mb-8 max-w-3xl mx-auto leading-relaxed">
             Interplay turns youth perspectives into a real-time measure of flourishing—helping universities identify hidden tensions across happiness, health, purpose, relationships, character, and stability, then translate them into strategies that drive success.
@@ -121,7 +121,7 @@ export default function LandingPage() {
             <span className="text-lg font-semibold font-primary">Interplay</span>
           </div>
           <p className="text-white/60 font-primary">
-            Your Voice Powers Youth Flourishing
+            Your Voice Matters
           </p>
         </div>
       </footer>
