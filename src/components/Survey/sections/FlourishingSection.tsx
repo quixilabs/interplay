@@ -101,6 +101,7 @@ export default function FlourishingSection() {
   const [enablerOtherText, setEnablerOtherText] = useState('');
   const [barrierOtherText, setBarrierOtherText] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showError, setShowError] = useState(false);
 
   // Load enablers and barriers data on component mount
   useEffect(() => {
@@ -137,6 +138,8 @@ export default function FlourishingSection() {
       setEnablerOtherText('');
       setBarrierOtherText('');
     }
+    // Clear error when domain changes
+    setShowError(false);
   }, [currentDomain, state.enablersBarriers]);
 
   const domain = FLOURISHING_DOMAINS[currentDomain];
@@ -155,11 +158,20 @@ export default function FlourishingSection() {
   };
 
   const isEnablersBarriersComplete = () => {
+    // Require at least one enabler to be selected
+    if (selectedEnablers.length === 0) {
+      return false;
+    }
+
+    // Require at least one barrier to be selected
+    if (selectedBarriers.length === 0) {
+      return false;
+    }
+
     // Check if "Other" selections have required text
     const enablerOtherValid = !selectedEnablers.includes('Other') || enablerOtherText.trim().length > 0;
     const barrierOtherValid = !selectedBarriers.includes('Other') || barrierOtherText.trim().length > 0;
 
-    // Allow form to be complete even with no selections (enablers/barriers are optional)
     return enablerOtherValid && barrierOtherValid;
   };
 
@@ -168,10 +180,16 @@ export default function FlourishingSection() {
   };
 
   const handleNext = () => {
+    if (!isComplete) {
+      setShowError(true);
+      scrollToTop();
+      return;
+    }
     continueToNext();
   };
 
   const continueToNext = () => {
+    setShowError(false);
     dispatch({ type: 'SET_FLOURISHING_SCORES', payload: scores });
 
     // Save enablers and barriers
@@ -204,6 +222,9 @@ export default function FlourishingSection() {
         ? prev.filter(e => e !== enabler)
         : [...prev, enabler]
     );
+    if (showError) {
+      setShowError(false);
+    }
   };
 
   const handleBarrierToggle = (barrier: string) => {
@@ -212,6 +233,9 @@ export default function FlourishingSection() {
         ? prev.filter(b => b !== barrier)
         : [...prev, barrier]
     );
+    if (showError) {
+      setShowError(false);
+    }
   };
 
   const handleBack = () => {
@@ -252,6 +276,23 @@ export default function FlourishingSection() {
             Please rate your current experience in this area of well-being.
           </p>
         </div>
+
+        {/* Error Message */}
+        {showError && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-800 text-sm font-semibold">
+              {!isQuestionsComplete() && "Please answer both rating questions."}
+              {isQuestionsComplete() && !isEnablersBarriersComplete() && (
+                <>
+                  {selectedEnablers.length === 0 && "Please select at least one enabler. "}
+                  {selectedBarriers.length === 0 && "Please select at least one barrier. "}
+                  {selectedEnablers.includes('Other') && !enablerOtherText.trim() && "Please specify your 'Other' enabler. "}
+                  {selectedBarriers.includes('Other') && !barrierOtherText.trim() && "Please specify your 'Other' barrier."}
+                </>
+              )}
+            </p>
+          </div>
+        )}
 
         <div className="space-y-8">
           {/* Domain Questions */}
@@ -301,7 +342,7 @@ export default function FlourishingSection() {
                   Help us understand what supports or challenges your {domain.name.toLowerCase()}.
                 </p>
                 <p className="text-blue-700 text-sm">
-                  Select all that apply for each category.
+                  Select at least one option for each category. <span className="text-red-600">*</span>
                 </p>
               </div>
 
@@ -313,7 +354,7 @@ export default function FlourishingSection() {
                       domain.name.toLowerCase().includes('meaning') ? 'purposeful' :
                         domain.name.toLowerCase().includes('character') ? 'grow in character' :
                           domain.name.toLowerCase().includes('social') ? 'connected' :
-                            'secure'}:
+                            'secure'}: <span className="text-red-600">*</span>
                 </h4>
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 gap-3">
@@ -334,9 +375,15 @@ export default function FlourishingSection() {
                       <input
                         type="text"
                         value={enablerOtherText}
-                        onChange={(e) => setEnablerOtherText(e.target.value)}
-                        placeholder="Please specify..."
+                        onChange={(e) => {
+                          setEnablerOtherText(e.target.value);
+                          if (showError) {
+                            setShowError(false);
+                          }
+                        }}
+                        placeholder="Please specify *"
                         className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        required
                       />
                     </div>
                   )}
@@ -351,7 +398,7 @@ export default function FlourishingSection() {
                       domain.name.toLowerCase().includes('meaning') ? 'feeling purposeful' :
                         domain.name.toLowerCase().includes('character') ? 'growth' :
                           domain.name.toLowerCase().includes('social') ? 'relationships' :
-                            'security'}:
+                            'security'}: <span className="text-red-600">*</span>
                 </h4>
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 gap-3">
@@ -372,9 +419,15 @@ export default function FlourishingSection() {
                       <input
                         type="text"
                         value={barrierOtherText}
-                        onChange={(e) => setBarrierOtherText(e.target.value)}
-                        placeholder="Please specify..."
+                        onChange={(e) => {
+                          setBarrierOtherText(e.target.value);
+                          if (showError) {
+                            setShowError(false);
+                          }
+                        }}
+                        placeholder="Please specify *"
                         className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                        required
                       />
                     </div>
                   )}
@@ -395,8 +448,7 @@ export default function FlourishingSection() {
           </button>
           <button
             onClick={handleNext}
-            disabled={!isComplete}
-            className="flex items-center justify-center bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white px-6 sm:px-8 py-3 rounded-lg font-semibold transition-colors"
+            className="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold transition-colors"
           >
             {currentDomain < FLOURISHING_DOMAINS.length - 1 ? 'Next Domain' : 'Continue'}
             <ChevronRight className="h-5 w-5 ml-1" />
