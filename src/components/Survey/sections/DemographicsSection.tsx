@@ -84,16 +84,66 @@ const TRANSFER_STUDENT_OPTIONS = [
 export default function DemographicsSection() {
   const { state, dispatch } = useSurvey();
   const [formData, setFormData] = useState(state.demographics);
+  const [showError, setShowError] = useState(false);
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear error when user starts filling out the form
+    if (showError) {
+      setShowError(false);
+    }
   };
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const isFormValid = () => {
+    const requiredFields = [
+      'yearInSchool',
+      'enrollmentStatus',
+      'ageRange',
+      'genderIdentity',
+      'isInternational',
+      'employmentStatus',
+      'hasCaregavingResponsibilities',
+      'inGreekOrganization',
+      'studyMode',
+      'transferStudent'
+    ];
+
+    // Check all required radio button fields
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        return false;
+      }
+    }
+
+    // Check race/ethnicity (at least one must be selected)
+    if (!formData.raceEthnicity || formData.raceEthnicity.length === 0) {
+      return false;
+    }
+
+    // If "Other" is selected for year in school, check if text is provided
+    if (formData.yearInSchool === 'Other' && !formData.yearInSchoolOther?.trim()) {
+      return false;
+    }
+
+    // If "Self-describe" is selected for gender, check if text is provided
+    if (formData.genderIdentity === 'Self-describe' && !formData.genderSelfDescribe?.trim()) {
+      return false;
+    }
+
+    return true;
+  };
+
   const handleNext = () => {
+    if (!isFormValid()) {
+      setShowError(true);
+      scrollToTop();
+      return;
+    }
+
     dispatch({ type: 'SET_DEMOGRAPHICS', payload: formData });
     dispatch({ type: 'SET_SECTION', payload: 3 }); // Go to Flourishing Intro
     scrollToTop();
@@ -111,13 +161,25 @@ export default function DemographicsSection() {
         <p className="text-slate-600">
           These questions help us understand different student experiences and ensure all voices are represented.
         </p>
+        <p className="text-sm text-slate-500 mt-2">
+          <span className="text-red-600">*</span> All questions are required
+        </p>
       </div>
+
+      {/* Error Message */}
+      {showError && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-800 text-sm font-semibold">
+            Please answer all required questions before continuing.
+          </p>
+        </div>
+      )}
 
       <div className="space-y-8">
         {/* Year in School */}
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-3">
-            What year are you in school?
+            What year are you in school? <span className="text-red-600">*</span>
           </label>
           <div className="space-y-2">
             {YEAR_OPTIONS.map(option => (
@@ -134,12 +196,22 @@ export default function DemographicsSection() {
               </label>
             ))}
           </div>
+          {formData.yearInSchool === 'Other' && (
+            <input
+              type="text"
+              placeholder="Please specify *"
+              value={formData.yearInSchoolOther || ''}
+              onChange={(e) => handleInputChange('yearInSchoolOther', e.target.value)}
+              className="mt-2 block w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          )}
         </div>
 
         {/* Enrollment Status */}
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-3">
-            What is your enrollment status?
+            What is your enrollment status? <span className="text-red-600">*</span>
           </label>
           <div className="space-y-2">
             {ENROLLMENT_OPTIONS.map(option => (
@@ -161,7 +233,7 @@ export default function DemographicsSection() {
         {/* Age Range */}
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-3">
-            What is your age range?
+            What is your age range? <span className="text-red-600">*</span>
           </label>
           <div className="space-y-2">
             {AGE_OPTIONS.map(option => (
@@ -183,7 +255,7 @@ export default function DemographicsSection() {
         {/* Gender Identity */}
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-3">
-            What is your gender identity?
+            What is your gender identity? <span className="text-red-600">*</span>
           </label>
           <div className="space-y-2">
             {GENDER_OPTIONS.map(option => (
@@ -203,10 +275,11 @@ export default function DemographicsSection() {
           {formData.genderIdentity === 'Self-describe' && (
             <input
               type="text"
-              placeholder="Please specify"
+              placeholder="Please specify *"
               value={formData.genderSelfDescribe || ''}
               onChange={(e) => handleInputChange('genderSelfDescribe', e.target.value)}
               className="mt-2 block w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              required
             />
           )}
         </div>
@@ -214,7 +287,7 @@ export default function DemographicsSection() {
         {/* Race/Ethnicity */}
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-3">
-            What is your race/ethnicity? (Select all that apply)
+            What is your race/ethnicity? (Select all that apply) <span className="text-red-600">*</span>
           </label>
           <div className="space-y-2">
             {RACE_ETHNICITY_OPTIONS.map(option => (
@@ -242,7 +315,7 @@ export default function DemographicsSection() {
         {/* International Student */}
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-3">
-            Are you an international student?
+            Are you an international student? <span className="text-red-600">*</span>
           </label>
           <div className="space-y-2">
             {INTERNATIONAL_OPTIONS.map(option => (
@@ -264,7 +337,7 @@ export default function DemographicsSection() {
         {/* Employment Status */}
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-3">
-            What is your employment status?
+            What is your employment status? <span className="text-red-600">*</span>
           </label>
           <div className="space-y-2">
             {EMPLOYMENT_OPTIONS.map(option => (
@@ -286,7 +359,7 @@ export default function DemographicsSection() {
         {/* Caregiving Responsibilities */}
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-3">
-            Do you have family or caregiving responsibilities that impact your time as a student?
+            Do you have family or caregiving responsibilities that impact your time as a student? <span className="text-red-600">*</span>
           </label>
           <div className="space-y-2">
             {CAREGIVING_OPTIONS.map(option => (
@@ -308,7 +381,7 @@ export default function DemographicsSection() {
         {/* Greek Organization */}
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-3">
-            Are you a member of a Greek organization (fraternity/sorority)?
+            Are you a member of a Greek organization (fraternity/sorority)? <span className="text-red-600">*</span>
           </label>
           <div className="space-y-2">
             {GREEK_OPTIONS.map(option => (
@@ -330,7 +403,7 @@ export default function DemographicsSection() {
         {/* Study Mode */}
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-3">
-            What is your current mode of study?
+            What is your current mode of study? <span className="text-red-600">*</span>
           </label>
           <div className="space-y-2">
             {STUDY_MODE_OPTIONS.map(option => (
@@ -352,7 +425,7 @@ export default function DemographicsSection() {
         {/* Transfer Student */}
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-3">
-            Are you a transfer student?
+            Are you a transfer student? <span className="text-red-600">*</span>
           </label>
           <div className="space-y-2">
             {TRANSFER_STUDENT_OPTIONS.map(option => (

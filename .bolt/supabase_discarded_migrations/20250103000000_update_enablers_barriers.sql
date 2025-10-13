@@ -73,7 +73,7 @@ INSERT INTO domain_enablers_barriers (domain_key, domain_name, enablers, barrier
 ),
 (
     'character_virtue',
-    'Character & Growth',
+    'Character & Virtue',
     ARRAY[
         'Learning and practicing emotional tools',
         'Being recognized for kindness or integrity',
