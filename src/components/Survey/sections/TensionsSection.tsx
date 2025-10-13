@@ -72,6 +72,13 @@ export default function TensionsSection() {
         </p>
       </div>
 
+      <div className="mb-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <p className="text-blue-800 text-sm">
+          <strong>Remember:</strong> There's no "right" answer here. This is about understanding your current
+          approach to balancing these important aspects of life as a student.
+        </p>
+      </div>
+
       <div className="space-y-10">
         {TENSION_PAIRS.map((pair) => {
           const value = values[pair.key as keyof typeof values] || 50;
@@ -107,12 +114,6 @@ export default function TensionsSection() {
                   />
                 </div>
 
-                <div className="flex justify-between mt-2 text-xs text-slate-500">
-                  <span>0</span>
-                  <span>50</span>
-                  <span>100</span>
-                </div>
-
                 <div className="text-center mt-3">
                   {value === 50 ? (
                     <span className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
@@ -128,13 +129,6 @@ export default function TensionsSection() {
             </div>
           );
         })}
-      </div>
-
-      <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <p className="text-blue-800 text-sm">
-          <strong>Remember:</strong> There's no "right" answer here. This is about understanding your current
-          approach to balancing these important aspects of life as a student.
-        </p>
       </div>
 
       {/* Navigation */}
