@@ -456,7 +456,11 @@ export default function DemographicsSection() {
         </button>
         <button
           onClick={handleNext}
-          className="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold transition-colors"
+          disabled={!isFormValid()}
+          className={`flex items-center justify-center px-6 sm:px-8 py-3 rounded-lg font-semibold transition-colors ${isFormValid()
+            ? 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'
+            : 'bg-slate-300 text-slate-500 cursor-not-allowed'
+            }`}
         >
           Continue
           <ChevronRight className="h-5 w-5 ml-1" />

@@ -28,10 +28,6 @@ const SCHOOL_WELLBEING_QUESTIONS = [
     question: 'I have opportunities at school to contribute to something bigger than myself.'
   },
   {
-    key: 'kind_to_others',
-    question: 'I am kind to others at school each day.'
-  },
-  {
     key: 'manage_emotions',
     question: 'I know how to manage my emotions when I feel stressed.'
   },
@@ -53,17 +49,17 @@ const WELLBEING_CHECKLIST = [
   'I have at least one teacher who knows me well.',
   'I participate in school sports or regular physical activity.',
   'I participate in arts, music, or creative activities at school.',
-  'I have opportunities for service learning or helping the community.',
   'I have time during the school week for fun, play, or humor.',
   'I spend time in nature at or near school.',
-  'My school celebrates student kindness and respect.',
-  'I know where to get help at school if I’m struggling.'
+  'I know where to get help at school if I\'m struggling.'
 ];
 
 export default function SchoolWellbeingSection() {
   const { state, dispatch } = useSurvey();
   const [scores, setScores] = useState(state.schoolWellbeing);
-  const [checklist, setChecklist] = useState<string[]>([]);
+  const [checklist, setChecklist] = useState<string[]>(
+    state.schoolWellbeing.wellbeingChecklist || []
+  );
 
   const handleScoreChange = (key: string, value: number) => {
     setScores(prev => ({ ...prev, [key]: value }));
