@@ -28,10 +28,6 @@ const SCHOOL_WELLBEING_QUESTIONS = [
     question: 'I have opportunities at school to contribute to something bigger than myself.'
   },
   {
-    key: 'kind_to_others',
-    question: 'I am kind to others at school each day.'
-  },
-  {
     key: 'manage_emotions',
     question: 'I know how to manage my emotions when I feel stressed.'
   },
