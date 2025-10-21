@@ -2,11 +2,11 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 
 interface DemographicsAnalysisProps {
   data: any;
+  selectedDemographic: string;
+  onDemographicChange: (demographic: string) => void;
 }
 
-export default function DemographicsAnalysis({ data }: DemographicsAnalysisProps) {
-  // Default to showing Year in School demographic
-  const selectedDemographic = 'yearInSchool';
+export default function DemographicsAnalysis({ data, selectedDemographic, onDemographicChange }: DemographicsAnalysisProps) {
   // Use real data from the analytics service
   const demographicBreakdown = data?.demographicBreakdown || {};
   const totalAtRiskPercentage = data?.studentsAtRisk || 23; // Overall at-risk percentage
@@ -43,11 +43,29 @@ export default function DemographicsAnalysis({ data }: DemographicsAnalysisProps
     notAtRisk: item.total - item.atRisk
   }));
 
+  const demographicOptions = [
+    { value: 'yearInSchool', label: 'Year in School' },
+    { value: 'genderIdentity', label: 'Gender Identity' },
+    { value: 'raceEthnicity', label: 'Race/Ethnicity' },
+    { value: 'employmentStatus', label: 'Employment Status' }
+  ];
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold text-slate-900">At-Risk Students by Demographics</h3>
-        <p className="text-sm text-slate-600">Students with any flourishing domain score below 6 - Year in School</p>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h3 className="text-lg font-semibold text-slate-900">At-Risk Students by Demographics</h3>
+          <p className="text-sm text-slate-600">Students with any flourishing domain score below 6</p>
+        </div>
+        <select
+          value={selectedDemographic}
+          onChange={(e) => onDemographicChange(e.target.value)}
+          className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          {demographicOptions.map(option => (
+            <option key={option.value} value={option.value}>{option.label}</option>
+          ))}
+        </select>
       </div>
 
       <div className="h-80">

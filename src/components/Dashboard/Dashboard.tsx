@@ -17,6 +17,7 @@ import { DemographicsFilters, DEFAULT_FILTERS } from '../../types/filters';
 export default function Dashboard() {
   const { adminUser } = useAuthStore();
   const [dateRange, setDateRange] = useState('semester');
+  const [selectedDemographic, setSelectedDemographic] = useState('yearInSchool');
   const [filters, setFilters] = useState<DemographicsFilters>(DEFAULT_FILTERS);
   const [surveyData, setSurveyData] = useState<any>(null);
   const [filteredData, setFilteredData] = useState<any>(null);
@@ -194,7 +195,11 @@ export default function Dashboard() {
         {/* Primary Visualizations */}
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
           <FlourishingChart data={filteredData || surveyData} />
-          <DemographicsAnalysis data={filteredData || surveyData} />
+          <DemographicsAnalysis
+            data={filteredData || surveyData}
+            selectedDemographic={selectedDemographic}
+            onDemographicChange={setSelectedDemographic}
+          />
         </div>
 
         {/* Tension Heatmap - Our IP Highlight */}
