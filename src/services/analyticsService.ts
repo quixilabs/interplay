@@ -1,5 +1,8 @@
 import { supabase } from '../lib/supabase';
 
+// Debug flag - set to false to disable debug logging in production
+const DEBUG_ANALYTICS = import.meta.env.DEV; // Automatically disabled in production builds
+
 export class AnalyticsService {
   // Get survey analytics for dashboard
   static async getSurveyAnalytics(universitySlug?: string) {
@@ -161,6 +164,9 @@ export class AnalyticsService {
       // Analyze tension data
       const tensionAnalysis = this.analyzeTensions(tensionsData || [], flourishingData || [], wellbeingData || [], enablersBarriersData || [], domainData || []);
 
+      // Build combined responses array for filtering
+      const responses = this.buildResponsesArray(sessions || [], demographicsData || [], flourishingData || [], wellbeingData || [], enablersBarriersData || [], tensionsData || []);
+
       return {
         totalResponses,
         completionRate: Math.round(completionRate * 10) / 10,
@@ -172,7 +178,8 @@ export class AnalyticsService {
         interventionAnalysis,
         fastestWinSuggestions,
         brightSpotThemes,
-        tensionAnalysis
+        tensionAnalysis,
+        responses
       };
     } catch (error) {
       console.error('Error fetching survey analytics:', error);
@@ -207,7 +214,8 @@ export class AnalyticsService {
     return averages;
   }
 
-  private static calculateOverallFlourishingScore(data: any[]) {
+  // Make this method public so it can be called from Dashboard when filtering
+  static calculateOverallFlourishingScore(data: any[]) {
     if (data.length === 0) return 0;
 
     const domains = [
@@ -245,7 +253,8 @@ export class AnalyticsService {
     return validResponses > 0 ? Math.round((totalScore / validResponses) * 10) / 10 : 0;
   }
 
-  private static calculateAtRiskStudents(data: any[]) {
+  // Make this method public so it can be called from Dashboard when filtering
+  static calculateAtRiskStudents(data: any[]) {
     if (data.length === 0) return 0;
 
     const domains = [
@@ -451,6 +460,129 @@ export class AnalyticsService {
     return suggestions.slice(0, 10);
   }
 
+
+  private static buildResponsesArray(sessions: any[], demographicsData: any[], flourishingData: any[], wellbeingData: any[], enablersBarriersData: any[], tensionsData: any[]) {
+    // Debug: Check what data we received
+    if (DEBUG_ANALYTICS) {
+      console.log('🔍 DEBUG: Data received for building responses:');
+      console.log('  - Sessions:', sessions.length, 'records');
+      console.log('  - Demographics:', demographicsData.length, 'records');
+      console.log('  - Flourishing:', flourishingData.length, 'records');
+      console.log('  - Wellbeing:', wellbeingData.length, 'records');
+      
+      if (sessions.length > 0) {
+        console.log('  - Sample session.id (UUID):', sessions[0].id);
+        console.log('  - Sample session.session_id (TEXT):', sessions[0].session_id);
+      }
+      if (demographicsData.length > 0) {
+        console.log('  - Sample demographics session_id:', demographicsData[0].session_id);
+        console.log('  - Sample demographics data:', {
+          session_id: demographicsData[0].session_id,
+          year_in_school: demographicsData[0].year_in_school,
+          gender_identity: demographicsData[0].gender_identity,
+          race_ethnicity: demographicsData[0].race_ethnicity
+        });
+      }
+    }
+
+    // Create maps by session_id for quick lookup
+    const demographicsMap = new Map();
+    demographicsData.forEach(d => demographicsMap.set(d.session_id, d));
+
+    const flourishingMap = new Map();
+    flourishingData.forEach(f => flourishingMap.set(f.session_id, f));
+
+    const wellbeingMap = new Map();
+    wellbeingData.forEach(w => wellbeingMap.set(w.session_id, w));
+
+    const tensionsMap = new Map();
+    tensionsData.forEach(t => tensionsMap.set(t.session_id, t));
+
+    // Group enablers/barriers by session_id
+    const enablersBarriersMap = new Map();
+    enablersBarriersData.forEach(eb => {
+      if (!enablersBarriersMap.has(eb.session_id)) {
+        enablersBarriersMap.set(eb.session_id, []);
+      }
+      enablersBarriersMap.get(eb.session_id).push(eb);
+    });
+
+    // Build responses array from completed sessions
+    const responses = sessions
+      .filter(session => session.is_completed)
+      .map(session => {
+        // IMPORTANT: Use session.session_id (text) not session.id (uuid) to match other tables
+        const sessionKey = session.session_id;
+        const demographics = demographicsMap.get(sessionKey) || {};
+        const flourishing = flourishingMap.get(sessionKey) || {};
+        const wellbeing = wellbeingMap.get(sessionKey) || {};
+        const tensions = tensionsMap.get(sessionKey) || {};
+        const enablersBarriers = enablersBarriersMap.get(sessionKey) || [];
+
+        return {
+          id: session.id,
+          sessionId: session.session_id, // Use the text session_id, not the UUID id
+          createdAt: session.created_at,
+          demographics: {
+            yearInSchool: demographics.year_in_school,
+            enrollmentStatus: demographics.enrollment_status,
+            ageRange: demographics.age_range,
+            genderIdentity: demographics.gender_identity,
+            raceEthnicity: demographics.race_ethnicity || [],
+            isInternational: demographics.is_international_student,
+            employmentStatus: demographics.employment_status,
+            hasCaregavingResponsibilities: demographics.has_caregiving_responsibilities,
+            inGreekOrganization: demographics.in_greek_organization,
+            studyMode: demographics.study_mode,
+            transferStudent: demographics.transfer_student
+          },
+          flourishing: {
+            happiness_satisfaction_1: flourishing.happiness_satisfaction_1,
+            happiness_satisfaction_2: flourishing.happiness_satisfaction_2,
+            mental_physical_health_1: flourishing.mental_physical_health_1,
+            mental_physical_health_2: flourishing.mental_physical_health_2,
+            meaning_purpose_1: flourishing.meaning_purpose_1,
+            meaning_purpose_2: flourishing.meaning_purpose_2,
+            character_virtue_1: flourishing.character_virtue_1,
+            character_virtue_2: flourishing.character_virtue_2,
+            social_relationships_1: flourishing.social_relationships_1,
+            social_relationships_2: flourishing.social_relationships_2,
+            financial_stability_1: flourishing.financial_stability_1,
+            financial_stability_2: flourishing.financial_stability_2
+          },
+          schoolWellbeing: wellbeing,
+          tensions: tensions,
+          enablersBarriers: enablersBarriers
+        };
+      });
+
+    // Debug logging to help diagnose filter issues
+    if (DEBUG_ANALYTICS && responses.length > 0) {
+      console.log('🔍 DEBUG: Sample response demographics:', responses[0]?.demographics);
+      console.log('🔍 DEBUG: Total responses:', responses.length);
+      
+      // Show unique values for each demographic field
+      const uniqueValues: any = {};
+      responses.forEach(r => {
+        Object.keys(r.demographics).forEach(key => {
+          if (!uniqueValues[key]) uniqueValues[key] = new Set();
+          const value = r.demographics[key as keyof typeof r.demographics];
+          if (Array.isArray(value)) {
+            value.forEach(v => uniqueValues[key].add(v));
+          } else if (value) {
+            uniqueValues[key].add(value);
+          }
+        });
+      });
+      
+      console.log('🔍 DEBUG: Unique demographic values in database:');
+      Object.keys(uniqueValues).forEach(key => {
+        console.log(`  ${key}:`, Array.from(uniqueValues[key]));
+      });
+    }
+
+    return responses;
+  }
 
   private static analyzeTensions(tensionsData: any[], flourishingData: any[], wellbeingData: any[], enablersBarriersData: any[], domainData: any[]) {
     if (tensionsData.length === 0) return null;

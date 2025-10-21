@@ -56,9 +56,9 @@ export default function SurveyFlow() {
   const initializingRef = useRef(false);
   const [universityName, setUniversityName] = useState<string>('');
 
+  // Only generate session ID on mount, don't create database record yet
   useEffect(() => {
-    if (universitySlug && !state.sessionId && !initializingRef.current) {
-      initializingRef.current = true; // Prevent duplicate initialization during this effect
+    if (universitySlug && !state.sessionId) {
       const sessionId = generateSessionId();
 
       dispatch({
@@ -68,9 +68,16 @@ export default function SurveyFlow() {
           universitySlug
         }
       });
+    }
+  }, [universitySlug, state.sessionId, dispatch]);
+
+  // Create database record only after consent is given
+  useEffect(() => {
+    if (state.consentGiven && state.sessionId && !state.isInitialized && !initializingRef.current) {
+      initializingRef.current = true;
 
       // Initialize survey in database asynchronously
-      SurveyService.initializeSurvey(sessionId, universitySlug)
+      SurveyService.initializeSurvey(state.sessionId, state.universitySlug)
         .then(() => {
           dispatch({ type: 'SET_INITIALIZED', payload: true });
         })
@@ -78,10 +85,10 @@ export default function SurveyFlow() {
           console.error('Failed to initialize survey:', error);
         })
         .finally(() => {
-          initializingRef.current = false; // Reset after completion/error
+          initializingRef.current = false;
         });
     }
-  }, [universitySlug, state.sessionId, dispatch]);
+  }, [state.consentGiven, state.sessionId, state.universitySlug, state.isInitialized, dispatch]);
 
   // Reset initialization ref when university slug changes
   useEffect(() => {

@@ -30,34 +30,72 @@ export const mockSurveyData = {
   
   demographicBreakdown: {
     yearInSchool: {
-      'First year': 189,
-      'Sophomore': 176,
-      'Junior': 162,
-      'Senior': 148,
-      'Graduate': 134,
+      'First year/Freshman': 189,
+      'Second year/Sophomore': 176,
+      'Third year/Junior': 162,
+      'Fourth year/Senior': 148,
+      'Graduate student': 134,
       'Other': 34
+    },
+    enrollmentStatus: {
+      'Full-time': 892,
+      'Part-time': 151
+    },
+    ageRange: {
+      '18-19': 298,
+      '20-21': 287,
+      '22-24': 234,
+      '25 or older': 189,
+      'Prefer not to say': 35
     },
     genderIdentity: {
       'Woman': 456,
       'Man': 389,
       'Non-binary': 67,
-      'Other/Prefer not to say': 131
+      'Self-describe': 45,
+      'Prefer not to say': 86
     },
     raceEthnicity: {
       'Asian': 234,
-      'Black/African American': 142,
-      'Hispanic/Latino/a/x': 178,
+      'Black or African American': 142,
+      'Hispanic or Latino/a/x': 178,
       'White': 387,
-      'American Indian/Alaska Native': 23,
-      'Native Hawaiian/Pacific Islander': 18,
-      'Other/Multiple': 61
+      'American Indian or Alaska Native': 23,
+      'Native Hawaiian or Other Pacific Islander': 18,
+      'Prefer not to say': 61
+    },
+    isInternational: {
+      'Yes, international student': 156,
+      'No, domestic student': 823,
+      'Prefer not to say': 64
     },
     employmentStatus: {
       'Not employed': 298,
-      'Part-time (<20hrs)': 234,
-      'Part-time (20+hrs)': 189,
+      'Part-time (less than 20 hours/week)': 234,
+      'Part-time (20+ hours/week)': 189,
       'Full-time': 122,
-      'Other': 34
+      'Prefer not to say': 200
+    },
+    hasCaregavingResponsibilities: {
+      'Yes': 234,
+      'No': 756,
+      'Prefer not to say': 53
+    },
+    inGreekOrganization: {
+      'Yes, currently active': 178,
+      'No': 823,
+      'Prefer not to say': 42
+    },
+    studyMode: {
+      'Entirely in-person': 687,
+      'Entirely online': 145,
+      'Hybrid (a mix of in-person and online)': 211
+    },
+    transferStudent: {
+      'No, I started at this university as a first-time freshman': 645,
+      'Yes, I transferred this year': 123,
+      'Yes, I transferred last year': 145,
+      'Yes, I transferred two or more years ago': 130
     }
   },
   
@@ -265,10 +303,23 @@ export const mockSurveyData = {
 function generateMockResponses(count: number) {
   const responses = [];
   
-  const yearOptions = ['First year', 'Sophomore', 'Junior', 'Senior', 'Graduate', 'Other'];
-  const genderOptions = ['Woman', 'Man', 'Non-binary', 'Other/Prefer not to say'];
-  const raceOptions = ['Asian', 'Black/African American', 'Hispanic/Latino/a/x', 'White', 'American Indian/Alaska Native', 'Native Hawaiian/Pacific Islander', 'Other/Multiple'];
-  const employmentOptions = ['Not employed', 'Part-time (<20hrs)', 'Part-time (20+hrs)', 'Full-time', 'Other'];
+  // Use the exact same values as FILTER_OPTIONS to ensure they match
+  const yearOptions = ['First year/Freshman', 'Second year/Sophomore', 'Third year/Junior', 'Fourth year/Senior', 'Graduate student', 'Other'];
+  const genderOptions = ['Woman', 'Man', 'Non-binary', 'Self-describe', 'Prefer not to say'];
+  const raceOptions = ['Asian', 'Black or African American', 'Hispanic or Latino/a/x', 'White', 'American Indian or Alaska Native', 'Native Hawaiian or Other Pacific Islander', 'Prefer not to say'];
+  const employmentOptions = ['Not employed', 'Part-time (less than 20 hours/week)', 'Part-time (20+ hours/week)', 'Full-time', 'Prefer not to say'];
+  const enrollmentOptions = ['Full-time', 'Part-time'];
+  const ageRangeOptions = ['18-19', '20-21', '22-24', '25 or older', 'Prefer not to say'];
+  const internationalOptions = ['Yes, international student', 'No, domestic student', 'Prefer not to say'];
+  const caregivingOptions = ['Yes', 'No', 'Prefer not to say'];
+  const greekOptions = ['Yes, currently active', 'No', 'Prefer not to say'];
+  const studyModeOptions = ['Entirely in-person', 'Entirely online', 'Hybrid (a mix of in-person and online)'];
+  const transferOptions = [
+    'No, I started at this university as a first-time freshman',
+    'Yes, I transferred this year',
+    'Yes, I transferred last year',
+    'Yes, I transferred two or more years ago'
+  ];
   
   for (let i = 0; i < count; i++) {
     const response = {
@@ -277,9 +328,16 @@ function generateMockResponses(count: number) {
       createdAt: new Date(2024, 0, 1 + Math.floor(Math.random() * 90)).toISOString(),
       demographics: {
         yearInSchool: yearOptions[Math.floor(Math.random() * yearOptions.length)],
+        enrollmentStatus: enrollmentOptions[Math.floor(Math.random() * enrollmentOptions.length)],
+        ageRange: ageRangeOptions[Math.floor(Math.random() * ageRangeOptions.length)],
         genderIdentity: genderOptions[Math.floor(Math.random() * genderOptions.length)],
         raceEthnicity: [raceOptions[Math.floor(Math.random() * raceOptions.length)]],
-        employmentStatus: employmentOptions[Math.floor(Math.random() * employmentOptions.length)]
+        isInternational: internationalOptions[Math.floor(Math.random() * internationalOptions.length)],
+        employmentStatus: employmentOptions[Math.floor(Math.random() * employmentOptions.length)],
+        hasCaregavingResponsibilities: caregivingOptions[Math.floor(Math.random() * caregivingOptions.length)],
+        inGreekOrganization: greekOptions[Math.floor(Math.random() * greekOptions.length)],
+        studyMode: studyModeOptions[Math.floor(Math.random() * studyModeOptions.length)],
+        transferStudent: transferOptions[Math.floor(Math.random() * transferOptions.length)]
       },
       flourishing: generateFlourishingScores(),
       schoolWellbeing: generateSchoolWellbeingScores(),

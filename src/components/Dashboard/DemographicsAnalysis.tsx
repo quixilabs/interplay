@@ -1,5 +1,4 @@
-import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface DemographicsAnalysisProps {
   data: any;
@@ -11,7 +10,7 @@ export default function DemographicsAnalysis({ data, selectedDemographic, onDemo
   // Use real data from the analytics service
   const demographicBreakdown = data?.demographicBreakdown || {};
   const totalAtRiskPercentage = data?.studentsAtRisk || 23; // Overall at-risk percentage
-  
+
   // Convert the demographic data to the expected format with estimated at-risk calculations
   const calculateAtRiskData = (categoryData: Record<string, number>) => {
     return Object.entries(categoryData).map(([category, total]) => {
@@ -20,7 +19,7 @@ export default function DemographicsAnalysis({ data, selectedDemographic, onDemo
       const variation = (Math.random() - 0.5) * 0.2; // ±10% variation
       const riskRate = Math.max(0.1, Math.min(0.4, baseRiskRate + variation));
       const atRisk = Math.round(total * riskRate);
-      
+
       return {
         category,
         atRisk,
@@ -73,15 +72,15 @@ export default function DemographicsAnalysis({ data, selectedDemographic, onDemo
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-            <XAxis 
-              dataKey="category" 
+            <XAxis
+              dataKey="category"
               tick={{ fontSize: 12, fill: '#64748b' }}
               angle={-45}
               textAnchor="end"
               height={80}
             />
             <YAxis tick={{ fontSize: 12, fill: '#64748b' }} />
-            <Tooltip 
+            <Tooltip
               content={({ active, payload, label }) => {
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;

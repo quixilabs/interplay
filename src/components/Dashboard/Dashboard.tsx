@@ -8,7 +8,6 @@ import FlourishingChart from './FlourishingChart';
 import DemographicsAnalysis from './DemographicsAnalysis';
 import InterventionMatrix from './InterventionMatrix';
 import ActionableInsights from './ActionableInsights';
-import SchoolWellbeingTrends from './SchoolWellbeingTrends';
 import TensionHeatmap from './TensionHeatmap';
 import InsightTiles from './InsightTiles';
 import EnablersBarriersBreakdown from './EnablersBarriersBreakdown';
@@ -18,12 +17,40 @@ import { DemographicsFilters, DEFAULT_FILTERS } from '../../types/filters';
 export default function Dashboard() {
   const { adminUser } = useAuthStore();
   const [dateRange, setDateRange] = useState('semester');
-  const [selectedDemographic, setSelectedDemographic] = useState('all');
+  const [selectedDemographic, setSelectedDemographic] = useState('yearInSchool');
   const [filters, setFilters] = useState<DemographicsFilters>(DEFAULT_FILTERS);
   const [surveyData, setSurveyData] = useState<any>(null);
   const [filteredData, setFilteredData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Helper function to recalculate domain averages from filtered data
+  const calculateFlourishingDomainAverages = (data: any[]) => {
+    if (data.length === 0) return {};
+
+    const domains = [
+      'happiness_satisfaction',
+      'mental_physical_health',
+      'meaning_purpose',
+      'character_virtue',
+      'social_relationships',
+      'financial_stability'
+    ];
+
+    const averages: any = {};
+
+    domains.forEach(domain => {
+      const scores1 = data.map(d => d[`${domain}_1`]).filter(s => s !== null && s !== undefined);
+      const scores2 = data.map(d => d[`${domain}_2`]).filter(s => s !== null && s !== undefined);
+      const allScores = [...scores1, ...scores2];
+
+      if (allScores.length > 0) {
+        averages[domain] = Math.round((allScores.reduce((a, b) => a + b, 0) / allScores.length) * 10) / 10;
+      }
+    });
+
+    return averages;
+  };
 
   // Function to filter data based on selected filters
   const filterSurveyData = (data: any, filters: DemographicsFilters) => {
@@ -50,10 +77,33 @@ export default function Dashboard() {
       });
     });
 
+    // Extract flourishing data from filtered responses to recalculate overall score
+    const filteredFlourishingData = filteredResponses
+      .filter((response: any) => response.flourishing) // Filter out responses without flourishing data
+      .map((response: any) => ({
+        ...response.flourishing,
+        session_id: response.sessionId
+      }));
+
+    // Recalculate overall flourishing score with filtered data
+    const recalculatedFlourishingScore = AnalyticsService.calculateOverallFlourishingScore(filteredFlourishingData);
+
+    // Recalculate flourishing domain averages
+    const recalculatedDomainAverages = calculateFlourishingDomainAverages(filteredFlourishingData);
+
+    // Recalculate students at risk (students below threshold)
+    const atRiskCount = AnalyticsService.calculateAtRiskStudents(filteredFlourishingData);
+    const recalculatedStudentsAtRisk = filteredResponses.length > 0
+      ? Math.round((atRiskCount / filteredResponses.length) * 100)
+      : 0;
+
     return {
       ...data,
       responses: filteredResponses,
-      totalResponses: filteredResponses.length
+      totalResponses: filteredResponses.length,
+      overallFlourishingScore: recalculatedFlourishingScore,
+      flourishingDomainAverages: recalculatedDomainAverages,
+      studentsAtRisk: recalculatedStudentsAtRisk
     };
   };
 
