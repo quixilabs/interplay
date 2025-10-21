@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { LOCAL_SUPABASE_CONFIG, USE_LOCAL_SUPABASE } from '../config/local';
+import { debugLog } from '../utils/debug';
 
 // Use local config if enabled, otherwise fall back to environment variables
 const supabaseUrl = USE_LOCAL_SUPABASE 
@@ -10,32 +11,32 @@ const supabaseAnonKey = USE_LOCAL_SUPABASE
   : import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Debug logging for database configuration
-console.log('🔧 [DEBUG] Supabase Configuration:');
-console.log('  - USE_LOCAL_SUPABASE:', USE_LOCAL_SUPABASE);
-console.log('  - supabaseUrl:', supabaseUrl);
-console.log('  - supabaseAnonKey:', supabaseAnonKey ? `${supabaseAnonKey.substring(0, 20)}...` : 'NOT SET');
-console.log('  - Environment VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL || 'NOT SET');
-console.log('  - Environment VITE_SUPABASE_ANON_KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY ? `${import.meta.env.VITE_SUPABASE_ANON_KEY.substring(0, 20)}...` : 'NOT SET');
+debugLog('🔧 [DEBUG] Supabase Configuration:');
+debugLog('  - USE_LOCAL_SUPABASE:', USE_LOCAL_SUPABASE);
+debugLog('  - supabaseUrl:', supabaseUrl);
+debugLog('  - supabaseAnonKey:', supabaseAnonKey ? `${supabaseAnonKey.substring(0, 20)}...` : 'NOT SET');
+debugLog('  - Environment VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL || 'NOT SET');
+debugLog('  - Environment VITE_SUPABASE_ANON_KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY ? `${import.meta.env.VITE_SUPABASE_ANON_KEY.substring(0, 20)}...` : 'NOT SET');
 
 if (USE_LOCAL_SUPABASE) {
-  console.log('🏠 [DEBUG] Using LOCAL Supabase instance');
-  console.log('  - Local URL:', LOCAL_SUPABASE_CONFIG.url);
-  console.log('  - Local Database URL:', LOCAL_SUPABASE_CONFIG.databaseUrl);
-  console.log('  - Local Studio URL:', LOCAL_SUPABASE_CONFIG.studioUrl);
+  debugLog('🏠 [DEBUG] Using LOCAL Supabase instance');
+  debugLog('  - Local URL:', LOCAL_SUPABASE_CONFIG.url);
+  debugLog('  - Local Database URL:', LOCAL_SUPABASE_CONFIG.databaseUrl);
+  debugLog('  - Local Studio URL:', LOCAL_SUPABASE_CONFIG.studioUrl);
 } else {
-  console.log('☁️ [DEBUG] Using PRODUCTION Supabase instance');
+  debugLog('☁️ [DEBUG] Using PRODUCTION Supabase instance');
 }
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('❌ [DEBUG] Missing Supabase configuration details:');
+  console.error('❌ Missing Supabase configuration details:');
   console.error('  - supabaseUrl:', supabaseUrl || 'MISSING');
   console.error('  - supabaseAnonKey:', supabaseAnonKey || 'MISSING');
   throw new Error('Missing Supabase configuration. Please set up your Supabase connection.');
 }
 
-console.log('✅ [DEBUG] Creating Supabase client...');
+debugLog('✅ [DEBUG] Creating Supabase client...');
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-console.log('✅ [DEBUG] Supabase client created successfully');
+debugLog('✅ [DEBUG] Supabase client created successfully');
 
 // Database types
 export interface Database {

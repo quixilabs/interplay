@@ -3,6 +3,7 @@ import { useSurvey } from '../../../contexts/SurveyContext';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { SurveyService } from '../../../services/surveyService';
 import { DomainEnablersBarriers } from '../../../types/survey';
+import { debugLog } from '../../../utils/debug';
 
 const FLOURISHING_DOMAINS = [
   {
@@ -125,14 +126,14 @@ export default function FlourishingSection() {
 
     if (savedData) {
       // Restore previously saved selections
-      console.log(`🔄 [DEBUG] Restoring selections for domain: ${domain.key}`, savedData);
+      debugLog(`🔄 [DEBUG] Restoring selections for domain: ${domain.key}`, savedData);
       setSelectedEnablers(savedData.selectedEnablers || []);
       setSelectedBarriers(savedData.selectedBarriers || []);
       setEnablerOtherText(savedData.enablerOtherText || '');
       setBarrierOtherText(savedData.barrierOtherText || '');
     } else {
       // Clear selections for new domain
-      console.log(`🆕 [DEBUG] No saved data for domain: ${domain.key}, clearing selections`);
+      debugLog(`🆕 [DEBUG] No saved data for domain: ${domain.key}, clearing selections`);
       setSelectedEnablers([]);
       setSelectedBarriers([]);
       setEnablerOtherText('');

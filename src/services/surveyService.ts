@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { debugLog, debugWarn } from '../utils/debug';
 import { SurveyState } from '../types/survey';
 
 export class SurveyService {
@@ -12,7 +13,7 @@ export class SurveyService {
       'tensions_assessment'
     ];
     
-    console.log(`🧹 [DEBUG] Cleaning up potential duplicates for session: ${sessionId}`);
+    debugLog(`🧹 [DEBUG] Cleaning up potential duplicates for session: ${sessionId}`);
     
     for (const tableName of tablesToClean) {
       try {
@@ -28,7 +29,7 @@ export class SurveyService {
         }
         
         if (duplicates && duplicates.length > 1) {
-          console.warn(`⚠️ [DEBUG] Found ${duplicates.length} duplicate records in ${tableName} for session ${sessionId}`);
+          debugWarn(`⚠️ [DEBUG] Found ${duplicates.length} duplicate records in ${tableName} for session ${sessionId}`);
           
           // Sort by created_at to keep the earliest record
           duplicates.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
@@ -36,7 +37,7 @@ export class SurveyService {
           // Delete all but the first (earliest) record
           const recordsToDelete = duplicates.slice(1);
           for (const record of recordsToDelete) {
-            console.log(`🗑️ [DEBUG] Deleting duplicate record from ${tableName} with id: ${record.id}`);
+            debugLog(`🗑️ [DEBUG] Deleting duplicate record from ${tableName} with id: ${record.id}`);
             const { error: deleteError } = await supabase
               .from(tableName)
               .delete()
@@ -45,11 +46,11 @@ export class SurveyService {
             if (deleteError) {
               console.error(`❌ [DEBUG] Error deleting duplicate from ${tableName}:`, deleteError);
             } else {
-              console.log(`✅ [DEBUG] Successfully deleted duplicate from ${tableName}`);
+              debugLog(`✅ [DEBUG] Successfully deleted duplicate from ${tableName}`);
             }
           }
         } else if (duplicates && duplicates.length === 1) {
-          console.log(`✅ [DEBUG] No duplicates found in ${tableName} for session ${sessionId}`);
+          debugLog(`✅ [DEBUG] No duplicates found in ${tableName} for session ${sessionId}`);
         }
         
       } catch (error) {
@@ -57,7 +58,7 @@ export class SurveyService {
       }
     }
     
-    console.log(`✅ [DEBUG] Finished cleanup for session ${sessionId}`);
+    debugLog(`✅ [DEBUG] Finished cleanup for session ${sessionId}`);
   }
   // Helper method to handle upsert operations ensuring unique session_id
   private static async upsertRecord(
@@ -68,8 +69,8 @@ export class SurveyService {
     debugLabel: string
   ): Promise<void> {
     try {
-      console.log(`💾 [DEBUG] ${debugLabel} for session:`, sessionId);
-      console.log(`📋 [DEBUG] ${debugLabel} data:`, JSON.stringify(data, null, 2));
+      debugLog(`💾 [DEBUG] ${debugLabel} for session:`, sessionId);
+      debugLog(`📋 [DEBUG] ${debugLabel} data:`, JSON.stringify(data, null, 2));
       
       // Build the query to check for existing records - use array query, not single()
       let query = supabase.from(tableName).select('id, session_id');
@@ -88,19 +89,19 @@ export class SurveyService {
         throw checkError;
       }
       
-      console.log(`🔍 [DEBUG] Found ${existingRecords?.length || 0} existing records for session ${sessionId}`);
+      debugLog(`🔍 [DEBUG] Found ${existingRecords?.length || 0} existing records for session ${sessionId}`);
       
       let result;
       
       if (existingRecords && existingRecords.length > 0) {
         // Handle duplicates if they exist
         if (existingRecords.length > 1) {
-          console.warn(`⚠️ [DEBUG] Found ${existingRecords.length} duplicate records for session ${sessionId}. Keeping the first one and deleting others.`);
+          debugWarn(`⚠️ [DEBUG] Found ${existingRecords.length} duplicate records for session ${sessionId}. Keeping the first one and deleting others.`);
           
           // Delete all but the first record
           const recordsToDelete = existingRecords.slice(1);
           for (const record of recordsToDelete) {
-            console.log(`🗑️ [DEBUG] Deleting duplicate record with id: ${record.id}`);
+            debugLog(`🗑️ [DEBUG] Deleting duplicate record with id: ${record.id}`);
             const { error: deleteError } = await supabase
               .from(tableName)
               .delete()
@@ -109,13 +110,13 @@ export class SurveyService {
             if (deleteError) {
               console.error(`❌ [DEBUG] Error deleting duplicate record:`, deleteError);
             } else {
-              console.log(`✅ [DEBUG] Deleted duplicate record successfully`);
+              debugLog(`✅ [DEBUG] Deleted duplicate record successfully`);
             }
           }
         }
         
         // Update the remaining/first record using all match columns
-        console.log(`🔄 [DEBUG] Updating existing ${debugLabel.toLowerCase()} record for session ${sessionId}`);
+        debugLog(`🔄 [DEBUG] Updating existing ${debugLabel.toLowerCase()} record for session ${sessionId}`);
         
         // Remove session_id from data to avoid updating it
         const updateData = { ...data };
@@ -135,7 +136,7 @@ export class SurveyService {
           
       } else {
         // Insert new record
-        console.log(`➕ [DEBUG] Inserting new ${debugLabel.toLowerCase()} record for session ${sessionId}`);
+        debugLog(`➕ [DEBUG] Inserting new ${debugLabel.toLowerCase()} record for session ${sessionId}`);
         result = await supabase.from(tableName).insert(data);
       }
 
@@ -147,7 +148,7 @@ export class SurveyService {
         throw result.error;
       }
       
-      console.log(`✅ [DEBUG] ${debugLabel} saved successfully for session ${sessionId}`);
+      debugLog(`✅ [DEBUG] ${debugLabel} saved successfully for session ${sessionId}`);
       
       // Final verification - check that we have exactly one record for this specific combination
       let verifyQuery = supabase.from(tableName).select('id');
@@ -166,7 +167,7 @@ export class SurveyService {
       } else if (finalCheck && finalCheck.length > 1) {
         console.error(`❌ [DEBUG] CRITICAL: Still have ${finalCheck.length} records after upsert!`);
       } else if (finalCheck && finalCheck.length === 1) {
-        console.log(`✅ [DEBUG] Verified: Exactly 1 record exists for the match criteria`);
+        debugLog(`✅ [DEBUG] Verified: Exactly 1 record exists for the match criteria`);
       } else {
         console.warn(`⚠️ [DEBUG] Warning: No records found after upsert`);
       }
@@ -265,7 +266,7 @@ export class SurveyService {
 
   // Save enablers and barriers data
   static async saveEnablersBarriers(sessionId: string, enablersBarriers: any[]): Promise<void> {
-    console.log(`🔄 [DEBUG] Starting saveEnablersBarriers for session: ${sessionId}`, enablersBarriers);
+    debugLog(`🔄 [DEBUG] Starting saveEnablersBarriers for session: ${sessionId}`, enablersBarriers);
     
     for (const item of enablersBarriers) {
       const enablersBarriersData = {
@@ -277,14 +278,14 @@ export class SurveyService {
         barrier_other_text: item.barrierOtherText || null
       };
 
-      console.log(`💿 [DEBUG] Saving data for domain: ${item.domainKey}`, enablersBarriersData);
-      console.log(`🔑 [DEBUG] Match columns: session_id=${sessionId}, domain_key=${item.domainKey}`);
+      debugLog(`💿 [DEBUG] Saving data for domain: ${item.domainKey}`, enablersBarriersData);
+      debugLog(`🔑 [DEBUG] Match columns: session_id=${sessionId}, domain_key=${item.domainKey}`);
 
       // Enablers and barriers can have multiple entries per session (one per domain), so we match on both session_id and domain_key
       await this.upsertRecord('user_enablers_barriers', enablersBarriersData, ['session_id', 'domain_key'], sessionId, `Enablers Barriers for ${item.domainKey}`);
     }
     
-    console.log(`✅ [DEBUG] Completed saveEnablersBarriers for session: ${sessionId}`);
+    debugLog(`✅ [DEBUG] Completed saveEnablersBarriers for session: ${sessionId}`);
   }
 
   // Get domain enablers and barriers reference data
@@ -381,7 +382,7 @@ export class SurveyService {
         await this.saveTensionsAssessment(surveyState.sessionId, surveyState.tensionsAssessment);
       }
 
-      console.log('Survey data saved successfully');
+      debugLog('Survey data saved successfully');
     } catch (error) {
       console.error('Failed to save survey data:', error);
       throw error;
