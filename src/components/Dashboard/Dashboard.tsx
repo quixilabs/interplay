@@ -90,12 +90,19 @@ export default function Dashboard() {
     // Recalculate flourishing domain averages
     const recalculatedDomainAverages = calculateFlourishingDomainAverages(filteredFlourishingData);
 
+    // Recalculate students at risk (students below threshold)
+    const atRiskCount = AnalyticsService.calculateAtRiskStudents(filteredFlourishingData);
+    const recalculatedStudentsAtRisk = filteredResponses.length > 0
+      ? Math.round((atRiskCount / filteredResponses.length) * 100)
+      : 0;
+
     return {
       ...data,
       responses: filteredResponses,
       totalResponses: filteredResponses.length,
       overallFlourishingScore: recalculatedFlourishingScore,
-      flourishingDomainAverages: recalculatedDomainAverages
+      flourishingDomainAverages: recalculatedDomainAverages,
+      studentsAtRisk: recalculatedStudentsAtRisk
     };
   };
 

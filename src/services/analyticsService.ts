@@ -253,7 +253,8 @@ export class AnalyticsService {
     return validResponses > 0 ? Math.round((totalScore / validResponses) * 10) / 10 : 0;
   }
 
-  private static calculateAtRiskStudents(data: any[]) {
+  // Make this method public so it can be called from Dashboard when filtering
+  static calculateAtRiskStudents(data: any[]) {
     if (data.length === 0) return 0;
 
     const domains = [
