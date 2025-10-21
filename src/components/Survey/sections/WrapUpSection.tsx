@@ -1,5 +1,6 @@
 import { useSurvey } from '../../../contexts/SurveyContext';
 import { CheckCircle, Heart, TrendingUp } from 'lucide-react';
+import { debugLog } from '../../../utils/debug';
 
 export default function WrapUpSection() {
   const { state, dispatch } = useSurvey();
@@ -13,7 +14,7 @@ export default function WrapUpSection() {
     scrollToTop();
 
     // Here you would typically submit the survey data to your backend
-    console.log('Survey completed:', state);
+    debugLog('Survey completed:', state);
   };
 
   const calculateCompletionTime = () => {

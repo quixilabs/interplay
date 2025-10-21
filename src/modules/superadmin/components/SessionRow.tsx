@@ -10,6 +10,7 @@ import {
     Mail,
     AlertTriangle
 } from 'lucide-react';
+import { debugLog } from '../../../utils/debug';
 
 interface ResponseData {
     session_id: string;
@@ -63,7 +64,7 @@ export default function SessionRow({
 
     // Debug logging (remove after fixing)
     if (isSelected) {
-        console.log('Session Data Debug:', {
+        debugLog('Session Data Debug:', {
             session_id: response.session_id,
             demographics_raw: response.demographics,
             demographics_processed: demographics,

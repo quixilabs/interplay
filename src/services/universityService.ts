@@ -1,9 +1,10 @@
 import { supabase } from '../lib/supabase';
+import { debugLog, debugWarn } from '../utils/debug';
 
 // Debug helper function to test database connection
 const testDatabaseConnection = async () => {
   try {
-    console.log('🔍 [DEBUG] Testing database connection...');
+    debugLog('🔍 [DEBUG] Testing database connection...');
     const { data, error } = await supabase.from('universities').select('count', { count: 'exact', head: true });
     
     if (error) {
@@ -11,7 +12,7 @@ const testDatabaseConnection = async () => {
       return false;
     }
     
-    console.log('✅ [DEBUG] Database connection successful. University table exists with', data?.length || 0, 'records');
+    debugLog('✅ [DEBUG] Database connection successful. University table exists with', data?.length || 0, 'records');
     return true;
   } catch (error) {
     console.error('❌ [DEBUG] Database connection test failed:', error);
@@ -49,17 +50,17 @@ export class UniversityService {
   // Get university by slug
   static async getUniversityBySlug(slug: string): Promise<University | null> {
     try {
-      console.log('🔍 [DEBUG] Starting getUniversityBySlug...');
-      console.log('📥 [DEBUG] Input slug:', JSON.stringify(slug));
-      console.log('📏 [DEBUG] Slug length:', slug?.length);
-      console.log('🔤 [DEBUG] Slug type:', typeof slug);
+      debugLog('🔍 [DEBUG] Starting getUniversityBySlug...');
+      debugLog('📥 [DEBUG] Input slug:', JSON.stringify(slug));
+      debugLog('📏 [DEBUG] Slug length:', slug?.length);
+      debugLog('🔤 [DEBUG] Slug type:', typeof slug);
       
       // Test database connection first
       await testDatabaseConnection();
       
       // Log the exact query being executed
-      console.log('🔍 [DEBUG] Executing query: SELECT * FROM universities WHERE slug = $1');
-      console.log('📋 [DEBUG] Query parameters:', { slug });
+      debugLog('🔍 [DEBUG] Executing query: SELECT * FROM universities WHERE slug = $1');
+      debugLog('📋 [DEBUG] Query parameters:', { slug });
       
       const { data, error } = await supabase
         .from('universities')
@@ -67,22 +68,22 @@ export class UniversityService {
         .eq('slug', slug)
         .single();
 
-      console.log('📊 [DEBUG] Raw database response:');
-      console.log('  - data:', JSON.stringify(data, null, 2));
-      console.log('  - error:', error);
+      debugLog('📊 [DEBUG] Raw database response:');
+      debugLog('  - data:', JSON.stringify(data, null, 2));
+      debugLog('  - error:', error);
 
       if (error) {
-        console.log('❌ [DEBUG] Database error details:');
-        console.log('  - error.code:', error.code);
-        console.log('  - error.message:', error.message);
-        console.log('  - error.details:', error.details);
-        console.log('  - error.hint:', error.hint);
+        debugLog('❌ [DEBUG] Database error details:');
+        debugLog('  - error.code:', error.code);
+        debugLog('  - error.message:', error.message);
+        debugLog('  - error.details:', error.details);
+        debugLog('  - error.hint:', error.hint);
         
         if (error.code === 'PGRST116') {
-          console.log('🔍 [DEBUG] University not found (PGRST116 - no rows returned)');
+          debugLog('🔍 [DEBUG] University not found (PGRST116 - no rows returned)');
           
           // Let's also check what universities actually exist
-          console.log('🔍 [DEBUG] Checking all existing universities...');
+          debugLog('🔍 [DEBUG] Checking all existing universities...');
           const { data: allUniversities, error: listError } = await supabase
             .from('universities')
             .select('slug, name');
@@ -90,7 +91,7 @@ export class UniversityService {
           if (listError) {
             console.error('❌ [DEBUG] Failed to list universities:', listError);
           } else {
-            console.log('📋 [DEBUG] Existing universities:', JSON.stringify(allUniversities, null, 2));
+            debugLog('📋 [DEBUG] Existing universities:', JSON.stringify(allUniversities, null, 2));
             
             // Check for similar slugs
             const similarSlugs = allUniversities?.filter(u => 
@@ -99,9 +100,9 @@ export class UniversityService {
             );
             
             if (similarSlugs && similarSlugs.length > 0) {
-              console.log('🔍 [DEBUG] Found similar slugs:', JSON.stringify(similarSlugs, null, 2));
+              debugLog('🔍 [DEBUG] Found similar slugs:', JSON.stringify(similarSlugs, null, 2));
             } else {
-              console.log('🔍 [DEBUG] No similar slugs found');
+              debugLog('🔍 [DEBUG] No similar slugs found');
             }
           }
           
@@ -110,7 +111,7 @@ export class UniversityService {
         throw error;
       }
       
-      console.log('✅ [DEBUG] University found successfully:', JSON.stringify(data, null, 2));
+      debugLog('✅ [DEBUG] University found successfully:', JSON.stringify(data, null, 2));
       return data;
     } catch (error) {
       console.error('❌ [DEBUG] Unexpected error in getUniversityBySlug:', error);
