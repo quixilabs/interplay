@@ -5,6 +5,7 @@ import DashboardHeader from './DashboardHeader';
 import DashboardFilters from './DashboardFilters';
 import MetricsOverview from './MetricsOverview';
 import FlourishingChart from './FlourishingChart';
+import ActionPathwayChart from './ActionPathwayChart';
 import DemographicsAnalysis from './DemographicsAnalysis';
 import InterventionMatrix from './InterventionMatrix';
 import ActionableInsights from './ActionableInsights';
@@ -97,13 +98,24 @@ export default function Dashboard() {
       ? Math.round((atRiskCount / filteredResponses.length) * 100)
       : 0;
 
+    // Recalculate action pathway data with filtered data
+    const filteredEnablersBarriers = filteredResponses
+      .filter((response: any) => response.enablersBarriers)
+      .flatMap((response: any) => response.enablersBarriers);
+
+    const recalculatedActionPathway = AnalyticsService.calculateActionPathwayPublic(
+      filteredFlourishingData,
+      filteredEnablersBarriers
+    );
+
     return {
       ...data,
       responses: filteredResponses,
       totalResponses: filteredResponses.length,
       overallFlourishingScore: recalculatedFlourishingScore,
       flourishingDomainAverages: recalculatedDomainAverages,
-      studentsAtRisk: recalculatedStudentsAtRisk
+      studentsAtRisk: recalculatedStudentsAtRisk,
+      actionPathwayData: recalculatedActionPathway
     };
   };
 
@@ -200,6 +212,11 @@ export default function Dashboard() {
             selectedDemographic={selectedDemographic}
             onDemographicChange={setSelectedDemographic}
           />
+        </div>
+
+        {/* Action Pathway - Critical Action Path */}
+        <div className="mb-8">
+          <ActionPathwayChart data={filteredData || surveyData} />
         </div>
 
         {/* Tension Heatmap - Our IP Highlight */}

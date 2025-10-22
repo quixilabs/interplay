@@ -295,6 +295,97 @@ export const mockSurveyData = {
     totalTensionResponses: 1043
   },
 
+  // Action Pathway data - domains ranked by criticality
+  actionPathwayData: {
+    domains: [
+      {
+        domainKey: 'financial_stability',
+        domainLabel: 'Financial & Material Stability',
+        averageScore: 5.9,
+        criticality: {
+          level: 3,
+          label: 'Priority',
+          color: '#F97316',
+          bgColor: '#FFEDD5'
+        },
+        topEnabler: 'Financial aid/scholarships',
+        topBarrier: 'High tuition costs',
+        sampleSize: 1043
+      },
+      {
+        domainKey: 'mental_physical_health',
+        domainLabel: 'Mental & Physical Health',
+        averageScore: 6.3,
+        criticality: {
+          level: 2,
+          label: 'Watch',
+          color: '#EAB308',
+          bgColor: '#FEF9C3'
+        },
+        topEnabler: 'Regular exercise routine',
+        topBarrier: 'High stress levels',
+        sampleSize: 1043
+      },
+      {
+        domainKey: 'social_relationships',
+        domainLabel: 'Close Social Relationships',
+        averageScore: 6.8,
+        criticality: {
+          level: 2,
+          label: 'Watch',
+          color: '#EAB308',
+          bgColor: '#FEF9C3'
+        },
+        topEnabler: 'Close friendships',
+        topBarrier: 'Social anxiety',
+        sampleSize: 1043
+      },
+      {
+        domainKey: 'happiness_satisfaction',
+        domainLabel: 'Happiness & Life Satisfaction',
+        averageScore: 7.2,
+        criticality: {
+          level: 2,
+          label: 'Watch',
+          color: '#EAB308',
+          bgColor: '#FEF9C3'
+        },
+        topEnabler: 'Positive relationships',
+        topBarrier: 'Academic pressure',
+        sampleSize: 1043
+      },
+      {
+        domainKey: 'meaning_purpose',
+        domainLabel: 'Meaning & Purpose',
+        averageScore: 7.6,
+        criticality: {
+          level: 2,
+          label: 'Watch',
+          color: '#EAB308',
+          bgColor: '#FEF9C3'
+        },
+        topEnabler: 'Clear academic goals',
+        topBarrier: 'Lack of direction',
+        sampleSize: 1043
+      },
+      {
+        domainKey: 'character_virtue',
+        domainLabel: 'Character & Growth',
+        averageScore: 8.0,
+        criticality: {
+          level: 1,
+          label: 'Informational',
+          color: '#22C55E',
+          bgColor: '#D1FAE5'
+        },
+        topEnabler: 'Personal values alignment',
+        topBarrier: 'Ethical dilemmas',
+        sampleSize: 1043
+      }
+    ],
+    totalResponses: 1043
+  },
+
   // Generate mock individual response data for filtering
   responses: generateMockResponses(1043)
 };
