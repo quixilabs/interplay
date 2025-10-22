@@ -1,4 +1,6 @@
 import { supabase } from '../lib/supabase';
+import { getCriticalityLevel } from '../utils/calculateCriticality';
+import { DOMAIN_CONFIG, ActionPathwayData, DomainActionData, DomainKey } from '../types/actionPathway';
 
 // Debug flag - set to false to disable debug logging in production
 const DEBUG_ANALYTICS = import.meta.env.DEV; // Automatically disabled in production builds
@@ -167,6 +169,9 @@ export class AnalyticsService {
       // Build combined responses array for filtering
       const responses = this.buildResponsesArray(sessions || [], demographicsData || [], flourishingData || [], wellbeingData || [], enablersBarriersData || [], tensionsData || []);
 
+      // Calculate action pathway data
+      const actionPathwayData = this.calculateActionPathway(flourishingData || [], enablersBarriersData || []);
+
       return {
         totalResponses,
         completionRate: Math.round(completionRate * 10) / 10,
@@ -179,7 +184,8 @@ export class AnalyticsService {
         fastestWinSuggestions,
         brightSpotThemes,
         tensionAnalysis,
-        responses
+        responses,
+        actionPathwayData
       };
     } catch (error) {
       console.error('Error fetching survey analytics:', error);
@@ -815,5 +821,136 @@ export class AnalyticsService {
     });
 
     return heatmapData;
+  }
+
+  /**
+   * Calculate Action Pathway data: domain criticality with top enablers/barriers
+   * This helps administrators identify which domains need attention and what interventions to focus on
+   * Public method for use in filtering
+   */
+  static calculateActionPathwayPublic(flourishingData: any[], enablersBarriersData: any[]): ActionPathwayData {
+    return this.calculateActionPathway(flourishingData, enablersBarriersData);
+  }
+
+  /**
+   * Internal calculation method for Action Pathway data
+   */
+  private static calculateActionPathway(flourishingData: any[], enablersBarriersData: any[]): ActionPathwayData {
+    if (flourishingData.length === 0) {
+      return {
+        domains: [],
+        totalResponses: 0
+      };
+    }
+
+    const domainKeys = Object.keys(DOMAIN_CONFIG) as DomainKey[];
+    const domainResults: DomainActionData[] = [];
+
+    // Process each domain
+    domainKeys.forEach(domainKey => {
+      const config = DOMAIN_CONFIG[domainKey];
+      const [col1, col2] = config.columns;
+
+      // Calculate domain average score across all students
+      const domainScores: number[] = [];
+      
+      flourishingData.forEach(response => {
+        const score1 = response[col1];
+        const score2 = response[col2];
+        
+        // Only include if BOTH questions are answered (as per requirements)
+        if (score1 !== null && score1 !== undefined && score2 !== null && score2 !== undefined) {
+          const domainAvg = (score1 + score2) / 2;
+          domainScores.push(domainAvg);
+        }
+      });
+
+      // Skip domain if no valid responses
+      if (domainScores.length === 0) {
+        return;
+      }
+
+      const averageScore = domainScores.reduce((sum, score) => sum + score, 0) / domainScores.length;
+      const roundedAverage = Math.round(averageScore * 10) / 10;
+
+      // Calculate criticality level
+      const criticality = getCriticalityLevel(roundedAverage);
+
+      // Find top enabler and barrier for this domain
+      const domainEnablersBarriers = enablersBarriersData.filter(
+        eb => eb.domain_key === domainKey
+      );
+
+      const enablerCounts: Record<string, number> = {};
+      const barrierCounts: Record<string, number> = {};
+
+      domainEnablersBarriers.forEach(record => {
+        // Count enablers
+        if (record.selected_enablers && Array.isArray(record.selected_enablers)) {
+          record.selected_enablers.forEach((enabler: string) => {
+            enablerCounts[enabler] = (enablerCounts[enabler] || 0) + 1;
+          });
+        }
+
+        // Count barriers
+        if (record.selected_barriers && Array.isArray(record.selected_barriers)) {
+          record.selected_barriers.forEach((barrier: string) => {
+            barrierCounts[barrier] = (barrierCounts[barrier] || 0) + 1;
+          });
+        }
+      });
+
+      // Get top enabler (most frequently selected)
+      let topEnabler = 'None reported';
+      if (Object.keys(enablerCounts).length > 0) {
+        const sortedEnablers = Object.entries(enablerCounts)
+          .sort((a, b) => {
+            // Sort by frequency, then alphabetically for ties
+            if (b[1] === a[1]) {
+              return a[0].localeCompare(b[0]);
+            }
+            return b[1] - a[1];
+          });
+        topEnabler = sortedEnablers[0][0];
+      }
+
+      // Get top barrier (most frequently selected)
+      let topBarrier = 'None reported';
+      if (Object.keys(barrierCounts).length > 0) {
+        const sortedBarriers = Object.entries(barrierCounts)
+          .sort((a, b) => {
+            // Sort by frequency, then alphabetically for ties
+            if (b[1] === a[1]) {
+              return a[0].localeCompare(b[0]);
+            }
+            return b[1] - a[1];
+          });
+        topBarrier = sortedBarriers[0][0];
+      }
+
+      domainResults.push({
+        domainKey,
+        domainLabel: config.label,
+        averageScore: roundedAverage,
+        criticality,
+        topEnabler,
+        topBarrier,
+        sampleSize: domainScores.length
+      });
+    });
+
+    // Sort domains by criticality (highest level first = worst scores)
+    // Then by average score (lowest first within same criticality level)
+    const sortedDomains = domainResults.sort((a, b) => {
+      if (b.criticality.level === a.criticality.level) {
+        return a.averageScore - b.averageScore;
+      }
+      return b.criticality.level - a.criticality.level;
+    });
+
+    return {
+      domains: sortedDomains,
+      totalResponses: flourishingData.length
+    };
   }
 }
