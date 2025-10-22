@@ -2,46 +2,77 @@ import { useState } from 'react';
 import { useSurvey } from '../../../contexts/SurveyContext';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
+/**
+ * SCHOOL WELL-BEING QUESTIONS WITH DOMAIN METADATA
+ * 
+ * Each question includes a 'domain' field to support domain-based filtering and analytics.
+ * Questions are organized into 4 domains for better UX and dashboard reporting.
+ * 
+ * ⚠️ CRITICAL: Do not change 'key' or 'question' values - existing data depends on these!
+ * 
+ * Domain Structure:
+ * - Health & Safety: Physical activity, emotional regulation, safety (3 questions)
+ * - Enjoyment & Engagement: School enjoyment, participation, contribution (3 questions)
+ * - Belonging: Sense of belonging, friendships, adult support (3 questions)
+ * - Purpose & Growth: Connection to future goals (1 question)
+ */
 const SCHOOL_WELLBEING_QUESTIONS = [
+  // === HEALTH & SAFETY DOMAIN ===
   {
-    key: 'belonging_score',
-    question: ' I feel a strong sense of belonging at my school.'
+    key: 'physical_activity', // ⚠️ DO NOT CHANGE - used for data storage
+    question: 'I get at least 60 minutes of physical activity most days.',
+    domain: 'Health & Safety'
   },
   {
-    key: 'enjoy_school_days',
-    question: 'I enjoy most of my school days.'
+    key: 'manage_emotions', // ⚠️ DO NOT CHANGE - used for data storage
+    question: 'I know how to manage my emotions when I feel stressed.',
+    domain: 'Health & Safety'
   },
   {
-    key: 'physical_activity',
-    question: 'I get at least 60 minutes of physical activity most days.'
+    key: 'feel_safe', // ⚠️ DO NOT CHANGE - used for data storage
+    question: 'I feel safe in and around my school.',
+    domain: 'Health & Safety'
+  },
+
+  // === ENJOYMENT & ENGAGEMENT DOMAIN ===
+  {
+    key: 'enjoy_school_days', // ⚠️ DO NOT CHANGE - used for data storage
+    question: 'I enjoy most of my school days.',
+    domain: 'Enjoyment & Engagement'
   },
   {
-    key: 'feel_safe',
-    question: 'I feel safe in and around my school.'
+    key: 'resources_participation', // ⚠️ DO NOT CHANGE - used for data storage
+    question: 'I have what I need to participate fully in school activities.',
+    domain: 'Enjoyment & Engagement'
   },
   {
-    key: 'work_connected_goals',
-    question: 'My schoolwork feels connected to my future goals.'
+    key: 'contribute_bigger_purpose', // ⚠️ DO NOT CHANGE - used for data storage
+    question: 'I have opportunities at school to contribute to something bigger than myself.',
+    domain: 'Enjoyment & Engagement'
+  },
+
+  // === BELONGING DOMAIN ===
+  {
+    key: 'belonging_score', // ⚠️ DO NOT CHANGE - used for data storage
+    question: ' I feel a strong sense of belonging at my school.',
+    domain: 'Belonging'
   },
   {
-    key: 'contribute_bigger_purpose',
-    question: 'I have opportunities at school to contribute to something bigger than myself.'
+    key: 'supportive_friends', // ⚠️ DO NOT CHANGE - used for data storage
+    question: 'I have friends at school who support me.',
+    domain: 'Belonging'
   },
   {
-    key: 'manage_emotions',
-    question: 'I know how to manage my emotions when I feel stressed.'
+    key: 'trusted_adult', // ⚠️ DO NOT CHANGE - used for data storage
+    question: 'I have at least one trusted adult at school I can talk to if I need help.',
+    domain: 'Belonging'
   },
+
+  // === PURPOSE & GROWTH DOMAIN ===
   {
-    key: 'trusted_adult',
-    question: 'I have at least one trusted adult at school I can talk to if I need help.'
-  },
-  {
-    key: 'supportive_friends',
-    question: 'I have friends at school who support me.'
-  },
-  {
-    key: 'resources_participation',
-    question: 'I have what I need to participate fully in school activities.'
+    key: 'work_connected_goals', // ⚠️ DO NOT CHANGE - used for data storage
+    question: 'My schoolwork feels connected to my future goals.',
+    domain: 'Purpose & Growth'
   }
 ];
 
@@ -92,6 +123,23 @@ export default function SchoolWellbeingSection() {
     scores[q.key as keyof typeof scores] !== undefined
   );
 
+  /**
+   * Helper function to group questions by domain for organized rendering
+   * This structure supports future dashboard analytics by domain
+   */
+  const groupQuestionsByDomain = () => {
+    const domains: { [key: string]: typeof SCHOOL_WELLBEING_QUESTIONS } = {};
+    SCHOOL_WELLBEING_QUESTIONS.forEach(question => {
+      if (!domains[question.domain]) {
+        domains[question.domain] = [];
+      }
+      domains[question.domain].push(question);
+    });
+    return domains;
+  };
+
+  const questionsByDomain = groupQuestionsByDomain();
+
   return (
     <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-3xl mx-auto">
       <div className="mb-8">
@@ -101,43 +149,71 @@ export default function SchoolWellbeingSection() {
         </p>
       </div>
 
+      {/* 
+        UI LAYOUT CHANGES: Questions grouped by domain with visual hierarchy
+        - Domain headers provide context and structure
+        - Card-based design with clear separation between domains
+        - Enhanced spacing and backgrounds for better readability
+        - Mobile-responsive design maintained
+        - All question keys, wording, and scales remain unchanged
+      */}
       <div className="space-y-8">
-        {/* School Well-Being Questions */}
-        {SCHOOL_WELLBEING_QUESTIONS.map((item) => {
-          const score = scores[item.key as keyof typeof scores];
-
-          return (
-            <div key={item.key}>
-              <label className="block text-base sm:text-lg font-medium text-slate-800 mb-4">
-                {item.question}
-              </label>
-              {/* Mobile-first responsive scale */}
-              <div className="space-y-3">
-                {/* Scale labels */}
-                <div className="flex justify-between text-xs sm:text-sm text-slate-500 px-1">
-                  <span className="text-left">Not at all</span>
-                  <span className="text-right">Completely</span>
-                </div>
-
-                {/* Rating buttons */}
-                <div className="grid grid-cols-11 gap-1 sm:gap-2">
-                  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
-                    <button
-                      key={num}
-                      onClick={() => handleScoreChange(item.key, num)}
-                      className={`aspect-square text-xs sm:text-sm font-medium rounded-md sm:rounded-lg transition-colors ${score === num
-                        ? 'bg-teal-600 text-white'
-                        : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                        }`}
-                    >
-                      {num}
-                    </button>
-                  ))}
-                </div>
+        {/* Render questions grouped by domain as distinct cards */}
+        {Object.entries(questionsByDomain).map(([domain, questions]) => (
+          <div
+            key={domain}
+            className="bg-slate-50 rounded-lg border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+          >
+            {/* Domain Header - provides visual grouping */}
+            <div className="bg-gradient-to-r from-teal-50 to-slate-50 border-b border-slate-200 px-4 sm:px-6 py-4">
+              <div className="flex items-center">
+                <div className="w-1 h-8 bg-teal-500 rounded-full mr-3"></div>
+                <h3 className="text-lg sm:text-xl font-semibold text-slate-900">
+                  {domain}
+                </h3>
               </div>
             </div>
-          );
-        })}
+
+            {/* Questions within this domain */}
+            <div className="p-4 sm:p-6 space-y-8 bg-white">
+              {questions.map((item) => {
+                const score = scores[item.key as keyof typeof scores];
+
+                return (
+                  <div key={item.key}>
+                    <label className="block text-base sm:text-lg font-medium text-slate-800 mb-4">
+                      {item.question}
+                    </label>
+                    {/* Mobile-first responsive scale - UNCHANGED */}
+                    <div className="space-y-3">
+                      {/* Scale labels - UNCHANGED 0-10 scale */}
+                      <div className="flex justify-between text-xs sm:text-sm text-slate-500 px-1">
+                        <span className="text-left">Not at all</span>
+                        <span className="text-right">Completely</span>
+                      </div>
+
+                      {/* Rating buttons - UNCHANGED */}
+                      <div className="grid grid-cols-11 gap-1 sm:gap-2">
+                        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+                          <button
+                            key={num}
+                            onClick={() => handleScoreChange(item.key, num)}
+                            className={`aspect-square text-xs sm:text-sm font-medium rounded-md sm:rounded-lg transition-colors ${score === num
+                              ? 'bg-teal-600 text-white'
+                              : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                              }`}
+                          >
+                            {num}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
 
         {/* School Engagement Checklist */}
         <div className="border-t border-slate-200 pt-8">
