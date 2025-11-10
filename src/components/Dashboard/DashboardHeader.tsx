@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuthStore } from '../../stores/authStore';
-import { BarChart3, Calendar, Download, LogOut, Settings } from 'lucide-react';
+import { BarChart3, Calendar, LogOut, Settings } from 'lucide-react';
 
 interface DashboardHeaderProps {
   universityName: string;
@@ -43,11 +43,6 @@ export default function DashboardHeader({ universityName, dateRange, onDateRange
             </div>
 
             {/* Action Buttons */}
-            <button className="btn-primary flex items-center space-x-2 px-4 py-2 rounded-brand">
-              <Download className="h-4 w-4" />
-              <span>Export Data</span>
-            </button>
-
             <button className="p-2 text-warm-gray hover:text-navy transition-colors">
               <Settings className="h-5 w-5" />
             </button>
