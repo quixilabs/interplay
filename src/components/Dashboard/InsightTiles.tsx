@@ -268,6 +268,14 @@ export default function InsightTiles({ data }: InsightTilesProps) {
                     <div className="flex items-center mb-4">
                         <TrendingUp className="h-5 w-5 text-red-500 mr-2" />
                         <h4 className="font-semibold text-slate-900">High Priority - Based on Your Data</h4>
+                        <ChartTooltip
+                            title="How to use this section"
+                            content={[
+                                "These research insights are automatically prioritized based on your institution's data. They correspond to tension areas where your students show significant gaps (relevance score ≥ 0.2).",
+                                "Each insight provides research-backed context for why the tensions your students face matter for their success and wellbeing.",
+                                "Click any insight tile to expand and see detailed statistics, impact metrics, and research sources. Use these insights to justify and contextualize your intervention strategies."
+                            ]}
+                        />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {highRelevanceInsights.slice(0, 4).map(insight => (
