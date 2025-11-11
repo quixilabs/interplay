@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { BookOpen, TrendingUp, Users, DollarSign, Heart, Brain, ExternalLink, ChevronRight } from 'lucide-react';
+import ChartTooltip from './ChartTooltip';
 
 interface InsightTilesProps {
     data: any;
@@ -221,6 +222,14 @@ export default function InsightTiles({ data }: InsightTilesProps) {
                             <h3 className="text-lg font-semibold text-slate-900">Research Insights</h3>
                             <p className="text-sm text-slate-600">Why these tensions matter - backed by research</p>
                         </div>
+                        <ChartTooltip
+                            title="How to use these insights"
+                            content={[
+                                "These research-backed insights provide context for why the tensions students face matter for their success and wellbeing.",
+                                "Insights marked as 'Relevant' correspond to areas where your students show significant gaps based on your data.",
+                                "Click any insight tile to expand and see detailed statistics and research sources. Use the category filters to focus on specific tension types."
+                            ]}
+                        />
                     </div>
 
                     {tensionAnalysis && (
@@ -259,6 +268,14 @@ export default function InsightTiles({ data }: InsightTilesProps) {
                     <div className="flex items-center mb-4">
                         <TrendingUp className="h-5 w-5 text-red-500 mr-2" />
                         <h4 className="font-semibold text-slate-900">High Priority - Based on Your Data</h4>
+                        <ChartTooltip
+                            title="How to use this section"
+                            content={[
+                                "These research insights are automatically prioritized based on your institution's data. They correspond to tension areas where your students show significant gaps (relevance score ≥ 0.2).",
+                                "Each insight provides research-backed context for why the tensions your students face matter for their success and wellbeing.",
+                                "Click any insight tile to expand and see detailed statistics, impact metrics, and research sources. Use these insights to justify and contextualize your intervention strategies."
+                            ]}
+                        />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {highRelevanceInsights.slice(0, 4).map(insight => (

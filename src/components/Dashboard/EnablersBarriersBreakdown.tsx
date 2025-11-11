@@ -1,5 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Shield, AlertTriangle, TrendingUp } from 'lucide-react';
+import ChartTooltip from './ChartTooltip';
 
 interface EnablersBarriersBreakdownProps {
     data: any;
@@ -53,6 +54,14 @@ export default function EnablersBarriersBreakdown({ data }: EnablersBarriersBrea
                             <h3 className="text-lg font-semibold text-slate-900">Enablers & Barriers by Domain</h3>
                             <p className="text-sm text-slate-600">Average number selected per student by flourishing domain</p>
                         </div>
+                        <ChartTooltip
+                            title="How to use this chart"
+                            content={[
+                                "This chart shows the average number of enablers (green) and barriers (red) students identified for each flourishing domain.",
+                                "Domains with more barriers than enablers need urgent attention. Hover over bars for exact counts.",
+                                "The ranked lists below show the most frequently mentioned enablers and barriers across all domains—these are your key action items."
+                            ]}
+                        />
                     </div>
                     <div className="text-right">
                         <div className="text-sm text-slate-500">Based on {interventionAnalysis.totalResponses || 0} responses</div>

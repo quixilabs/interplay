@@ -1,5 +1,5 @@
-import React from 'react';
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Legend } from 'recharts';
+import ChartTooltip from './ChartTooltip';
 
 interface FlourishingChartProps {
   data: any;
@@ -51,9 +51,19 @@ export default function FlourishingChart({ data }: FlourishingChartProps) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h3 className="text-lg font-semibold text-slate-900">Flourishing Domain Scores</h3>
-          <p className="text-sm text-slate-600">Average scores across six well-being domains</p>
+        <div className="flex items-center space-x-2">
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900">Flourishing Domain Scores</h3>
+            <p className="text-sm text-slate-600">Average scores across six well-being domains</p>
+          </div>
+          <ChartTooltip
+            title="How to use this chart"
+            content={[
+              "The blue area shows your university's average scores across six flourishing domains, while the dashed teal line represents peer institution averages.",
+              "Larger gaps between your scores and peer averages indicate areas where your students may need more support.",
+              "Look at 'Growth Areas' below the chart to identify which domains need the most attention."
+            ]}
+          />
         </div>
         <div className="flex items-center space-x-4 text-sm">
           <div className="flex items-center">

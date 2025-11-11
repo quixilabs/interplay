@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { AlertTriangle, TrendingUp, Info, Zap } from 'lucide-react';
+import ChartTooltip from './ChartTooltip';
 
 interface TensionHeatmapProps {
     data: any;
@@ -87,6 +88,14 @@ export default function TensionHeatmap({ data }: TensionHeatmapProps) {
                                 <h3 className="text-lg font-semibold text-slate-900">Cross-Domain Tension Analysis</h3>
                                 <p className="text-sm text-slate-600">Complex tensions between competing priorities</p>
                             </div>
+                            <ChartTooltip
+                                title="How to use this chart"
+                                content={[
+                                    "This heatmap reveals where students experience tension between competing values (e.g., academic performance vs. wellbeing, stability vs. growth).",
+                                    "Colors indicate severity: Red = Critical gap, Orange = Moderate gap, Yellow = Minor gap, Green = Well supported.",
+                                    "Click any cell to see detailed statistics. Use the Priority Tension Areas section below to identify which tensions need immediate attention."
+                                ]}
+                            />
                         </div>
                         <div className="text-right">
                             <div className="text-sm text-slate-500">Based on {tensionAnalysis?.totalTensionResponses || 0} tension assessments</div>
@@ -136,6 +145,14 @@ export default function TensionHeatmap({ data }: TensionHeatmapProps) {
                 <div className="flex items-center mb-4">
                     <AlertTriangle className="h-5 w-5 text-orange-600 mr-2" />
                     <h3 className="text-lg font-semibold text-slate-900">Priority Tension Areas</h3>
+                    <ChartTooltip
+                        title="How to use this chart"
+                        content={[
+                            "This section highlights the top 3 tensions where students show the biggest gaps between their needs and available support.",
+                            "Tensions are ranked by severity (Critical = gap score ≥ 0.4, High = gap score ≥ 0.2). Focus on Critical tensions first for maximum impact.",
+                            "The percentage shows what proportion of students experience significant gaps in each tension area. Use these insights to prioritize which competing demands need immediate policy or program attention."
+                        ]}
+                    />
                 </div>
 
                 <div className="space-y-4">

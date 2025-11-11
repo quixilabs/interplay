@@ -1,5 +1,6 @@
 
 import { TrendingUp, TrendingDown, AlertTriangle, Target } from 'lucide-react';
+import ChartTooltip from './ChartTooltip';
 
 interface MetricsOverviewProps {
   data: any;
@@ -61,7 +62,17 @@ export default function MetricsOverview({ data }: MetricsOverviewProps) {
 
   return (
     <div className="mb-8">
-      <h2 className="text-lg font-semibold text-navy font-primary mb-4">Key Metrics Overview</h2>
+      <div className="flex items-center space-x-2 mb-4">
+        <h2 className="text-lg font-semibold text-navy font-primary">Key Metrics Overview</h2>
+        <ChartTooltip
+          title="How to use these metrics"
+          content={[
+            "These four key metrics provide a quick snapshot of overall student wellbeing at your institution.",
+            "The Overall Flourishing Score (out of 10) averages all six domains. Students Below Threshold shows the percentage with any domain score under 6.",
+            "Track changes over time using the trend indicators. Use these metrics to set targets and measure progress on wellbeing initiatives."
+          ]}
+        />
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard
           title="Overall Flourishing Score"

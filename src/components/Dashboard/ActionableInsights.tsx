@@ -1,4 +1,5 @@
 import { Lightbulb, TrendingUp, AlertTriangle, Star } from 'lucide-react';
+import ChartTooltip from './ChartTooltip';
 
 interface ActionableInsightsProps {
   data: any;
@@ -99,7 +100,17 @@ export default function ActionableInsights({ data }: ActionableInsightsProps) {
     <div className="space-y-6">
       {/* Key Insights */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <h3 className="text-lg font-semibold text-slate-900 mb-4">Key Actionable Insights</h3>
+        <div className="flex items-center space-x-2 mb-4">
+          <h3 className="text-lg font-semibold text-slate-900">Key Actionable Insights</h3>
+          <ChartTooltip
+            title="How to use these insights"
+            content={[
+              "These insights translate your data into specific, prioritized actions. Each insight card shows a recommendation, the supporting evidence, and suggested next steps.",
+              "Priority levels (High, Medium, Low) indicate urgency. Focus on High Priority items first for maximum impact.",
+              "The 'Top Student Suggestions' section below shows verbatim improvement ideas from students—implement 2-3 of these for quick wins."
+            ]}
+          />
+        </div>
         <div className="space-y-4">
           {insights.map((insight, index) => (
             <div key={index} className={`border rounded-lg p-4 ${getUrgencyColor(insight.urgency)}`}>
