@@ -1,4 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import ChartTooltip from './ChartTooltip';
 
 interface DemographicsAnalysisProps {
   data: any;
@@ -53,9 +54,19 @@ export default function DemographicsAnalysis({ data, selectedDemographic, onDemo
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h3 className="text-lg font-semibold text-slate-900">At-Risk Students by Demographics</h3>
-          <p className="text-sm text-slate-600">Students with any flourishing domain score below 6</p>
+        <div className="flex items-center space-x-2">
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900">At-Risk Students by Demographics</h3>
+            <p className="text-sm text-slate-600">Students with any flourishing domain score below 6</p>
+          </div>
+          <ChartTooltip
+            title="How to use this chart"
+            content={[
+              "Red bars show students at risk (any domain score below 6), while green bars show students flourishing.",
+              "Use the dropdown to view different demographic breakdowns and identify which student groups need targeted support.",
+              "Hover over bars for detailed numbers. The 'Highest Risk Groups' section below highlights priority populations."
+            ]}
+          />
         </div>
         <select
           value={selectedDemographic}

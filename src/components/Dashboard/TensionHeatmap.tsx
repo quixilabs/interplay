@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { AlertTriangle, TrendingUp, Info, Zap } from 'lucide-react';
+import ChartTooltip from './ChartTooltip';
 
 interface TensionHeatmapProps {
     data: any;
@@ -87,6 +88,14 @@ export default function TensionHeatmap({ data }: TensionHeatmapProps) {
                                 <h3 className="text-lg font-semibold text-slate-900">Cross-Domain Tension Analysis</h3>
                                 <p className="text-sm text-slate-600">Complex tensions between competing priorities</p>
                             </div>
+                            <ChartTooltip
+                                title="How to use this chart"
+                                content={[
+                                    "This heatmap reveals where students experience tension between competing values (e.g., academic performance vs. wellbeing, stability vs. growth).",
+                                    "Colors indicate severity: Red = Critical gap, Orange = Moderate gap, Yellow = Minor gap, Green = Well supported.",
+                                    "Click any cell to see detailed statistics. Use the Priority Tension Areas section below to identify which tensions need immediate attention."
+                                ]}
+                            />
                         </div>
                         <div className="text-right">
                             <div className="text-sm text-slate-500">Based on {tensionAnalysis?.totalTensionResponses || 0} tension assessments</div>

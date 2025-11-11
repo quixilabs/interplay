@@ -1,4 +1,3 @@
-import React from 'react';
 import { useAuthStore } from '../../stores/authStore';
 import { BarChart3, Calendar, LogOut, Settings } from 'lucide-react';
 

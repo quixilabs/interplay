@@ -1,5 +1,5 @@
-import React from 'react';
 import { ActionPathwayData, DomainActionData } from '../../types/actionPathway';
+import ChartTooltip from './ChartTooltip';
 
 interface ActionPathwayChartProps {
     data: any;
@@ -153,7 +153,17 @@ export default function ActionPathwayChart({ data }: ActionPathwayChartProps) {
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
             {/* Header */}
             <div className="mb-6">
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">Action Pathway</h3>
+                <div className="flex items-center space-x-2 mb-2">
+                    <h3 className="text-lg font-semibold text-slate-900">Action Pathway</h3>
+                    <ChartTooltip
+                        title="How to use this chart"
+                        content={[
+                            "Domains are sorted from highest to lowest priority based on average flourishing scores (Critical < 5.0, Priority 5.0-6.49, Watch 6.5-7.99, Informational ≥ 8.0).",
+                            "Focus your interventions on Critical and Priority domains first. The colors (red, orange, yellow, green) indicate urgency levels.",
+                            "For each domain, you can see the top enabler students want and the top barrier they face. Use this to guide program development and resource allocation."
+                        ]}
+                    />
+                </div>
                 <p className="text-sm text-slate-600">
                     Domains ranked by criticality with most common enablers and barriers
                 </p>
@@ -184,15 +194,6 @@ export default function ActionPathwayChart({ data }: ActionPathwayChartProps) {
 
             {/* Legend */}
             <CriticalityLegend />
-
-            {/* Helpful Note */}
-            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-xs text-blue-800">
-                    <strong>How to use this chart:</strong> Domains are sorted from highest to lowest priority.
-                    Focus interventions on <span className="font-semibold">Critical</span> and <span className="font-semibold">Priority</span> domains first,
-                    leveraging the top enablers and addressing the top barriers.
-                </p>
-            </div>
         </div>
     );
 }

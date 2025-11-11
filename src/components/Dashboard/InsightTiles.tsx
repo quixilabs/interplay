@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { BookOpen, TrendingUp, Users, DollarSign, Heart, Brain, ExternalLink, ChevronRight } from 'lucide-react';
+import ChartTooltip from './ChartTooltip';
 
 interface InsightTilesProps {
     data: any;
@@ -221,6 +222,14 @@ export default function InsightTiles({ data }: InsightTilesProps) {
                             <h3 className="text-lg font-semibold text-slate-900">Research Insights</h3>
                             <p className="text-sm text-slate-600">Why these tensions matter - backed by research</p>
                         </div>
+                        <ChartTooltip
+                            title="How to use these insights"
+                            content={[
+                                "These research-backed insights provide context for why the tensions students face matter for their success and wellbeing.",
+                                "Insights marked as 'Relevant' correspond to areas where your students show significant gaps based on your data.",
+                                "Click any insight tile to expand and see detailed statistics and research sources. Use the category filters to focus on specific tension types."
+                            ]}
+                        />
                     </div>
 
                     {tensionAnalysis && (

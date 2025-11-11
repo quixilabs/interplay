@@ -1,4 +1,5 @@
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import ChartTooltip from './ChartTooltip';
 
 interface InterventionMatrixProps {
   data: any;
@@ -54,7 +55,17 @@ export default function InterventionMatrix({ data }: InterventionMatrixProps) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-slate-900">Enablers & Barriers Priority Matrix</h3>
+        <div className="flex items-center space-x-2 mb-1">
+          <h3 className="text-lg font-semibold text-slate-900">Enablers & Barriers Priority Matrix</h3>
+          <ChartTooltip
+            title="How to use this chart"
+            content={[
+              "This scatter plot maps enablers and barriers by how often students mention them (X-axis) versus their potential impact on flourishing (Y-axis).",
+              "Blue dots are enablers to strengthen, while red/orange dots are barriers to address. Top-right quadrant = highest priority (high frequency + high impact).",
+              "Items in the bottom-right are 'quick wins' - frequently mentioned but easier to address. Focus on these for immediate improvements."
+            ]}
+          />
+        </div>
         <p className="text-sm text-slate-600">Frequency cited by students vs. potential impact (barriers shown in red/orange)</p>
       </div>
 
