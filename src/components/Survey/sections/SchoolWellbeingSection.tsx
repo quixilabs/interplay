@@ -11,13 +11,18 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
  * ⚠️ CRITICAL: Do not change 'key' or 'question' values - existing data depends on these!
  * 
  * Domain Structure:
- * - Health & Safety: Physical activity, emotional regulation, safety (3 questions)
+ * - Health & Safety: Getting help, physical activity, emotional regulation, safety (4 questions)
  * - Enjoyment & Engagement: School enjoyment, participation, contribution (3 questions)
  * - Belonging: Sense of belonging, friendships, adult support (3 questions)
  * - Purpose & Growth: Connection to future goals (1 question)
  */
 const SCHOOL_WELLBEING_QUESTIONS = [
   // === HEALTH & SAFETY DOMAIN ===
+  {
+    key: 'know_where_get_help', // ⚠️ DO NOT CHANGE - used for data storage
+    question: 'I know where to get help at school if I\'m struggling.',
+    domain: 'Health & Safety'
+  },
   {
     key: 'physical_activity', // ⚠️ DO NOT CHANGE - used for data storage
     question: 'I get at least 60 minutes of physical activity most days.',
@@ -81,8 +86,7 @@ const WELLBEING_CHECKLIST = [
   'I participate in school sports or regular physical activity.',
   'I participate in arts, music, or creative activities at school.',
   'I have time during the school week for fun, play, or humor.',
-  'I spend time in nature at or near school.',
-  'I know where to get help at school if I\'m struggling.'
+  'I spend time in nature at or near school.'
 ];
 
 export default function SchoolWellbeingSection() {
