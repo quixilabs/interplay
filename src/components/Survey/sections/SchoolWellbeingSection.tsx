@@ -138,9 +138,9 @@ export default function SchoolWellbeingSection() {
   return (
     <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-3xl mx-auto">
       <div className="mb-8">
-        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">School-Influenced Well-Being</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">Your Experience at This School</h2>
         <p className="text-slate-600">
-          These questions focus specifically on your experience at this institution and how it impacts your overall well-being.
+          These questions explore how your day-to-day experience at this school supports your ability to learn, connect, and thrive.
         </p>
       </div>
 
