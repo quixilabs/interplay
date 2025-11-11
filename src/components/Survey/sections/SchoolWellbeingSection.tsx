@@ -14,7 +14,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
  * - Health & Safety: Getting help, physical activity, emotional regulation, safety (4 questions)
  * - Enjoyment & Engagement: School enjoyment, participation, contribution (3 questions)
  * - Belonging: Sense of belonging, friendships, adult support (3 questions)
- * - Purpose & Growth: Connection to future goals (1 question)
+ * - Purpose & Growth: Future goals, career skills, mentors & connections (3 questions)
  */
 const SCHOOL_WELLBEING_QUESTIONS = [
   // === HEALTH & SAFETY DOMAIN ===
@@ -77,6 +77,16 @@ const SCHOOL_WELLBEING_QUESTIONS = [
   {
     key: 'work_connected_goals', // ⚠️ DO NOT CHANGE - used for data storage
     question: 'My schoolwork feels connected to my future goals.',
+    domain: 'Purpose & Growth'
+  },
+  {
+    key: 'developing_career_skills', // ⚠️ DO NOT CHANGE - used for data storage
+    question: 'I feel confident that I\'m developing the skills and experiences I\'ll need to succeed in my future career.',
+    domain: 'Purpose & Growth'
+  },
+  {
+    key: 'mentors_professional_connections', // ⚠️ DO NOT CHANGE - used for data storage
+    question: 'I have mentors, professors, or peers who can help me make professional connections.',
     domain: 'Purpose & Growth'
   }
 ];
