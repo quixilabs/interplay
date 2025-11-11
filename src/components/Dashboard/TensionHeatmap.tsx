@@ -145,6 +145,14 @@ export default function TensionHeatmap({ data }: TensionHeatmapProps) {
                 <div className="flex items-center mb-4">
                     <AlertTriangle className="h-5 w-5 text-orange-600 mr-2" />
                     <h3 className="text-lg font-semibold text-slate-900">Priority Tension Areas</h3>
+                    <ChartTooltip
+                        title="How to use this chart"
+                        content={[
+                            "This section highlights the top 3 tensions where students show the biggest gaps between their needs and available support.",
+                            "Tensions are ranked by severity (Critical = gap score ≥ 0.4, High = gap score ≥ 0.2). Focus on Critical tensions first for maximum impact.",
+                            "The percentage shows what proportion of students experience significant gaps in each tension area. Use these insights to prioritize which competing demands need immediate policy or program attention."
+                        ]}
+                    />
                 </div>
 
                 <div className="space-y-4">
