@@ -91,31 +91,12 @@ const SCHOOL_WELLBEING_QUESTIONS = [
   }
 ];
 
-const WELLBEING_CHECKLIST = [
-  'I have at least one teacher who knows me well.',
-  'I participate in school sports or regular physical activity.',
-  'I participate in arts, music, or creative activities at school.',
-  'I have time during the school week for fun, play, or humor.',
-  'I spend time in nature at or near school.'
-];
-
 export default function SchoolWellbeingSection() {
   const { state, dispatch } = useSurvey();
   const [scores, setScores] = useState(state.schoolWellbeing);
-  const [checklist, setChecklist] = useState<string[]>(
-    state.schoolWellbeing.wellbeingChecklist || []
-  );
 
   const handleScoreChange = (key: string, value: number) => {
     setScores(prev => ({ ...prev, [key]: value }));
-  };
-
-  const handleChecklistToggle = (item: string) => {
-    setChecklist(prev =>
-      prev.includes(item)
-        ? prev.filter(i => i !== item)
-        : [...prev, item]
-    );
   };
 
   const scrollToTop = () => {
@@ -123,7 +104,7 @@ export default function SchoolWellbeingSection() {
   };
 
   const handleNext = () => {
-    dispatch({ type: 'SET_SCHOOL_WELLBEING', payload: { ...scores, wellbeingChecklist: checklist } });
+    dispatch({ type: 'SET_SCHOOL_WELLBEING', payload: scores });
     dispatch({ type: 'SET_SECTION', payload: 7 }); // Go to Tensions Intro
     scrollToTop();
   };
@@ -228,29 +209,6 @@ export default function SchoolWellbeingSection() {
             </div>
           </div>
         ))}
-
-        {/* School Engagement Checklist */}
-        <div className="border-t border-slate-200 pt-8">
-          <h3 className="text-lg font-semibold text-slate-900 mb-4">
-            School Well-Being Drivers Checklist
-          </h3>
-          <p className="text-slate-600 mb-4">
-            Which of the following statements apply to you? (Select all that apply)
-          </p>
-          <div className="grid grid-cols-1 gap-3">
-            {WELLBEING_CHECKLIST.map((item) => (
-              <label key={item} className="flex items-center cursor-pointer p-3 rounded-lg hover:bg-slate-50 transition-colors">
-                <input
-                  type="checkbox"
-                  checked={checklist.includes(item)}
-                  onChange={() => handleChecklistToggle(item)}
-                  className="h-5 w-5 text-teal-600 border-slate-300 rounded focus:ring-2 focus:ring-teal-500"
-                />
-                <span className="ml-3 text-slate-700">{item}</span>
-              </label>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* Navigation */}
