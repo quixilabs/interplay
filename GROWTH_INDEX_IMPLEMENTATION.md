@@ -20,10 +20,12 @@ Where each driver score = 10 - (number of selected statements × 2.5)
 
 **Key Features**:
 - Filters for v2 assessment responses only
-- Handles partial responses (only includes drivers with data)
-- Returns null if no v2 data is available
+- Handles partial responses (missing drivers are treated as 0 in the sum, always divides by 5)
+- Returns null if no v2 data is available (no drivers have data)
 - Rounds to 1 decimal place
 - Public method `calculateGrowthIndexScorePublic()` for use in filtering
+
+**Important**: The Growth Index Score always divides by 5 (the total number of drivers), even if some drivers have no data. This ensures the score accurately reflects institutional support quality across all dimensions. Missing driver data effectively contributes 0 to the score.
 
 **Driver Mappings**:
 - **ACCESS** (3 statements):
@@ -93,10 +95,10 @@ Where each driver score = 10 - (number of selected statements × 2.5)
 ## Edge Cases Handled
 
 1. **No v2 Data Available**: Displays "No data available" message
-2. **Partial Responses**: Calculates score using only drivers with data
+2. **Partial Responses**: Missing drivers are treated as 0; score always divides by 5 (not just available drivers)
 3. **Mixed v1/v2 Data**: Filters to only use v2 responses
 4. **Filtered Data**: Recalculates score when demographic filters are applied
-5. **Minimum Data**: Works with as little as 1 student response
+5. **Minimum Data**: Works with as little as 1 student response (but score reflects partial data accurately)
 
 ## Data Flow
 

@@ -1180,7 +1180,9 @@ export class AnalyticsService {
       return null;
     }
 
-    const growthIndexScore = Object.values(driverAverages).reduce((sum, avg) => sum + avg, 0) / validDriverCount;
+    // Growth Index Score = sum of all driver averages / 5 (always divide by 5, not validDriverCount)
+    // Missing drivers are effectively treated as 0 since they're not in driverAverages
+    const growthIndexScore = Object.values(driverAverages).reduce((sum, avg) => sum + avg, 0) / 5;
 
     // Round to 1 decimal place
     return Math.round(growthIndexScore * 10) / 10;

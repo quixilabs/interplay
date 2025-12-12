@@ -256,9 +256,19 @@ The mock data currently shows very high driver scores (9.7-10.0) because:
 ## Integration with Growth Index Score
 
 The Support Driver Tiles work in perfect harmony with the Growth Index Score:
-- **Growth Index Score** = Average of all 5 driver scores
+- **Growth Index Score** = Average of all 5 driver scores (always divides by 5)
 - **Driver Tiles** = Individual breakdown showing which drivers need attention
 - Together they provide both high-level overview and detailed insights
+
+### Handling Partial Data
+
+**Important**: The Growth Index Score calculation always uses 5 as the denominator, even when some drivers have no data:
+
+- **Example 1**: If only Trust has data (score: 8.0), Growth Index = 8.0 / 5 = **1.6**
+- **Example 2**: If Trust (8.0), Access (7.5), and Care (9.0) have data, Growth Index = (8.0 + 7.5 + 9.0) / 5 = **4.9**
+- **Complete data**: All 5 drivers with scores → average all 5 and divide by 5
+
+This ensures the Growth Index Score accurately reflects institutional support quality. Missing driver data effectively contributes 0 to the score, preventing artificially inflated scores from partial data.
 
 ## Best Practices
 
