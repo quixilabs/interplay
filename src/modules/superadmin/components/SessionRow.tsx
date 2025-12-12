@@ -339,65 +339,267 @@ export default function SessionRow({
 
                             {/* Compact School Wellbeing with Mini Bars */}
                             {hasData(wellbeing) ? (
-                                <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-200">
-                                    <div className="flex items-center justify-between mb-3">
-                                        <div className="flex items-center">
-                                            <Shield className="h-4 w-4 text-blue-500 mr-2" />
-                                            <h4 className="font-semibold text-slate-900 text-sm">School Wellbeing</h4>
-                                        </div>
-                                        <span className="text-xs text-slate-500">(0-10 scale)</span>
-                                    </div>
-                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                                        {[
-                                            { key: 'belonging_score', label: 'Belonging' },
-                                            { key: 'enjoy_school_days', label: 'Enjoy School' },
-                                            { key: 'physical_activity', label: 'Physical Activity' },
-                                            { key: 'feel_safe', label: 'Feel Safe' },
-                                            { key: 'work_connected_goals', label: 'Goal Connection' },
-                                            { key: 'contribute_bigger_purpose', label: 'Bigger Purpose' },
-                                            { key: 'kind_to_others', label: 'Kindness' },
-                                            { key: 'manage_emotions', label: 'Emotions' },
-                                            { key: 'trusted_adult', label: 'Adult Support' },
-                                            { key: 'supportive_friends', label: 'Friend Support' },
-                                            { key: 'resources_participation', label: 'Resources' }
-                                        ].map(item => {
-                                            const score = wellbeing[item.key];
-                                            const isLow = score !== null && score < 6;
-                                            const hasScore = score !== null && score !== undefined;
-
-                                            return (
-                                                <div key={item.key} className="bg-slate-50 p-2 rounded border">
-                                                    <div className="text-xs text-slate-600 mb-1 truncate" title={item.label}>{item.label}</div>
-                                                    <div className="flex items-center gap-1">
-                                                        <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
-                                                            {hasScore && (
-                                                                <div
-                                                                    className={`h-full ${isLow ? 'bg-red-500' : score >= 8 ? 'bg-green-500' : 'bg-yellow-500'}`}
-                                                                    style={{ width: `${(score / 10) * 100}%` }}
-                                                                ></div>
-                                                            )}
-                                                        </div>
-                                                        <span className={`text-xs font-bold ${isLow ? 'text-red-600' : score >= 8 ? 'text-green-600' : 'text-slate-900'}`}>
-                                                            {hasScore ? score : '—'}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                    {wellbeing.wellbeing_checklist && wellbeing.wellbeing_checklist.length > 0 && (
-                                        <div className="mt-3 p-3 bg-blue-50 rounded border border-blue-200">
-                                            <h5 className="font-medium text-blue-900 mb-2 text-xs">Wellbeing Checklist ({wellbeing.wellbeing_checklist.length} selected):</h5>
-                                            <div className="flex flex-wrap gap-1">
-                                                {wellbeing.wellbeing_checklist.map((item: string, index: number) => (
-                                                    <span key={index} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                                        {item}
-                                                    </span>
-                                                ))}
+                                wellbeing.assessment_version === 'v2' ? (
+                                    // V2: Display checkbox barriers grouped by driver
+                                    <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-200">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="flex items-center">
+                                                <Shield className="h-4 w-4 text-blue-500 mr-2" />
+                                                <h4 className="font-semibold text-slate-900 text-sm">Support Barriers (V2)</h4>
                                             </div>
+                                            <span className="text-xs text-slate-500">Checkbox Assessment</span>
                                         </div>
-                                    )}
-                                </div>
+                                        
+                                        {/* Display barriers grouped by driver */}
+                                        <div className="space-y-3">
+                                            {/* CARE Driver */}
+                                            {(() => {
+                                                const careBarriers = [
+                                                    { key: 'care_not_understood_supported', label: 'Not understood/supported when struggling' },
+                                                    { key: 'care_no_empathy_from_staff', label: 'No empathy from staff' },
+                                                    { key: 'care_school_doesnt_care', label: 'School doesn\'t care about students like me' }
+                                                ].filter(b => wellbeing[b.key] === true);
+                                                const careCount = careBarriers.length;
+                                                const careScore = (10 - (careCount * 2.5)).toFixed(1);
+                                                
+                                                return (
+                                                    <div className="bg-red-50 p-3 rounded border border-red-200">
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <h5 className="font-medium text-red-900 text-xs">CARE</h5>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-xs text-red-700">{careCount}/3 barriers</span>
+                                                                <span className={`text-xs font-bold px-2 py-0.5 rounded ${careCount === 0 ? 'bg-green-100 text-green-800' : careCount >= 2 ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                                                    Score: {careScore}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        {careCount > 0 ? (
+                                                            <div className="space-y-1">
+                                                                {careBarriers.map((barrier, idx) => (
+                                                                    <div key={idx} className="flex items-start gap-2">
+                                                                        <span className="text-red-600 mt-0.5">✗</span>
+                                                                        <span className="text-xs text-red-800">{barrier.label}</span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        ) : (
+                                                            <p className="text-xs text-red-700 italic">No barriers selected</p>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })()}
+
+                                            {/* ACCESS Driver */}
+                                            {(() => {
+                                                const accessBarriers = [
+                                                    { key: 'access_hard_find_resources', label: 'Hard to find campus resources' },
+                                                    { key: 'access_dont_know_where_help', label: 'Don\'t know where to go for help' },
+                                                    { key: 'access_long_appointment_wait', label: 'Long wait for appointments' }
+                                                ].filter(b => wellbeing[b.key] === true);
+                                                const accessCount = accessBarriers.length;
+                                                const accessScore = (10 - (accessCount * 2.5)).toFixed(1);
+                                                
+                                                return (
+                                                    <div className="bg-orange-50 p-3 rounded border border-orange-200">
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <h5 className="font-medium text-orange-900 text-xs">ACCESS</h5>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-xs text-orange-700">{accessCount}/3 barriers</span>
+                                                                <span className={`text-xs font-bold px-2 py-0.5 rounded ${accessCount === 0 ? 'bg-green-100 text-green-800' : accessCount >= 2 ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                                                    Score: {accessScore}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        {accessCount > 0 ? (
+                                                            <div className="space-y-1">
+                                                                {accessBarriers.map((barrier, idx) => (
+                                                                    <div key={idx} className="flex items-start gap-2">
+                                                                        <span className="text-orange-600 mt-0.5">✗</span>
+                                                                        <span className="text-xs text-orange-800">{barrier.label}</span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        ) : (
+                                                            <p className="text-xs text-orange-700 italic">No barriers selected</p>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })()}
+
+                                            {/* GUIDANCE Driver */}
+                                            {(() => {
+                                                const guidanceBarriers = [
+                                                    { key: 'guidance_unsure_direction', label: 'Unsure about academic/career direction' },
+                                                    { key: 'guidance_want_help_planning', label: 'Want more help planning next steps' },
+                                                    { key: 'guidance_confused_courses', label: 'Confused about which courses to take' }
+                                                ].filter(b => wellbeing[b.key] === true);
+                                                const guidanceCount = guidanceBarriers.length;
+                                                const guidanceScore = (10 - (guidanceCount * 2.5)).toFixed(1);
+                                                
+                                                return (
+                                                    <div className="bg-blue-50 p-3 rounded border border-blue-200">
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <h5 className="font-medium text-blue-900 text-xs">GUIDANCE</h5>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-xs text-blue-700">{guidanceCount}/3 barriers</span>
+                                                                <span className={`text-xs font-bold px-2 py-0.5 rounded ${guidanceCount === 0 ? 'bg-green-100 text-green-800' : guidanceCount >= 2 ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                                                    Score: {guidanceScore}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        {guidanceCount > 0 ? (
+                                                            <div className="space-y-1">
+                                                                {guidanceBarriers.map((barrier, idx) => (
+                                                                    <div key={idx} className="flex items-start gap-2">
+                                                                        <span className="text-blue-600 mt-0.5">✗</span>
+                                                                        <span className="text-xs text-blue-800">{barrier.label}</span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        ) : (
+                                                            <p className="text-xs text-blue-700 italic">No barriers selected</p>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })()}
+
+                                            {/* TRUST Driver */}
+                                            {(() => {
+                                                const trustBarriers = [
+                                                    { key: 'trust_messages_not_answered', label: 'Messages not answered timely' },
+                                                    { key: 'trust_unclear_communication', label: 'Unclear/inconsistent communication' },
+                                                    { key: 'trust_bounced_between_offices', label: 'Bounced between offices' }
+                                                ].filter(b => wellbeing[b.key] === true);
+                                                const trustCount = trustBarriers.length;
+                                                const trustScore = (10 - (trustCount * 2.5)).toFixed(1);
+                                                
+                                                return (
+                                                    <div className="bg-purple-50 p-3 rounded border border-purple-200">
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <h5 className="font-medium text-purple-900 text-xs">TRUST</h5>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-xs text-purple-700">{trustCount}/3 barriers</span>
+                                                                <span className={`text-xs font-bold px-2 py-0.5 rounded ${trustCount === 0 ? 'bg-green-100 text-green-800' : trustCount >= 2 ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                                                    Score: {trustScore}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        {trustCount > 0 ? (
+                                                            <div className="space-y-1">
+                                                                {trustBarriers.map((barrier, idx) => (
+                                                                    <div key={idx} className="flex items-start gap-2">
+                                                                        <span className="text-purple-600 mt-0.5">✗</span>
+                                                                        <span className="text-xs text-purple-800">{barrier.label}</span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        ) : (
+                                                            <p className="text-xs text-purple-700 italic">No barriers selected</p>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })()}
+
+                                            {/* CONNECTION Driver */}
+                                            {(() => {
+                                                const connectionBarriers = [
+                                                    { key: 'connection_no_mentor', label: 'No mentor to turn to' },
+                                                    { key: 'connection_hard_make_friends', label: 'Hard to make friends' },
+                                                    { key: 'connection_not_connected_students', label: 'Not connected to other students' }
+                                                ].filter(b => wellbeing[b.key] === true);
+                                                const connectionCount = connectionBarriers.length;
+                                                const connectionScore = (10 - (connectionCount * 2.5)).toFixed(1);
+                                                
+                                                return (
+                                                    <div className="bg-green-50 p-3 rounded border border-green-200">
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <h5 className="font-medium text-green-900 text-xs">CONNECTION</h5>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-xs text-green-700">{connectionCount}/3 barriers</span>
+                                                                <span className={`text-xs font-bold px-2 py-0.5 rounded ${connectionCount === 0 ? 'bg-green-100 text-green-800' : connectionCount >= 2 ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                                                    Score: {connectionScore}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        {connectionCount > 0 ? (
+                                                            <div className="space-y-1">
+                                                                {connectionBarriers.map((barrier, idx) => (
+                                                                    <div key={idx} className="flex items-start gap-2">
+                                                                        <span className="text-green-600 mt-0.5">✗</span>
+                                                                        <span className="text-xs text-green-800">{barrier.label}</span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        ) : (
+                                                            <p className="text-xs text-green-700 italic">No barriers selected</p>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })()}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    // V1: Display original rating scale format
+                                    <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-200">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="flex items-center">
+                                                <Shield className="h-4 w-4 text-blue-500 mr-2" />
+                                                <h4 className="font-semibold text-slate-900 text-sm">School Wellbeing</h4>
+                                            </div>
+                                            <span className="text-xs text-slate-500">(0-10 scale)</span>
+                                        </div>
+                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                                            {[
+                                                { key: 'belonging_score', label: 'Belonging' },
+                                                { key: 'enjoy_school_days', label: 'Enjoy School' },
+                                                { key: 'physical_activity', label: 'Physical Activity' },
+                                                { key: 'feel_safe', label: 'Feel Safe' },
+                                                { key: 'work_connected_goals', label: 'Goal Connection' },
+                                                { key: 'contribute_bigger_purpose', label: 'Bigger Purpose' },
+                                                { key: 'kind_to_others', label: 'Kindness' },
+                                                { key: 'manage_emotions', label: 'Emotions' },
+                                                { key: 'trusted_adult', label: 'Adult Support' },
+                                                { key: 'supportive_friends', label: 'Friend Support' },
+                                                { key: 'resources_participation', label: 'Resources' }
+                                            ].map(item => {
+                                                const score = wellbeing[item.key];
+                                                const isLow = score !== null && score < 6;
+                                                const hasScore = score !== null && score !== undefined;
+
+                                                return (
+                                                    <div key={item.key} className="bg-slate-50 p-2 rounded border">
+                                                        <div className="text-xs text-slate-600 mb-1 truncate" title={item.label}>{item.label}</div>
+                                                        <div className="flex items-center gap-1">
+                                                            <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
+                                                                {hasScore && (
+                                                                    <div
+                                                                        className={`h-full ${isLow ? 'bg-red-500' : score >= 8 ? 'bg-green-500' : 'bg-yellow-500'}`}
+                                                                        style={{ width: `${(score / 10) * 100}%` }}
+                                                                    ></div>
+                                                                )}
+                                                            </div>
+                                                            <span className={`text-xs font-bold ${isLow ? 'text-red-600' : score >= 8 ? 'text-green-600' : 'text-slate-900'}`}>
+                                                                {hasScore ? score : '—'}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                        {wellbeing.wellbeing_checklist && wellbeing.wellbeing_checklist.length > 0 && (
+                                            <div className="mt-3 p-3 bg-blue-50 rounded border border-blue-200">
+                                                <h5 className="font-medium text-blue-900 mb-2 text-xs">Wellbeing Checklist ({wellbeing.wellbeing_checklist.length} selected):</h5>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {wellbeing.wellbeing_checklist.map((item: string, index: number) => (
+                                                        <span key={index} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                                            {item}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )
                             ) : (
                                 <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-200">
                                     <div className="flex items-center">
