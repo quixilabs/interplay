@@ -230,7 +230,7 @@ export default function Dashboard() {
         {/* Growth Index Score Card */}
         <SupportDriverTiles driverScores={(filteredData || surveyData)?.driverScores} />
 
-        {/* Action Pathway - Critical Action Path */}
+        {/* Conditions for Success - Critical Action Path */}
         <div className="mb-8">
           <ActionPathwayChart data={filteredData || surveyData} />
         </div>
