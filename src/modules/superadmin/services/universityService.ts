@@ -302,6 +302,7 @@ export class SuperAdminUniversityService {
               financial_stability_2
             ),
             school_wellbeing (
+              assessment_version,
               belonging_score,
               enjoy_school_days,
               physical_activity,
@@ -313,7 +314,22 @@ export class SuperAdminUniversityService {
               trusted_adult,
               supportive_friends,
               resources_participation,
-              wellbeing_checklist
+              wellbeing_checklist,
+              care_not_understood_supported,
+              care_no_empathy_from_staff,
+              care_school_doesnt_care,
+              access_hard_find_resources,
+              access_dont_know_where_help,
+              access_long_appointment_wait,
+              guidance_unsure_direction,
+              guidance_want_help_planning,
+              guidance_confused_courses,
+              trust_messages_not_answered,
+              trust_unclear_communication,
+              trust_bounced_between_offices,
+              connection_no_mentor,
+              connection_hard_make_friends,
+              connection_not_connected_students
             ),
             tensions_assessment (
               performance_wellbeing,
@@ -442,6 +458,7 @@ export class SuperAdminUniversityService {
       financial_stability_2: flourishing?.financial_stability_2 ?? '',
       
       // School Wellbeing
+      wellbeing_assessment_version: wellbeing?.assessment_version || 'v1',
       belonging_score: wellbeing?.belonging_score ?? '',
       enjoy_school_days: wellbeing?.enjoy_school_days ?? '',
       physical_activity: wellbeing?.physical_activity ?? '',
@@ -454,6 +471,73 @@ export class SuperAdminUniversityService {
       supportive_friends: wellbeing?.supportive_friends ?? '',
       resources_participation: wellbeing?.resources_participation ?? '',
       wellbeing_checklist: wellbeing?.wellbeing_checklist?.join('; ') || '',
+      
+      // V2 Support Barriers - CARE Driver
+      care_not_understood_supported: wellbeing?.care_not_understood_supported ?? '',
+      care_no_empathy_from_staff: wellbeing?.care_no_empathy_from_staff ?? '',
+      care_school_doesnt_care: wellbeing?.care_school_doesnt_care ?? '',
+      care_barrier_count: wellbeing?.assessment_version === 'v2' 
+        ? [wellbeing?.care_not_understood_supported, wellbeing?.care_no_empathy_from_staff, wellbeing?.care_school_doesnt_care].filter(Boolean).length 
+        : '',
+      care_score: wellbeing?.assessment_version === 'v2' 
+        ? (10 - ([wellbeing?.care_not_understood_supported, wellbeing?.care_no_empathy_from_staff, wellbeing?.care_school_doesnt_care].filter(Boolean).length * 2.5)).toFixed(1) 
+        : '',
+      
+      // V2 Support Barriers - ACCESS Driver
+      access_hard_find_resources: wellbeing?.access_hard_find_resources ?? '',
+      access_dont_know_where_help: wellbeing?.access_dont_know_where_help ?? '',
+      access_long_appointment_wait: wellbeing?.access_long_appointment_wait ?? '',
+      access_barrier_count: wellbeing?.assessment_version === 'v2' 
+        ? [wellbeing?.access_hard_find_resources, wellbeing?.access_dont_know_where_help, wellbeing?.access_long_appointment_wait].filter(Boolean).length 
+        : '',
+      access_score: wellbeing?.assessment_version === 'v2' 
+        ? (10 - ([wellbeing?.access_hard_find_resources, wellbeing?.access_dont_know_where_help, wellbeing?.access_long_appointment_wait].filter(Boolean).length * 2.5)).toFixed(1) 
+        : '',
+      
+      // V2 Support Barriers - GUIDANCE Driver
+      guidance_unsure_direction: wellbeing?.guidance_unsure_direction ?? '',
+      guidance_want_help_planning: wellbeing?.guidance_want_help_planning ?? '',
+      guidance_confused_courses: wellbeing?.guidance_confused_courses ?? '',
+      guidance_barrier_count: wellbeing?.assessment_version === 'v2' 
+        ? [wellbeing?.guidance_unsure_direction, wellbeing?.guidance_want_help_planning, wellbeing?.guidance_confused_courses].filter(Boolean).length 
+        : '',
+      guidance_score: wellbeing?.assessment_version === 'v2' 
+        ? (10 - ([wellbeing?.guidance_unsure_direction, wellbeing?.guidance_want_help_planning, wellbeing?.guidance_confused_courses].filter(Boolean).length * 2.5)).toFixed(1) 
+        : '',
+      
+      // V2 Support Barriers - TRUST Driver
+      trust_messages_not_answered: wellbeing?.trust_messages_not_answered ?? '',
+      trust_unclear_communication: wellbeing?.trust_unclear_communication ?? '',
+      trust_bounced_between_offices: wellbeing?.trust_bounced_between_offices ?? '',
+      trust_barrier_count: wellbeing?.assessment_version === 'v2' 
+        ? [wellbeing?.trust_messages_not_answered, wellbeing?.trust_unclear_communication, wellbeing?.trust_bounced_between_offices].filter(Boolean).length 
+        : '',
+      trust_score: wellbeing?.assessment_version === 'v2' 
+        ? (10 - ([wellbeing?.trust_messages_not_answered, wellbeing?.trust_unclear_communication, wellbeing?.trust_bounced_between_offices].filter(Boolean).length * 2.5)).toFixed(1) 
+        : '',
+      
+      // V2 Support Barriers - CONNECTION Driver
+      connection_no_mentor: wellbeing?.connection_no_mentor ?? '',
+      connection_hard_make_friends: wellbeing?.connection_hard_make_friends ?? '',
+      connection_not_connected_students: wellbeing?.connection_not_connected_students ?? '',
+      connection_barrier_count: wellbeing?.assessment_version === 'v2' 
+        ? [wellbeing?.connection_no_mentor, wellbeing?.connection_hard_make_friends, wellbeing?.connection_not_connected_students].filter(Boolean).length 
+        : '',
+      connection_score: wellbeing?.assessment_version === 'v2' 
+        ? (10 - ([wellbeing?.connection_no_mentor, wellbeing?.connection_hard_make_friends, wellbeing?.connection_not_connected_students].filter(Boolean).length * 2.5)).toFixed(1) 
+        : '',
+      
+      // V2 Overall Growth Index Score (average of all 5 driver scores)
+      growth_index_score: wellbeing?.assessment_version === 'v2' 
+        ? (() => {
+            const careScore = 10 - ([wellbeing?.care_not_understood_supported, wellbeing?.care_no_empathy_from_staff, wellbeing?.care_school_doesnt_care].filter(Boolean).length * 2.5);
+            const accessScore = 10 - ([wellbeing?.access_hard_find_resources, wellbeing?.access_dont_know_where_help, wellbeing?.access_long_appointment_wait].filter(Boolean).length * 2.5);
+            const guidanceScore = 10 - ([wellbeing?.guidance_unsure_direction, wellbeing?.guidance_want_help_planning, wellbeing?.guidance_confused_courses].filter(Boolean).length * 2.5);
+            const trustScore = 10 - ([wellbeing?.trust_messages_not_answered, wellbeing?.trust_unclear_communication, wellbeing?.trust_bounced_between_offices].filter(Boolean).length * 2.5);
+            const connectionScore = 10 - ([wellbeing?.connection_no_mentor, wellbeing?.connection_hard_make_friends, wellbeing?.connection_not_connected_students].filter(Boolean).length * 2.5);
+            return ((careScore + accessScore + guidanceScore + trustScore + connectionScore) / 5).toFixed(1);
+          })()
+        : '',
       
       // Tensions
       performance_wellbeing: tensions?.performance_wellbeing ?? '',
