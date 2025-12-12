@@ -217,9 +217,6 @@ export default function Dashboard() {
         {/* Key Metrics Overview */}
         <MetricsOverview data={filteredData || surveyData} />
 
-        {/* Growth Index Score Card */}
-        <SupportDriverTiles driverScores={(filteredData || surveyData)?.driverScores} />
-
         {/* Primary Visualizations */}
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
           <FlourishingChart data={filteredData || surveyData} />
@@ -229,6 +226,9 @@ export default function Dashboard() {
             onDemographicChange={setSelectedDemographic}
           />
         </div>
+
+        {/* Growth Index Score Card */}
+        <SupportDriverTiles driverScores={(filteredData || surveyData)?.driverScores} />
 
         {/* Action Pathway - Critical Action Path */}
         <div className="mb-8">
