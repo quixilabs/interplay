@@ -245,21 +245,52 @@ export class SurveyService {
 
   // Save school wellbeing data
   static async saveSchoolWellbeing(sessionId: string, wellbeing: any): Promise<void> {
-    const wellbeingData = {
+    const wellbeingData: any = {
       session_id: sessionId,
-      belonging_score: wellbeing.belonging_score,
-      enjoy_school_days: wellbeing.enjoy_school_days,
-      physical_activity: wellbeing.physical_activity,
-      feel_safe: wellbeing.feel_safe,
-      work_connected_goals: wellbeing.work_connected_goals,
-      contribute_bigger_purpose: wellbeing.contribute_bigger_purpose,
-      kind_to_others: wellbeing.kind_to_others,
-      manage_emotions: wellbeing.manage_emotions,
-      trusted_adult: wellbeing.trusted_adult,
-      supportive_friends: wellbeing.supportive_friends,
-      resources_participation: wellbeing.resources_participation,
-      wellbeing_checklist: wellbeing.wellbeingChecklist || []
+      assessment_version: wellbeing.assessment_version || 'v1'
     };
+
+    // Handle v2 format (checkbox barriers) - map to driver-prefixed column names
+    if (wellbeing.assessment_version === 'v2') {
+      // CARE DRIVER
+      wellbeingData.care_not_understood_supported = wellbeing.statement_1 || false;
+      wellbeingData.care_no_empathy_from_staff = wellbeing.statement_6 || false;
+      wellbeingData.care_school_doesnt_care = wellbeing.statement_13 || false;
+      
+      // ACCESS DRIVER
+      wellbeingData.access_hard_find_resources = wellbeing.statement_2 || false;
+      wellbeingData.access_dont_know_where_help = wellbeing.statement_14 || false;
+      wellbeingData.access_long_appointment_wait = wellbeing.statement_15 || false;
+      
+      // GUIDANCE DRIVER
+      wellbeingData.guidance_unsure_direction = wellbeing.statement_3 || false;
+      wellbeingData.guidance_want_help_planning = wellbeing.statement_7 || false;
+      wellbeingData.guidance_confused_courses = wellbeing.statement_9 || false;
+      
+      // TRUST DRIVER
+      wellbeingData.trust_messages_not_answered = wellbeing.statement_4 || false;
+      wellbeingData.trust_unclear_communication = wellbeing.statement_10 || false;
+      wellbeingData.trust_bounced_between_offices = wellbeing.statement_12 || false;
+      
+      // CONNECTION DRIVER
+      wellbeingData.connection_no_mentor = wellbeing.statement_5 || false;
+      wellbeingData.connection_hard_make_friends = wellbeing.statement_8 || false;
+      wellbeingData.connection_not_connected_students = wellbeing.statement_11 || false;
+    } else {
+      // Handle v1 format (legacy rating scale)
+      wellbeingData.belonging_score = wellbeing.belonging_score;
+      wellbeingData.enjoy_school_days = wellbeing.enjoy_school_days;
+      wellbeingData.physical_activity = wellbeing.physical_activity;
+      wellbeingData.feel_safe = wellbeing.feel_safe;
+      wellbeingData.work_connected_goals = wellbeing.work_connected_goals;
+      wellbeingData.contribute_bigger_purpose = wellbeing.contribute_bigger_purpose;
+      wellbeingData.kind_to_others = wellbeing.kind_to_others;
+      wellbeingData.manage_emotions = wellbeing.manage_emotions;
+      wellbeingData.trusted_adult = wellbeing.trusted_adult;
+      wellbeingData.supportive_friends = wellbeing.supportive_friends;
+      wellbeingData.resources_participation = wellbeing.resources_participation;
+      wellbeingData.wellbeing_checklist = wellbeing.wellbeingChecklist || [];
+    }
 
     await this.upsertRecord('school_wellbeing', wellbeingData, ['session_id'], sessionId, 'School Wellbeing');
   }

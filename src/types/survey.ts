@@ -29,6 +29,7 @@ export interface FlourishingScores {
 }
 
 export interface SchoolWellbeing {
+  // V1 fields (legacy rating scale format)
   belonging_score?: number;
   enjoy_school_days?: number;
   physical_activity?: number;
@@ -41,6 +42,55 @@ export interface SchoolWellbeing {
   supportive_friends?: number;
   resources_participation?: number;
   wellbeingChecklist?: string[];
+  
+  // V2 fields (checkbox barrier format)
+  assessment_version?: 'v1' | 'v2';
+  
+  // Frontend format (used by component state)
+  statement_1?: boolean;
+  statement_2?: boolean;
+  statement_3?: boolean;
+  statement_4?: boolean;
+  statement_5?: boolean;
+  statement_6?: boolean;
+  statement_7?: boolean;
+  statement_8?: boolean;
+  statement_9?: boolean;
+  statement_10?: boolean;
+  statement_11?: boolean;
+  statement_12?: boolean;
+  statement_13?: boolean;
+  statement_14?: boolean;
+  statement_15?: boolean;
+  
+  // Database format (driver-prefixed columns)
+  // CARE DRIVER
+  care_not_understood_supported?: boolean;
+  care_no_empathy_from_staff?: boolean;
+  care_school_doesnt_care?: boolean;
+  
+  // ACCESS DRIVER
+  access_hard_find_resources?: boolean;
+  access_dont_know_where_help?: boolean;
+  access_long_appointment_wait?: boolean;
+  
+  // GUIDANCE DRIVER
+  guidance_unsure_direction?: boolean;
+  guidance_want_help_planning?: boolean;
+  guidance_confused_courses?: boolean;
+  
+  // TRUST DRIVER
+  trust_messages_not_answered?: boolean;
+  trust_unclear_communication?: boolean;
+  trust_bounced_between_offices?: boolean;
+  
+  // CONNECTION DRIVER
+  connection_no_mentor?: boolean;
+  connection_hard_make_friends?: boolean;
+  connection_not_connected_students?: boolean;
+  
+  // Allow dynamic indexing for checkbox responses
+  [key: string]: number | string | string[] | boolean | undefined;
 }
 
 export interface TextResponses {
