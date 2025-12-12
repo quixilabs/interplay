@@ -4,6 +4,7 @@ import { useAuthStore } from '../../stores/authStore';
 import DashboardHeader from './DashboardHeader';
 import DashboardFilters from './DashboardFilters';
 import MetricsOverview from './MetricsOverview';
+import SupportDriverTiles from './SupportDriverTiles';
 import FlourishingChart from './FlourishingChart';
 import ActionPathwayChart from './ActionPathwayChart';
 import DemographicsAnalysis from './DemographicsAnalysis';
@@ -108,6 +109,16 @@ export default function Dashboard() {
       filteredEnablersBarriers
     );
 
+    // Recalculate Growth Index Score with filtered data
+    const filteredWellbeingData = filteredResponses
+      .filter((response: any) => response.schoolWellbeing)
+      .map((response: any) => response.schoolWellbeing);
+
+    const recalculatedGrowthIndexScore = AnalyticsService.calculateGrowthIndexScorePublic(filteredWellbeingData);
+
+    // Recalculate driver scores with filtered data
+    const recalculatedDriverScores = AnalyticsService.calculateDriverScoresPublic(filteredWellbeingData);
+
     return {
       ...data,
       responses: filteredResponses,
@@ -115,7 +126,9 @@ export default function Dashboard() {
       overallFlourishingScore: recalculatedFlourishingScore,
       flourishingDomainAverages: recalculatedDomainAverages,
       studentsAtRisk: recalculatedStudentsAtRisk,
-      actionPathwayData: recalculatedActionPathway
+      actionPathwayData: recalculatedActionPathway,
+      growthIndexScore: recalculatedGrowthIndexScore,
+      driverScores: recalculatedDriverScores
     };
   };
 
@@ -203,6 +216,9 @@ export default function Dashboard() {
 
         {/* Key Metrics Overview */}
         <MetricsOverview data={filteredData || surveyData} />
+
+        {/* Support Driver Breakdown */}
+        <SupportDriverTiles driverScores={(filteredData || surveyData)?.driverScores} />
 
         {/* Primary Visualizations */}
         <div className="grid lg:grid-cols-2 gap-8 mb-8">

@@ -12,7 +12,7 @@ export default function MetricsOverview({ data }: MetricsOverviewProps) {
     averageFlourishingScore: data?.overallFlourishingScore || 0,
     studentsAtRisk: data?.studentsAtRisk || 0,
     completionRate: data?.completionRate || 0,
-    topGrowthOpportunity: data?.topInterventions?.[0]?.name || 'No data available'
+    growthIndexScore: data?.growthIndexScore
   };
 
   const MetricCard = ({
@@ -69,6 +69,7 @@ export default function MetricsOverview({ data }: MetricsOverviewProps) {
           content={[
             "These four key metrics provide a quick snapshot of overall student wellbeing at your institution.",
             "The Overall Flourishing Score (out of 10) averages all six domains. Students Below Threshold shows the percentage with any domain score under 6.",
+            "The Growth Index Score measures institutional support quality across five drivers: Access, Guidance, Connection, Trust, and Care. Higher scores indicate better support.",
             "Track changes over time using the trend indicators. Use these metrics to set targets and measure progress on wellbeing initiatives."
           ]}
         />
@@ -102,10 +103,14 @@ export default function MetricsOverview({ data }: MetricsOverviewProps) {
         />
 
         <MetricCard
-          title="Top Growth Opportunity"
-          value={metrics.topGrowthOpportunity}
+          title="Growth Index Score"
+          value={
+            metrics.growthIndexScore !== null && metrics.growthIndexScore !== undefined
+              ? `${metrics.growthIndexScore} / 10`
+              : 'No data available'
+          }
           icon={Target}
-          subtitle="Most cited intervention need"
+          subtitle="How well the university is supporting student needs"
         />
       </div>
     </div>
