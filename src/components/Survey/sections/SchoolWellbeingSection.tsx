@@ -3,105 +3,78 @@ import { useSurvey } from '../../../contexts/SurveyContext';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 /**
- * SCHOOL WELL-BEING QUESTIONS WITH DOMAIN METADATA
+ * SCHOOL SUPPORT BARRIERS - VERSION 2 (CHECKBOX FORMAT)
  * 
- * Each question includes a 'domain' field to support domain-based filtering and analytics.
- * Questions are organized into 4 domains for better UX and dashboard reporting.
+ * This section identifies specific support barriers students experience at their school.
+ * Students can select 0 to 15 statements that describe challenges they're facing.
  * 
- * ⚠️ CRITICAL: Do not change 'key' or 'question' values - existing data depends on these!
+ * Each statement is mapped to a support driver for backend analytics:
+ * - Access: Finding resources and getting help when needed
+ * - Guidance: Academic/career direction and planning support
+ * - Connection: Social relationships and sense of belonging
+ * - Trust: Reliability and consistency of institutional support
+ * - Care: Empathy and understanding from staff/faculty
  * 
- * Domain Structure:
- * - Health & Safety: Physical activity, emotional regulation, safety (3 questions)
- * - Enjoyment & Engagement: School enjoyment, participation, contribution (3 questions)
- * - Belonging: Sense of belonging, friendships, adult support (3 questions)
- * - Purpose & Growth: Connection to future goals (1 question)
+ * ⚠️ CRITICAL: Assessment version = v2. Do not change statement text - dashboard analytics depend on this!
  */
-const SCHOOL_WELLBEING_QUESTIONS = [
-  // === HEALTH & SAFETY DOMAIN ===
-  {
-    key: 'physical_activity', // ⚠️ DO NOT CHANGE - used for data storage
-    question: 'I get at least 60 minutes of physical activity most days.',
-    domain: 'Health & Safety'
-  },
-  {
-    key: 'manage_emotions', // ⚠️ DO NOT CHANGE - used for data storage
-    question: 'I know how to manage my emotions when I feel stressed.',
-    domain: 'Health & Safety'
-  },
-  {
-    key: 'feel_safe', // ⚠️ DO NOT CHANGE - used for data storage
-    question: 'I feel safe in and around my school.',
-    domain: 'Health & Safety'
-  },
 
-  // === ENJOYMENT & ENGAGEMENT DOMAIN ===
-  {
-    key: 'enjoy_school_days', // ⚠️ DO NOT CHANGE - used for data storage
-    question: 'I enjoy most of my school days.',
-    domain: 'Enjoyment & Engagement'
-  },
-  {
-    key: 'resources_participation', // ⚠️ DO NOT CHANGE - used for data storage
-    question: 'I have what I need to participate fully in school activities.',
-    domain: 'Enjoyment & Engagement'
-  },
-  {
-    key: 'contribute_bigger_purpose', // ⚠️ DO NOT CHANGE - used for data storage
-    question: 'I have opportunities at school to contribute to something bigger than myself.',
-    domain: 'Enjoyment & Engagement'
-  },
+/**
+ * Support driver mapping for backend analytics
+ * Not visible to students - used for scoring and dashboard categorization
+ */
+export const SUPPORT_DRIVER_MAPPING = {
+  1: { statement: "I don't feel understood or supported when I'm struggling.", driver: "care" },
+  2: { statement: "It's hard to find information about campus resources.", driver: "access" },
+  3: { statement: "I'm unsure about my academic or career direction.", driver: "guidance" },
+  4: { statement: "My messages or emails aren't answered in a timely way.", driver: "trust" },
+  5: { statement: "I don't have a mentor or someone I can turn to.", driver: "connection" },
+  6: { statement: "Staff or faculty don't show empathy when I raise a concern.", driver: "care" },
+  7: { statement: "I want more help planning my next steps.", driver: "guidance" },
+  8: { statement: "It's hard for me to make friends here.", driver: "connection" },
+  9: { statement: "I'm confused about which courses I need to take.", driver: "guidance" },
+  10: { statement: "Communication from the school feels unclear or inconsistent.", driver: "trust" },
+  11: { statement: "I don't feel connected to other students.", driver: "connection" },
+  12: { statement: "I'm often bounced between offices when trying to get help.", driver: "trust" },
+  13: { statement: "I don't feel like the school cares about students like me.", driver: "care" },
+  14: { statement: "I don't know where to go when I need help.", driver: "access" },
+  15: { statement: "It takes too long to get an appointment when I need support.", driver: "access" }
+} as const;
 
-  // === BELONGING DOMAIN ===
-  {
-    key: 'belonging_score', // ⚠️ DO NOT CHANGE - used for data storage
-    question: ' I feel a strong sense of belonging at my school.',
-    domain: 'Belonging'
-  },
-  {
-    key: 'supportive_friends', // ⚠️ DO NOT CHANGE - used for data storage
-    question: 'I have friends at school who support me.',
-    domain: 'Belonging'
-  },
-  {
-    key: 'trusted_adult', // ⚠️ DO NOT CHANGE - used for data storage
-    question: 'I have at least one trusted adult at school I can talk to if I need help.',
-    domain: 'Belonging'
-  },
-
-  // === PURPOSE & GROWTH DOMAIN ===
-  {
-    key: 'work_connected_goals', // ⚠️ DO NOT CHANGE - used for data storage
-    question: 'My schoolwork feels connected to my future goals.',
-    domain: 'Purpose & Growth'
-  }
-];
-
-const WELLBEING_CHECKLIST = [
-  'I have at least one teacher who knows me well.',
-  'I participate in school sports or regular physical activity.',
-  'I participate in arts, music, or creative activities at school.',
-  'I have time during the school week for fun, play, or humor.',
-  'I spend time in nature at or near school.',
-  'I know where to get help at school if I\'m struggling.'
-];
+/**
+ * Ordered list of statements for UI display
+ */
+const SUPPORT_BARRIERS_STATEMENTS = Object.entries(SUPPORT_DRIVER_MAPPING).map(([id, data]) => ({
+  id: parseInt(id),
+  statement: data.statement,
+  driver: data.driver
+}));
 
 export default function SchoolWellbeingSection() {
   const { state, dispatch } = useSurvey();
-  const [scores, setScores] = useState(state.schoolWellbeing);
-  const [checklist, setChecklist] = useState<string[]>(
-    state.schoolWellbeing.wellbeingChecklist || []
-  );
 
-  const handleScoreChange = (key: string, value: number) => {
-    setScores(prev => ({ ...prev, [key]: value }));
-  };
+  // Initialize checkbox state from context or as empty object
+  // Format: { statement_1: boolean, statement_2: boolean, ... }
+  const initialCheckboxState: Record<string, boolean> = {};
+  if (state.schoolWellbeing?.assessment_version === 'v2') {
+    // Extract only the statement_X fields
+    Object.keys(state.schoolWellbeing).forEach(key => {
+      if (key.startsWith('statement_')) {
+        const value = state.schoolWellbeing[key];
+        if (typeof value === 'boolean') {
+          initialCheckboxState[key] = value;
+        }
+      }
+    });
+  }
 
-  const handleChecklistToggle = (item: string) => {
-    setChecklist(prev =>
-      prev.includes(item)
-        ? prev.filter(i => i !== item)
-        : [...prev, item]
-    );
+  const [selectedBarriers, setSelectedBarriers] = useState<Record<string, boolean>>(initialCheckboxState);
+
+  const handleCheckboxToggle = (statementId: number) => {
+    const key = `statement_${statementId}`;
+    setSelectedBarriers(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
   };
 
   const scrollToTop = () => {
@@ -109,7 +82,12 @@ export default function SchoolWellbeingSection() {
   };
 
   const handleNext = () => {
-    dispatch({ type: 'SET_SCHOOL_WELLBEING', payload: { ...scores, wellbeingChecklist: checklist } });
+    // Save checkbox responses with v2 version tag
+    const responseData = {
+      ...selectedBarriers,
+      assessment_version: 'v2' as const
+    };
+    dispatch({ type: 'SET_SCHOOL_WELLBEING', payload: responseData });
     dispatch({ type: 'SET_SECTION', payload: 7 }); // Go to Tensions Intro
     scrollToTop();
   };
@@ -119,124 +97,45 @@ export default function SchoolWellbeingSection() {
     scrollToTop();
   };
 
-  const allQuestionsAnswered = SCHOOL_WELLBEING_QUESTIONS.every(q =>
-    scores[q.key as keyof typeof scores] !== undefined
-  );
-
-  /**
-   * Helper function to group questions by domain for organized rendering
-   * This structure supports future dashboard analytics by domain
-   */
-  const groupQuestionsByDomain = () => {
-    const domains: { [key: string]: typeof SCHOOL_WELLBEING_QUESTIONS } = {};
-    SCHOOL_WELLBEING_QUESTIONS.forEach(question => {
-      if (!domains[question.domain]) {
-        domains[question.domain] = [];
-      }
-      domains[question.domain].push(question);
-    });
-    return domains;
-  };
-
-  const questionsByDomain = groupQuestionsByDomain();
-
   return (
     <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-3xl mx-auto">
+      {/* Header */}
       <div className="mb-8">
-        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">School-Influenced Well-Being</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">
+          Tell Us About the Support You Receive
+        </h2>
         <p className="text-slate-600">
-          These questions focus specifically on your experience at this institution and how it impacts your overall well-being.
+          Please tell us about your experience getting support at the school. There are no right or wrong answers — Just select everything that feels true for you right now. (Choose all that apply.)
         </p>
       </div>
 
-      {/* 
-        UI LAYOUT CHANGES: Questions grouped by domain with visual hierarchy
-        - Domain headers provide context and structure
-        - Card-based design with clear separation between domains
-        - Enhanced spacing and backgrounds for better readability
-        - Mobile-responsive design maintained
-        - All question keys, wording, and scales remain unchanged
-      */}
-      <div className="space-y-8">
-        {/* Render questions grouped by domain as distinct cards */}
-        {Object.entries(questionsByDomain).map(([domain, questions]) => (
-          <div
-            key={domain}
-            className="bg-slate-50 rounded-lg border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-          >
-            {/* Domain Header - provides visual grouping */}
-            <div className="bg-gradient-to-r from-teal-50 to-slate-50 border-b border-slate-200 px-4 sm:px-6 py-4">
-              <div className="flex items-center">
-                <div className="w-1 h-8 bg-teal-500 rounded-full mr-3"></div>
-                <h3 className="text-lg sm:text-xl font-semibold text-slate-900">
-                  {domain}
-                </h3>
-              </div>
-            </div>
+      {/* Checkbox list - clean vertical layout */}
+      <div className="space-y-3 mb-8">
+        {SUPPORT_BARRIERS_STATEMENTS.map((item) => {
+          const key = `statement_${item.id}`;
+          const isChecked = selectedBarriers[key] || false;
 
-            {/* Questions within this domain */}
-            <div className="p-4 sm:p-6 space-y-8 bg-white">
-              {questions.map((item) => {
-                const score = scores[item.key as keyof typeof scores];
+          return (
+            <label
+              key={item.id}
+              className="flex items-start gap-3 p-4 rounded-lg border border-slate-200 hover:border-teal-400 hover:bg-teal-50/30 transition-all cursor-pointer group"
+            >
+              {/* Checkbox */}
+              <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={() => handleCheckboxToggle(item.id)}
+                className="mt-0.5 h-5 w-5 rounded border-slate-300 text-teal-600 focus:ring-teal-500 focus:ring-offset-0 cursor-pointer"
+                aria-label={item.statement}
+              />
 
-                return (
-                  <div key={item.key}>
-                    <label className="block text-base sm:text-lg font-medium text-slate-800 mb-4">
-                      {item.question}
-                    </label>
-                    {/* Mobile-first responsive scale - UNCHANGED */}
-                    <div className="space-y-3">
-                      {/* Scale labels - UNCHANGED 0-10 scale */}
-                      <div className="flex justify-between text-xs sm:text-sm text-slate-500 px-1">
-                        <span className="text-left">Not at all</span>
-                        <span className="text-right">Completely</span>
-                      </div>
-
-                      {/* Rating buttons - UNCHANGED */}
-                      <div className="grid grid-cols-11 gap-1 sm:gap-2">
-                        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
-                          <button
-                            key={num}
-                            onClick={() => handleScoreChange(item.key, num)}
-                            className={`aspect-square text-xs sm:text-sm font-medium rounded-md sm:rounded-lg transition-colors ${score === num
-                              ? 'bg-teal-600 text-white'
-                              : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                              }`}
-                          >
-                            {num}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-
-        {/* School Engagement Checklist */}
-        <div className="border-t border-slate-200 pt-8">
-          <h3 className="text-lg font-semibold text-slate-900 mb-4">
-            School Well-Being Drivers Checklist
-          </h3>
-          <p className="text-slate-600 mb-4">
-            Which of the following statements apply to you? (Select all that apply)
-          </p>
-          <div className="grid grid-cols-1 gap-3">
-            {WELLBEING_CHECKLIST.map((item) => (
-              <label key={item} className="flex items-center cursor-pointer p-3 rounded-lg hover:bg-slate-50 transition-colors">
-                <input
-                  type="checkbox"
-                  checked={checklist.includes(item)}
-                  onChange={() => handleChecklistToggle(item)}
-                  className="h-5 w-5 text-teal-600 border-slate-300 rounded focus:ring-2 focus:ring-teal-500"
-                />
-                <span className="ml-3 text-slate-700">{item}</span>
-              </label>
-            ))}
-          </div>
-        </div>
+              {/* Statement text */}
+              <span className="flex-1 text-base text-slate-800 leading-relaxed select-none">
+                {item.statement}
+              </span>
+            </label>
+          );
+        })}
       </div>
 
       {/* Navigation */}
@@ -250,8 +149,7 @@ export default function SchoolWellbeingSection() {
         </button>
         <button
           onClick={handleNext}
-          disabled={!allQuestionsAnswered}
-          className="flex items-center justify-center bg-teal-600 hover:bg-teal-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white px-6 sm:px-8 py-3 rounded-lg font-semibold transition-colors"
+          className="flex items-center justify-center bg-teal-600 hover:bg-teal-700 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold transition-colors"
         >
           Continue
           <ChevronRight className="h-5 w-5 ml-1" />
