@@ -860,15 +860,9 @@ export class AnalyticsService {
    * @returns Object with driver scores or null values if no data available
    */
   private static calculateDriverScores(wellbeingData: any[]): Record<string, number | null> {
-    // Filter for v2 responses only
+    // Filter for v2 responses only - must have explicit v2 version
     const v2Responses = wellbeingData.filter(response => 
-      response.assessment_version === 'v2' || 
-      // If no version field, check if any v2 columns exist
-      (response.care_not_understood_supported !== undefined || 
-       response.access_hard_find_resources !== undefined ||
-       response.guidance_unsure_direction !== undefined ||
-       response.trust_messages_not_answered !== undefined ||
-       response.connection_no_mentor !== undefined)
+      response.assessment_version === 'v2'
     );
 
     if (v2Responses.length === 0) {
@@ -1098,15 +1092,9 @@ export class AnalyticsService {
    * @returns Growth Index Score rounded to 1 decimal place, or null if no v2 data available
    */
   private static calculateGrowthIndexScore(wellbeingData: any[]): number | null {
-    // Filter for v2 responses only
+    // Filter for v2 responses only - must have explicit v2 version
     const v2Responses = wellbeingData.filter(response => 
-      response.assessment_version === 'v2' || 
-      // If no version field, check if any v2 columns exist
-      (response.care_not_understood_supported !== undefined || 
-       response.access_hard_find_resources !== undefined ||
-       response.guidance_unsure_direction !== undefined ||
-       response.trust_messages_not_answered !== undefined ||
-       response.connection_no_mentor !== undefined)
+      response.assessment_version === 'v2'
     );
 
     if (v2Responses.length === 0) {
