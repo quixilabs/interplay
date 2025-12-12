@@ -217,7 +217,7 @@ export default function Dashboard() {
         {/* Key Metrics Overview */}
         <MetricsOverview data={filteredData || surveyData} />
 
-        {/* Support Driver Breakdown */}
+        {/* Growth Index Score Card */}
         <SupportDriverTiles driverScores={(filteredData || surveyData)?.driverScores} />
 
         {/* Primary Visualizations */}
