@@ -8,8 +8,8 @@ import SupportDriverTiles from './SupportDriverTiles';
 import FlourishingChart from './FlourishingChart';
 import ActionPathwayChart from './ActionPathwayChart';
 import DemographicsAnalysis from './DemographicsAnalysis';
-import InterventionMatrix from './InterventionMatrix';
-import ActionableInsights from './ActionableInsights';
+import KeyInsights from './KeyInsights';
+import StudentSuggestions from './StudentSuggestions';
 import TensionHeatmap from './TensionHeatmap';
 import InsightTiles from './InsightTiles';
 import EnablersBarriersBreakdown from './EnablersBarriersBreakdown';
@@ -246,8 +246,8 @@ export default function Dashboard() {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
-          <InterventionMatrix data={filteredData || surveyData} />
-          <ActionableInsights data={filteredData || surveyData} />
+          <KeyInsights data={filteredData || surveyData} />
+          <StudentSuggestions data={filteredData || surveyData} />
         </div>
 
         {/* Enablers & Barriers Detailed Analysis */}
