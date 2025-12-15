@@ -248,11 +248,6 @@ export default function Dashboard() {
           <TensionHeatmap data={filteredData || surveyData} />
         </section>
 
-        {/* Research Insights - Why It Matters */}
-        <section id="insights" className="mb-8">
-          <InsightTiles data={filteredData || surveyData} />
-        </section>
-
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
           <section id="key-insights">
             <KeyInsights data={filteredData || surveyData} />
@@ -265,6 +260,11 @@ export default function Dashboard() {
         {/* Enablers & Barriers Detailed Analysis */}
         <section id="enablers-barriers" className="mb-8">
           <EnablersBarriersBreakdown data={filteredData || surveyData} />
+        </section>
+
+        {/* Research Insights - Why It Matters */}
+        <section id="insights" className="mb-8">
+          <InsightTiles data={filteredData || surveyData} />
         </section>
 
         {/* School Wellbeing Trends

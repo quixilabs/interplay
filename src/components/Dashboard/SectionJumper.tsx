@@ -14,9 +14,10 @@ const sections: Section[] = [
   { id: 'growth-index', label: 'Growth Index', icon: '📈' },
   { id: 'action-pathway', label: 'Action Pathway', icon: '🎯' },
   { id: 'tensions', label: 'Tension Analysis', icon: '⚖️' },
-  { id: 'insights', label: 'Research Insights', icon: '💡' },
+  { id: 'key-insights', label: 'Key Actionable Insights', icon: '💡' },
   { id: 'student-voice', label: 'Student Voice', icon: '💬' },
-  { id: 'enablers-barriers', label: 'Enablers & Barriers', icon: '🔄' }
+  { id: 'enablers-barriers', label: 'Enablers & Barriers', icon: '🔄' },
+  { id: 'insights', label: 'Research Insights', icon: '📚' }
 ];
 
 export default function SectionJumper() {
