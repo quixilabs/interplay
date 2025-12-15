@@ -49,7 +49,7 @@ export default function FlourishingChart({ data }: FlourishingChartProps) {
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 h-full flex flex-col">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-2">
           <div>
