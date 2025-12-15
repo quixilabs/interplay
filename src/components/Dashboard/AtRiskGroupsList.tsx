@@ -16,60 +16,21 @@ interface AtRiskGroupsListProps {
 }
 
 export default function AtRiskGroupsList({ data }: AtRiskGroupsListProps) {
-  // Mock data structure - Replace this with actual backend data
-  // Nicole mentioned she can calculate this on the backend
-  const atRiskGroups: AtRiskGroup[] = [
-    {
-      rank: 1,
-      profile: 'Full-time students working 20+ hours/week',
-      description: 'Students balancing full course load with significant work commitments',
-      studentCount: 156,
-      totalInGroup: 867,
-      riskPercentage: 18,
-      riskLevel: 'high',
-      primaryConcerns: ['Financial Stability', 'Mental Health']
-    },
-    {
-      rank: 2,
-      profile: 'First-year students from low-income families',
-      description: 'New students facing financial challenges during transition',
-      studentCount: 142,
-      totalInGroup: 592,
-      riskPercentage: 24,
-      riskLevel: 'high',
-      primaryConcerns: ['Financial Stability', 'Social Relationships']
-    },
-    {
-      rank: 3,
-      profile: 'Transfer students working part-time',
-      description: 'Transfer students managing work while adjusting to new environment',
-      studentCount: 98,
-      totalInGroup: 653,
-      riskPercentage: 15,
-      riskLevel: 'medium',
-      primaryConcerns: ['Social Relationships', 'Meaning & Purpose']
-    },
-    {
-      rank: 4,
-      profile: 'International students in STEM programs',
-      description: 'International students in demanding academic programs',
-      studentCount: 76,
-      totalInGroup: 633,
-      riskPercentage: 12,
-      riskLevel: 'medium',
-      primaryConcerns: ['Mental Health', 'Social Relationships']
-    },
-    {
-      rank: 5,
-      profile: 'Part-time students over 25 years old',
-      description: 'Non-traditional students balancing multiple life responsibilities',
-      studentCount: 54,
-      totalInGroup: 284,
-      riskPercentage: 19,
-      riskLevel: 'medium',
-      primaryConcerns: ['Financial Stability', 'Character & Virtue']
-    }
-  ];
+  // Use real calculated at-risk groups from analytics service
+  const atRiskGroups: AtRiskGroup[] = data?.atRiskGroups || [];
+
+  // If no groups found, show a message
+  if (atRiskGroups.length === 0) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col h-full items-center justify-center">
+        <div className="text-center text-slate-500">
+          <Users className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+          <p className="font-medium">No at-risk groups identified</p>
+          <p className="text-sm mt-1">Need more survey responses to identify patterns</p>
+        </div>
+      </div>
+    );
+  }
 
   const getRiskLevelConfig = (level: 'high' | 'medium' | 'low') => {
     switch (level) {
@@ -100,6 +61,17 @@ export default function AtRiskGroupsList({ data }: AtRiskGroupsListProps) {
           iconColor: 'text-yellow-600',
           label: 'Low Risk'
         };
+      default:
+        // Fallback for unexpected values - treat as medium risk
+        console.warn(`Unexpected risk level: ${level}. Defaulting to medium risk.`);
+        return {
+          bgColor: 'bg-slate-50',
+          borderColor: 'border-slate-200',
+          badgeBg: 'bg-slate-100',
+          badgeText: 'text-slate-800',
+          iconColor: 'text-slate-600',
+          label: 'Unknown Risk'
+        };
     }
   };
 
@@ -122,7 +94,7 @@ export default function AtRiskGroupsList({ data }: AtRiskGroupsListProps) {
       <div className="space-y-3 overflow-y-auto pr-2 flex-1" style={{ maxHeight: '550px' }}>
         {atRiskGroups.map((group) => {
           const config = getRiskLevelConfig(group.riskLevel);
-          
+
           return (
             <div
               key={group.rank}
@@ -137,7 +109,7 @@ export default function AtRiskGroupsList({ data }: AtRiskGroupsListProps) {
                       {group.rank}
                     </div>
                   </div>
-                  
+
                   {/* Profile Info - More Compact */}
                   <div className="flex-1">
                     <h4 className="text-sm font-semibold text-slate-900 leading-tight">

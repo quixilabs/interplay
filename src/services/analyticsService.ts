@@ -181,6 +181,9 @@ export class AnalyticsService {
       // Calculate individual driver scores from v2 support barriers data
       const driverScores = this.calculateDriverScores(wellbeingData || []);
 
+      // Calculate intersectional at-risk groups
+      const atRiskGroups = this.calculateAtRiskGroups(responses);
+
       return {
         totalResponses,
         completionRate: Math.round(completionRate * 10) / 10,
@@ -196,7 +199,8 @@ export class AnalyticsService {
         responses,
         actionPathwayData,
         growthIndexScore,
-        driverScores
+        driverScores,
+        atRiskGroups
       };
     } catch (error) {
       console.error('Error fetching survey analytics:', error);
@@ -303,6 +307,166 @@ export class AnalyticsService {
     });
 
     return atRiskCount;
+  }
+
+  // Calculate intersectional at-risk groups
+  static calculateAtRiskGroups(responses: any[]) {
+    if (!responses || responses.length === 0) return [];
+
+    const domains = [
+      { key: 'happiness_satisfaction', label: 'Happiness & Satisfaction' },
+      { key: 'mental_physical_health', label: 'Mental Health' },
+      { key: 'meaning_purpose', label: 'Meaning & Purpose' },
+      { key: 'character_virtue', label: 'Character & Virtue' },
+      { key: 'social_relationships', label: 'Social Relationships' },
+      { key: 'financial_stability', label: 'Financial Stability' }
+    ];
+
+    // Helper to check if a student is at risk
+    const isStudentAtRisk = (flourishing: any) => {
+      if (!flourishing) return false;
+      return domains.some(domain => {
+        const score1 = flourishing[`${domain.key}_1`];
+        const score2 = flourishing[`${domain.key}_2`];
+        return (score1 !== null && score1 < 6) || (score2 !== null && score2 < 6);
+      });
+    };
+
+    // Helper to get primary concerns for a student
+    const getPrimaryConcerns = (flourishing: any) => {
+      if (!flourishing) return [];
+      const concerns: string[] = [];
+      domains.forEach(domain => {
+        const score1 = flourishing[`${domain.key}_1`];
+        const score2 = flourishing[`${domain.key}_2`];
+        if ((score1 !== null && score1 < 6) || (score2 !== null && score2 < 6)) {
+          concerns.push(domain.label);
+        }
+      });
+      return concerns;
+    };
+
+    // Define intersectional group combinations to analyze
+    interface GroupDefinition {
+      name: string;
+      matcher: (demo: any) => boolean;
+      description: string;
+    }
+
+    const groupDefinitions: GroupDefinition[] = [
+      {
+        name: 'Full-time students working 20+ hours/week',
+        matcher: (demo) => 
+          demo.enrollment_status === 'Full-time' && 
+          (demo.employment_status === 'Part-time (20+ hours/week)' || demo.employment_status === 'Full-time'),
+        description: 'Students balancing full course load with significant work commitments'
+      },
+      {
+        name: 'First-year students from low-income families',
+        matcher: (demo) => 
+          (demo.year_in_school === 'First year/Freshman') && 
+          (demo.employment_status === 'Full-time' || demo.employment_status === 'Part-time (20+ hours/week)'),
+        description: 'New students facing financial challenges during transition'
+      },
+      {
+        name: 'Transfer students working part-time',
+        matcher: (demo) => 
+          (demo.transfer_student === 'Yes, I transferred this year' || demo.transfer_student === 'Yes, I transferred last year') &&
+          (demo.employment_status === 'Part-time (less than 20 hours/week)' || demo.employment_status === 'Part-time (20+ hours/week)'),
+        description: 'Transfer students managing work while adjusting to new environment'
+      },
+      {
+        name: 'International students in STEM fields',
+        matcher: (demo) => 
+          demo.is_international === 'Yes, international student',
+        description: 'International students facing cultural and academic adjustment challenges'
+      },
+      {
+        name: 'Part-time students over 25 years old',
+        matcher: (demo) => 
+          demo.enrollment_status === 'Part-time' && 
+          demo.age_range === '25 or older',
+        description: 'Non-traditional students balancing multiple life responsibilities'
+      },
+      {
+        name: 'Students with caregiving responsibilities',
+        matcher: (demo) => 
+          demo.has_caregiving_responsibilities === 'Yes',
+        description: 'Students managing family or caregiving duties alongside studies'
+      },
+      {
+        name: 'Graduate students working full-time',
+        matcher: (demo) => 
+          demo.year_in_school === 'Graduate student' && 
+          demo.employment_status === 'Full-time',
+        description: 'Graduate students balancing advanced studies with full-time employment'
+      },
+      {
+        name: 'First-generation transfer students',
+        matcher: (demo) => 
+          (demo.transfer_student === 'Yes, I transferred this year' || demo.transfer_student === 'Yes, I transferred last year'),
+        description: 'Transfer students navigating new academic environment'
+      },
+      {
+        name: 'Online/hybrid students with employment',
+        matcher: (demo) => 
+          (demo.study_mode === 'Entirely online' || demo.study_mode === 'Hybrid (a mix of in-person and online)') &&
+          (demo.employment_status !== 'Not employed' && demo.employment_status !== 'Prefer not to say'),
+        description: 'Remote learners juggling work and studies'
+      },
+      {
+        name: 'Senior/graduate students with caregiving duties',
+        matcher: (demo) => 
+          (demo.year_in_school === 'Fourth year/Senior' || demo.year_in_school === 'Graduate student') &&
+          demo.has_caregiving_responsibilities === 'Yes',
+        description: 'Advanced students with family responsibilities'
+      }
+    ];
+
+    // Calculate statistics for each group
+    const groupStats = groupDefinitions.map(groupDef => {
+      const groupMembers = responses.filter(r => r.demographics && groupDef.matcher(r.demographics));
+      const atRiskMembers = groupMembers.filter(r => isStudentAtRisk(r.flourishing));
+      
+      // Get most common concerns for at-risk members
+      const allConcerns: string[] = [];
+      atRiskMembers.forEach(member => {
+        allConcerns.push(...getPrimaryConcerns(member.flourishing));
+      });
+      
+      // Count concern frequency
+      const concernCounts: Record<string, number> = {};
+      allConcerns.forEach(concern => {
+        concernCounts[concern] = (concernCounts[concern] || 0) + 1;
+      });
+      
+      // Get top 2 concerns
+      const primaryConcerns = Object.entries(concernCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 2)
+        .map(([concern]) => concern);
+
+      return {
+        profile: groupDef.name,
+        description: groupDef.description,
+        studentCount: atRiskMembers.length,
+        totalInGroup: groupMembers.length,
+        riskPercentage: groupMembers.length > 0 ? Math.round((atRiskMembers.length / groupMembers.length) * 100) : 0,
+        primaryConcerns: primaryConcerns.length > 0 ? primaryConcerns : ['Multiple Domains']
+      };
+    }).filter(group => group.totalInGroup >= 5); // Only include groups with at least 5 students
+
+    // Sort by number of at-risk students (absolute count) and get top 5
+    const topGroups = groupStats
+      .sort((a, b) => b.studentCount - a.studentCount)
+      .slice(0, 5)
+      .map((group, index) => ({
+        rank: index + 1,
+        ...group,
+        riskLevel: group.riskPercentage >= 20 ? 'high' as const : group.riskPercentage >= 10 ? 'medium' as const : 'low' as const
+      }));
+
+    return topGroups;
   }
 
   private static calculateSchoolWellbeingAverages(data: any[]) {

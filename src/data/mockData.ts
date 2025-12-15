@@ -386,6 +386,71 @@ export const mockSurveyData = {
     totalResponses: 1043
   },
 
+  // Growth Index Score and Driver Scores (from v2 support barriers)
+  growthIndexScore: 8.0,
+  
+  driverScores: {
+    trust: 10.0,
+    access: 10.0,
+    care: 10.0,
+    guidance: 5.0,
+    connection: 5.0
+  },
+
+  // Intersectional At-Risk Student Groups
+  atRiskGroups: [
+    {
+      rank: 1,
+      profile: 'Full-time students working 20+ hours/week',
+      description: 'Students balancing full course load with significant work commitments',
+      studentCount: 156,
+      totalInGroup: 867,
+      riskPercentage: 18,
+      riskLevel: 'medium',
+      primaryConcerns: ['Financial Stability', 'Mental Health']
+    },
+    {
+      rank: 2,
+      profile: 'First-year students from low-income families',
+      description: 'New students facing financial challenges during transition',
+      studentCount: 142,
+      totalInGroup: 592,
+      riskPercentage: 24,
+      riskLevel: 'high',
+      primaryConcerns: ['Financial Stability', 'Social Relationships']
+    },
+    {
+      rank: 3,
+      profile: 'Transfer students working part-time',
+      description: 'Transfer students managing work while adjusting to new environment',
+      studentCount: 98,
+      totalInGroup: 653,
+      riskPercentage: 15,
+      riskLevel: 'medium',
+      primaryConcerns: ['Social Relationships', 'Meaning & Purpose']
+    },
+    {
+      rank: 4,
+      profile: 'International students in STEM fields',
+      description: 'International students facing cultural and academic adjustment challenges',
+      studentCount: 76,
+      totalInGroup: 633,
+      riskPercentage: 12,
+      riskLevel: 'medium',
+      primaryConcerns: ['Mental Health', 'Social Relationships']
+    },
+    {
+      rank: 5,
+      profile: 'Part-time students over 25 years old',
+      description: 'Non-traditional students balancing multiple life responsibilities',
+      studentCount: 54,
+      totalInGroup: 284,
+      riskPercentage: 19,
+      riskLevel: 'medium',
+      primaryConcerns: ['Financial Stability', 'Character & Virtue']
+    }
+  ],
+
   // Generate mock individual response data for filtering
   responses: generateMockResponses(1043)
 };
