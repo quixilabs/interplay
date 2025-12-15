@@ -1,18 +1,19 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import DashboardHeader from '../Dashboard/DashboardHeader';
-import { Building2, Lock, FileText, Download, User } from 'lucide-react';
+import { Building2, Lock, FileText, Download, User, ArrowLeft } from 'lucide-react';
 
 type SettingsTab = 'profile' | 'account' | 'survey' | 'data';
 
 export default function AdminSettings() {
   const { adminUser } = useAuthStore();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
 
   // Form states
-  const [universityName, setUniversityName] = useState(adminUser?.universityName || '');
   const [contactEmail, setContactEmail] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -67,6 +68,15 @@ export default function AdminSettings() {
       />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate('/admin/dashboard')}
+          className="flex items-center gap-2 text-warm-gray hover:text-sage transition-colors mb-6 group"
+        >
+          <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+          <span>Back to Dashboard</span>
+        </button>
+
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-navy font-primary mb-2">Settings</h1>
@@ -76,8 +86,8 @@ export default function AdminSettings() {
         {/* Save Message */}
         {saveMessage && (
           <div className={`mb-6 p-4 rounded-brand ${saveMessage.includes('success')
-              ? 'bg-sage/10 text-sage border border-sage/30'
-              : 'bg-danger/10 text-danger border border-danger/30'
+            ? 'bg-sage/10 text-sage border border-sage/30'
+            : 'bg-danger/10 text-danger border border-danger/30'
             }`}>
             {saveMessage}
           </div>
@@ -94,8 +104,8 @@ export default function AdminSettings() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center gap-2 px-4 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.id
-                        ? 'border-sage text-sage'
-                        : 'border-transparent text-warm-gray hover:text-navy hover:border-warm-gray/30'
+                      ? 'border-sage text-sage'
+                      : 'border-transparent text-warm-gray hover:text-navy hover:border-warm-gray/30'
                       }`}
                   >
                     <Icon className="h-4 w-4" />
@@ -123,11 +133,11 @@ export default function AdminSettings() {
                     </label>
                     <input
                       type="text"
-                      value={universityName}
-                      onChange={(e) => setUniversityName(e.target.value)}
-                      className="w-full px-4 py-2 border border-warm-gray/30 rounded-brand focus:outline-none focus:ring-2 focus:ring-sage focus:border-sage"
-                      placeholder="Enter university name"
+                      value={adminUser?.universityName || ''}
+                      disabled
+                      className="w-full px-4 py-2 border border-warm-gray/30 rounded-brand bg-gray-50 text-warm-gray cursor-not-allowed"
                     />
+                    <p className="text-xs text-warm-gray mt-1">University name cannot be changed.</p>
                   </div>
 
                   <div>
