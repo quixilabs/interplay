@@ -17,7 +17,10 @@ interface AtRiskGroupsListProps {
 
 export default function AtRiskGroupsList({ data }: AtRiskGroupsListProps) {
   // Use real calculated at-risk groups from analytics service
-  const atRiskGroups: AtRiskGroup[] = data?.atRiskGroups || [];
+  const atRiskData = data?.atRiskGroups || {};
+  const atRiskGroups: AtRiskGroup[] = atRiskData.groups || [];
+  const uniqueStudentCount = atRiskData.uniqueStudentCount || 0;
+  const totalOccurrences = atRiskData.totalOccurrences || 0;
 
   // If no groups found, show a message
   if (atRiskGroups.length === 0) {
@@ -162,12 +165,19 @@ export default function AtRiskGroupsList({ data }: AtRiskGroupsListProps) {
       {/* Summary Footer */}
       <div className="mt-4 pt-3 border-t border-slate-200 flex-shrink-0">
         <div className="flex items-center justify-between text-sm">
-          <p className="text-slate-600">
-            <span className="font-semibold text-slate-900">
-              {atRiskGroups.reduce((sum, group) => sum + group.studentCount, 0)}
-            </span>
-            {' '}students identified across top 5 at-risk groups
-          </p>
+          <div className="text-slate-600">
+            <p>
+              <span className="font-semibold text-slate-900">
+                {uniqueStudentCount}
+              </span>
+              {' '}unique students identified across top 5 at-risk groups
+            </p>
+            {totalOccurrences > uniqueStudentCount && (
+              <p className="text-xs text-slate-500 mt-1">
+                ({totalOccurrences - uniqueStudentCount} students belong to multiple groups)
+              </p>
+            )}
+          </div>
           <button className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors">
             View Detailed Report →
           </button>

@@ -452,7 +452,8 @@ export class AnalyticsService {
         studentCount: atRiskMembers.length,
         totalInGroup: groupMembers.length,
         riskPercentage: groupMembers.length > 0 ? Math.round((atRiskMembers.length / groupMembers.length) * 100) : 0,
-        primaryConcerns: primaryConcerns.length > 0 ? primaryConcerns : ['Multiple Domains']
+        primaryConcerns: primaryConcerns.length > 0 ? primaryConcerns : ['Multiple Domains'],
+        atRiskMemberIds: atRiskMembers.map(m => m.id) // Track unique student IDs
       };
     }).filter(group => group.totalInGroup > 0); // Only include groups that have at least 1 student
 
@@ -466,7 +467,17 @@ export class AnalyticsService {
         riskLevel: group.riskPercentage >= 20 ? 'high' as const : group.riskPercentage >= 10 ? 'medium' as const : 'low' as const
       }));
 
-    return topGroups;
+    // Calculate unique students across all top 5 groups (to avoid double-counting)
+    const allAtRiskStudentIds = new Set<string>();
+    topGroups.forEach(group => {
+      group.atRiskMemberIds.forEach((id: string) => allAtRiskStudentIds.add(id));
+    });
+
+    return {
+      groups: topGroups,
+      uniqueStudentCount: allAtRiskStudentIds.size,
+      totalOccurrences: topGroups.reduce((sum, group) => sum + group.studentCount, 0)
+    };
   }
 
   private static calculateSchoolWellbeingAverages(data: any[]) {
