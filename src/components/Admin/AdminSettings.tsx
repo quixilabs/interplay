@@ -18,7 +18,6 @@ export default function AdminSettings() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [username, setUsername] = useState(adminUser?.username || '');
 
   const handleSaveProfile = async () => {
     setIsSaving(true);
@@ -198,19 +197,12 @@ export default function AdminSettings() {
                       </label>
                       <input
                         type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        className="w-full px-4 py-2 border border-warm-gray/30 rounded-brand focus:outline-none focus:ring-2 focus:ring-sage focus:border-sage"
-                        placeholder="Enter username"
+                        value={adminUser?.username || ''}
+                        disabled
+                        className="w-full px-4 py-2 border border-warm-gray/30 rounded-brand bg-gray-50 text-warm-gray cursor-not-allowed"
                       />
+                      <p className="text-xs text-warm-gray mt-1">Username cannot be changed.</p>
                     </div>
-                    <button
-                      onClick={handleSaveProfile}
-                      disabled={isSaving}
-                      className="btn-primary px-6 py-2"
-                    >
-                      Update Username
-                    </button>
                   </div>
                 </div>
 

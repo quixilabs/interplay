@@ -1,6 +1,6 @@
 import { useAuthStore } from '../../stores/authStore';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { BarChart3, Calendar, LogOut, Settings, BarChart2, FileText } from 'lucide-react';
+import { BarChart3, Calendar, LogOut, Settings } from 'lucide-react';
 
 interface DashboardHeaderProps {
   universityName: string;
@@ -14,7 +14,6 @@ export default function DashboardHeader({ universityName, dateRange, onDateRange
   const navigate = useNavigate();
 
   const isSettingsPage = location.pathname === '/admin/settings';
-  const showNavigation = location.pathname.startsWith('/admin/') && !isSettingsPage;
 
   return (
     <header className="bg-white shadow-brand border-b border-gray-200">
@@ -31,8 +30,8 @@ export default function DashboardHeader({ universityName, dateRange, onDateRange
 
           {/* Controls */}
           <div className="flex items-center space-x-4">
-            {/* Date Range Selector - Only show on dashboard and surveys pages */}
-            {showNavigation && (
+            {/* Date Range Selector - Only show on dashboard page */}
+            {!isSettingsPage && (
               <div className="flex items-center space-x-2">
                 <Calendar className="h-5 w-5 text-warm-gray" />
                 <select
@@ -68,33 +67,6 @@ export default function DashboardHeader({ universityName, dateRange, onDateRange
           </div>
         </div>
 
-        {/* Navigation Tabs - Only show on dashboard and surveys pages */}
-        {showNavigation && (
-          <nav className="border-t border-gray-200" aria-label="Main navigation">
-            <div className="flex space-x-8">
-              <button
-                onClick={() => navigate('/admin/dashboard')}
-                className={`flex items-center gap-2 px-3 py-3 text-sm font-medium border-b-2 transition-colors ${location.pathname === '/admin/dashboard'
-                    ? 'border-sage text-sage'
-                    : 'border-transparent text-warm-gray hover:text-navy hover:border-warm-gray/30'
-                  }`}
-              >
-                <BarChart2 className="h-4 w-4" />
-                Analytics Dashboard
-              </button>
-              <button
-                onClick={() => navigate('/admin/surveys')}
-                className={`flex items-center gap-2 px-3 py-3 text-sm font-medium border-b-2 transition-colors ${location.pathname === '/admin/surveys'
-                    ? 'border-sage text-sage'
-                    : 'border-transparent text-warm-gray hover:text-navy hover:border-warm-gray/30'
-                  }`}
-              >
-                <FileText className="h-4 w-4" />
-                Survey Responses
-              </button>
-            </div>
-          </nav>
-        )}
       </div>
     </header>
   );
