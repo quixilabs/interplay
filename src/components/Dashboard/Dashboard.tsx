@@ -7,7 +7,7 @@ import MetricsOverview from './MetricsOverview';
 import SupportDriverTiles from './SupportDriverTiles';
 import FlourishingChart from './FlourishingChart';
 import ActionPathwayChart from './ActionPathwayChart';
-import DemographicsAnalysis from './DemographicsAnalysis';
+import AtRiskGroupsList from './AtRiskGroupsList';
 import KeyInsights from './KeyInsights';
 import StudentSuggestions from './StudentSuggestions';
 import TensionHeatmap from './TensionHeatmap';
@@ -19,7 +19,6 @@ import { DemographicsFilters, DEFAULT_FILTERS } from '../../types/filters';
 export default function Dashboard() {
   const { adminUser } = useAuthStore();
   const [dateRange, setDateRange] = useState('semester');
-  const [selectedDemographic, setSelectedDemographic] = useState('yearInSchool');
   const [filters, setFilters] = useState<DemographicsFilters>(DEFAULT_FILTERS);
   const [surveyData, setSurveyData] = useState<any>(null);
   const [filteredData, setFilteredData] = useState<any>(null);
@@ -221,15 +220,11 @@ export default function Dashboard() {
 
         {/* Primary Visualizations */}
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
-          <section id="flourishing">
+          <section id="flourishing" className="flex">
             <FlourishingChart data={filteredData || surveyData} />
           </section>
-          <section id="demographics">
-            <DemographicsAnalysis
-              data={filteredData || surveyData}
-              selectedDemographic={selectedDemographic}
-              onDemographicChange={setSelectedDemographic}
-            />
+          <section id="at-risk-groups" className="flex">
+            <AtRiskGroupsList data={filteredData || surveyData} />
           </section>
         </div>
 
