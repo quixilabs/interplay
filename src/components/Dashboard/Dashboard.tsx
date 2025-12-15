@@ -215,45 +215,57 @@ export default function Dashboard() {
         />
 
         {/* Key Metrics Overview */}
-        <MetricsOverview data={filteredData || surveyData} />
+        <section id="metrics">
+          <MetricsOverview data={filteredData || surveyData} />
+        </section>
 
         {/* Primary Visualizations */}
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
-          <FlourishingChart data={filteredData || surveyData} />
-          <DemographicsAnalysis
-            data={filteredData || surveyData}
-            selectedDemographic={selectedDemographic}
-            onDemographicChange={setSelectedDemographic}
-          />
+          <section id="flourishing">
+            <FlourishingChart data={filteredData || surveyData} />
+          </section>
+          <section id="demographics">
+            <DemographicsAnalysis
+              data={filteredData || surveyData}
+              selectedDemographic={selectedDemographic}
+              onDemographicChange={setSelectedDemographic}
+            />
+          </section>
         </div>
 
         {/* Growth Index Score Card */}
-        <SupportDriverTiles driverScores={(filteredData || surveyData)?.driverScores} />
+        <section id="growth-index">
+          <SupportDriverTiles driverScores={(filteredData || surveyData)?.driverScores} />
+        </section>
 
         {/* Conditions for Success - Critical Action Path */}
-        <div className="mb-8">
+        <section id="action-pathway" className="mb-8">
           <ActionPathwayChart data={filteredData || surveyData} />
-        </div>
+        </section>
 
         {/* Tension Heatmap - Our IP Highlight */}
-        <div className="mb-8">
+        <section id="tensions" className="mb-8">
           <TensionHeatmap data={filteredData || surveyData} />
-        </div>
-
-        {/* Research Insights - Why It Matters */}
-        <div className="mb-8">
-          <InsightTiles data={filteredData || surveyData} />
-        </div>
+        </section>
 
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
-          <KeyInsights data={filteredData || surveyData} />
-          <StudentSuggestions data={filteredData || surveyData} />
+          <section id="key-insights">
+            <KeyInsights data={filteredData || surveyData} />
+          </section>
+          <section id="student-voice">
+            <StudentSuggestions data={filteredData || surveyData} />
+          </section>
         </div>
 
         {/* Enablers & Barriers Detailed Analysis */}
-        <div className="mb-8">
+        <section id="enablers-barriers" className="mb-8">
           <EnablersBarriersBreakdown data={filteredData || surveyData} />
-        </div>
+        </section>
+
+        {/* Research Insights - Why It Matters */}
+        <section id="insights" className="mb-8">
+          <InsightTiles data={filteredData || surveyData} />
+        </section>
 
         {/* School Wellbeing Trends
         <div className="mb-8">

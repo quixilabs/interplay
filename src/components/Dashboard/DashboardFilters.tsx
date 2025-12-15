@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp, Filter, X, RotateCcw } from 'lucide-react';
 import { DemographicsFilters, DEFAULT_FILTERS, FILTER_OPTIONS, FILTER_LABELS } from '../../types/filters';
 import { CompactFilterDisplay, MobileFilterCount } from './ActiveFilterBadge';
 import { getActiveFilters, clearFilter, hasActiveFilters, getActiveFilterCount } from '../../utils/filterHelpers';
+import SectionJumper from './SectionJumper';
 
 interface DashboardFiltersProps {
   filters: DemographicsFilters;
@@ -290,6 +291,9 @@ export default function DashboardFilters({ filters, onFiltersChange, data }: Das
                   />
                 )}
               </div>
+
+              {/* Section Jumper */}
+              <SectionJumper />
 
               {/* Clear all button */}
               {hasAnyFilters && (

@@ -1,4 +1,5 @@
 import { useAuthStore } from '../../stores/authStore';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { BarChart3, Calendar, LogOut, Settings } from 'lucide-react';
 
 interface DashboardHeaderProps {
@@ -9,6 +10,10 @@ interface DashboardHeaderProps {
 
 export default function DashboardHeader({ universityName, dateRange, onDateRangeChange }: DashboardHeaderProps) {
   const { logout } = useAuthStore();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const isSettingsPage = location.pathname === '/admin/settings';
 
   return (
     <header className="bg-white shadow-brand border-b border-gray-200">
@@ -25,24 +30,30 @@ export default function DashboardHeader({ universityName, dateRange, onDateRange
 
           {/* Controls */}
           <div className="flex items-center space-x-4">
-            {/* Date Range Selector */}
-            <div className="flex items-center space-x-2">
-              <Calendar className="h-5 w-5 text-warm-gray" />
-              <select
-                value={dateRange}
-                onChange={(e) => onDateRangeChange(e.target.value)}
-                className="border border-gray-300 rounded-brand px-3 py-2 text-sm font-primary focus:outline-none focus:ring-2 focus:ring-sage focus:border-sage"
-              >
-                <option value="week">Past Week</option>
-                <option value="month">Past Month</option>
-                <option value="semester">Current Semester</option>
-                <option value="year">Academic Year</option>
-                <option value="all">All Time</option>
-              </select>
-            </div>
+            {/* Date Range Selector - Only show on dashboard page */}
+            {!isSettingsPage && (
+              <div className="flex items-center space-x-2">
+                <Calendar className="h-5 w-5 text-warm-gray" />
+                <select
+                  value={dateRange}
+                  onChange={(e) => onDateRangeChange(e.target.value)}
+                  className="border border-gray-300 rounded-brand px-3 py-2 text-sm font-primary focus:outline-none focus:ring-2 focus:ring-sage focus:border-sage"
+                >
+                  <option value="week">Past Week</option>
+                  <option value="month">Past Month</option>
+                  <option value="semester">Current Semester</option>
+                  <option value="year">Academic Year</option>
+                  <option value="all">All Time</option>
+                </select>
+              </div>
+            )}
 
             {/* Action Buttons */}
-            <button className="p-2 text-warm-gray hover:text-navy transition-colors">
+            <button
+              onClick={() => navigate('/admin/settings')}
+              className="p-2 text-warm-gray hover:text-navy transition-colors"
+              aria-label="Settings"
+            >
               <Settings className="h-5 w-5" />
             </button>
 
@@ -55,6 +66,7 @@ export default function DashboardHeader({ universityName, dateRange, onDateRange
             </button>
           </div>
         </div>
+
       </div>
     </header>
   );
