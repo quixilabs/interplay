@@ -164,23 +164,18 @@ export default function AtRiskGroupsList({ data }: AtRiskGroupsListProps) {
 
       {/* Summary Footer */}
       <div className="mt-4 pt-3 border-t border-slate-200 flex-shrink-0">
-        <div className="flex items-center justify-between text-sm">
-          <div className="text-slate-600">
-            <p>
-              <span className="font-semibold text-slate-900">
-                {uniqueStudentCount}
-              </span>
-              {' '}unique students identified across top 5 at-risk groups
+        <div className="text-slate-600 text-sm">
+          <p>
+            <span className="font-semibold text-slate-900">
+              {uniqueStudentCount}
+            </span>
+            {' '}unique students identified across top 5 at-risk groups
+          </p>
+          {totalOccurrences > uniqueStudentCount && (
+            <p className="text-xs text-slate-500 mt-1">
+              ({totalOccurrences - uniqueStudentCount} students belong to multiple groups)
             </p>
-            {totalOccurrences > uniqueStudentCount && (
-              <p className="text-xs text-slate-500 mt-1">
-                ({totalOccurrences - uniqueStudentCount} students belong to multiple groups)
-              </p>
-            )}
-          </div>
-          <button className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors">
-            View Detailed Report →
-          </button>
+          )}
         </div>
       </div>
     </div>
