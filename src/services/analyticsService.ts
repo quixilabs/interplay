@@ -357,68 +357,68 @@ export class AnalyticsService {
       {
         name: 'Full-time students working 20+ hours/week',
         matcher: (demo) => 
-          demo.enrollment_status === 'Full-time' && 
-          (demo.employment_status === 'Part-time (20+ hours/week)' || demo.employment_status === 'Full-time'),
+          demo.enrollmentStatus === 'Full-time' && 
+          (demo.employmentStatus === 'Part-time (20+ hours/week)' || demo.employmentStatus === 'Full-time'),
         description: 'Students balancing full course load with significant work commitments'
       },
       {
         name: 'First-year students from low-income families',
         matcher: (demo) => 
-          (demo.year_in_school === 'First year/Freshman') && 
-          (demo.employment_status === 'Full-time' || demo.employment_status === 'Part-time (20+ hours/week)'),
+          (demo.yearInSchool === 'First year/Freshman') && 
+          (demo.employmentStatus === 'Full-time' || demo.employmentStatus === 'Part-time (20+ hours/week)'),
         description: 'New students facing financial challenges during transition'
       },
       {
         name: 'Transfer students working part-time',
         matcher: (demo) => 
-          (demo.transfer_student === 'Yes, I transferred this year' || demo.transfer_student === 'Yes, I transferred last year') &&
-          (demo.employment_status === 'Part-time (less than 20 hours/week)' || demo.employment_status === 'Part-time (20+ hours/week)'),
+          (demo.transferStudent === 'Yes, I transferred this year' || demo.transferStudent === 'Yes, I transferred last year') &&
+          (demo.employmentStatus === 'Part-time (less than 20 hours/week)' || demo.employmentStatus === 'Part-time (20+ hours/week)'),
         description: 'Transfer students managing work while adjusting to new environment'
       },
       {
-        name: 'International students in STEM fields',
+        name: 'International students',
         matcher: (demo) => 
-          demo.is_international === 'Yes, international student',
+          demo.isInternational === 'Yes, international student',
         description: 'International students facing cultural and academic adjustment challenges'
       },
       {
         name: 'Part-time students over 25 years old',
         matcher: (demo) => 
-          demo.enrollment_status === 'Part-time' && 
-          demo.age_range === '25 or older',
+          demo.enrollmentStatus === 'Part-time' && 
+          demo.ageRange === '25 or older',
         description: 'Non-traditional students balancing multiple life responsibilities'
       },
       {
         name: 'Students with caregiving responsibilities',
         matcher: (demo) => 
-          demo.has_caregiving_responsibilities === 'Yes',
+          demo.hasCaregavingResponsibilities === 'Yes',
         description: 'Students managing family or caregiving duties alongside studies'
       },
       {
         name: 'Graduate students working full-time',
         matcher: (demo) => 
-          demo.year_in_school === 'Graduate student' && 
-          demo.employment_status === 'Full-time',
+          demo.yearInSchool === 'Graduate student' && 
+          demo.employmentStatus === 'Full-time',
         description: 'Graduate students balancing advanced studies with full-time employment'
       },
       {
         name: 'First-generation transfer students',
         matcher: (demo) => 
-          (demo.transfer_student === 'Yes, I transferred this year' || demo.transfer_student === 'Yes, I transferred last year'),
+          (demo.transferStudent === 'Yes, I transferred this year' || demo.transferStudent === 'Yes, I transferred last year'),
         description: 'Transfer students navigating new academic environment'
       },
       {
         name: 'Online/hybrid students with employment',
         matcher: (demo) => 
-          (demo.study_mode === 'Entirely online' || demo.study_mode === 'Hybrid (a mix of in-person and online)') &&
-          (demo.employment_status !== 'Not employed' && demo.employment_status !== 'Prefer not to say'),
+          (demo.studyMode === 'Entirely online' || demo.studyMode === 'Hybrid (a mix of in-person and online)') &&
+          (demo.employmentStatus !== 'Not employed' && demo.employmentStatus !== 'Prefer not to say'),
         description: 'Remote learners juggling work and studies'
       },
       {
         name: 'Senior/graduate students with caregiving duties',
         matcher: (demo) => 
-          (demo.year_in_school === 'Fourth year/Senior' || demo.year_in_school === 'Graduate student') &&
-          demo.has_caregiving_responsibilities === 'Yes',
+          (demo.yearInSchool === 'Fourth year/Senior' || demo.yearInSchool === 'Graduate student') &&
+          demo.hasCaregavingResponsibilities === 'Yes',
         description: 'Advanced students with family responsibilities'
       }
     ];
@@ -454,7 +454,7 @@ export class AnalyticsService {
         riskPercentage: groupMembers.length > 0 ? Math.round((atRiskMembers.length / groupMembers.length) * 100) : 0,
         primaryConcerns: primaryConcerns.length > 0 ? primaryConcerns : ['Multiple Domains']
       };
-    }).filter(group => group.totalInGroup >= 5); // Only include groups with at least 5 students
+    }).filter(group => group.totalInGroup > 0); // Only include groups that have at least 1 student
 
     // Sort by number of at-risk students (absolute count) and get top 5
     const topGroups = groupStats
