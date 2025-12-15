@@ -105,11 +105,11 @@ export default function ActionPathwayChart({ data }: ActionPathwayChartProps) {
     if (!actionPathwayData) {
         return (
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">Action Pathway</h3>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">Conditions for Success</h3>
                 <div className="flex items-center justify-center h-64">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-300 border-t-blue-500 mx-auto mb-2"></div>
-                        <p className="text-sm text-slate-500">Loading action pathway data...</p>
+                        <p className="text-sm text-slate-500">Loading conditions for success data...</p>
                     </div>
                 </div>
             </div>
@@ -120,7 +120,7 @@ export default function ActionPathwayChart({ data }: ActionPathwayChartProps) {
     if (actionPathwayData.domains.length === 0) {
         return (
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">Action Pathway</h3>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">Conditions for Success</h3>
                 <p className="text-sm text-slate-600 mb-4">
                     Prioritized domains with top enablers and barriers
                 </p>
@@ -141,7 +141,7 @@ export default function ActionPathwayChart({ data }: ActionPathwayChartProps) {
                         </svg>
                         <p className="text-slate-600 font-medium mb-1">No Data Available</p>
                         <p className="text-sm text-slate-500">
-                            Student responses are needed to generate the action pathway.
+                            Student responses are needed to generate the conditions for success.
                         </p>
                     </div>
                 </div>
@@ -154,7 +154,7 @@ export default function ActionPathwayChart({ data }: ActionPathwayChartProps) {
             {/* Header */}
             <div className="mb-6">
                 <div className="flex items-center space-x-2 mb-2">
-                    <h3 className="text-lg font-semibold text-slate-900">Action Pathway</h3>
+                    <h3 className="text-lg font-semibold text-slate-900">Conditions for Success</h3>
                     <ChartTooltip
                         title="How to use this chart"
                         content={[

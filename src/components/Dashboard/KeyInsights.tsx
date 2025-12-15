@@ -1,11 +1,11 @@
 import { Lightbulb, TrendingUp, AlertTriangle, Star } from 'lucide-react';
 import ChartTooltip from './ChartTooltip';
 
-interface ActionableInsightsProps {
+interface KeyInsightsProps {
   data: any;
 }
 
-export default function ActionableInsights({ data }: ActionableInsightsProps) {
+export default function KeyInsights({ data }: KeyInsightsProps) {
   // Generate dynamic insights based on real data
   const interventionAnalysis = data?.interventionAnalysis || {};
   const topIntervention = interventionAnalysis?.topInterventions?.[0] || interventionAnalysis?.topEnablers?.[0];
@@ -69,14 +69,6 @@ export default function ActionableInsights({ data }: ActionableInsightsProps) {
     }
   ];
 
-  // Use real fastest win suggestions from data
-  const rawSuggestions = data?.fastestWinSuggestions || [];
-  const fastestWinSuggestions = rawSuggestions.slice(0, 5).map((suggestion: string, index: number) => ({
-    suggestion,
-    frequency: Math.max(5, 25 - (index * 3)), // Simulate decreasing frequency
-    theme: 'Student Suggestion' // Could be enhanced with categorization logic
-  }));
-
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
       case 'high': return 'border-red-200 bg-red-50';
@@ -97,74 +89,43 @@ export default function ActionableInsights({ data }: ActionableInsightsProps) {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Key Insights */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <div className="flex items-center space-x-2 mb-4">
-          <h3 className="text-lg font-semibold text-slate-900">Key Actionable Insights</h3>
-          <ChartTooltip
-            title="How to use these insights"
-            content={[
-              "These insights translate your data into specific, prioritized actions. Each insight card shows a recommendation, the supporting evidence, and suggested next steps.",
-              "Priority levels (High, Medium, Low) indicate urgency. Focus on High Priority items first for maximum impact.",
-              "The 'Top Student Suggestions' section below shows verbatim improvement ideas from students—implement 2-3 of these for quick wins."
-            ]}
-          />
-        </div>
-        <div className="space-y-4">
-          {insights.map((insight, index) => (
-            <div key={index} className={`border rounded-lg p-4 ${getUrgencyColor(insight.urgency)}`}>
-              <div className="flex items-start space-x-3">
-                <insight.icon className={`h-6 w-6 mt-0.5 ${getIconColor(insight.type)}`} />
-                <div className="flex-1">
-                  <h4 className="font-semibold text-slate-900">{insight.title}</h4>
-                  <p className="text-slate-700 mt-1 text-sm">{insight.content}</p>
-                  <div className="mt-2 flex items-center justify-between">
-                    <span className="text-xs font-medium text-slate-600 bg-white px-2 py-1 rounded">
-                      Action: {insight.action}
-                    </span>
-                    <span className={`text-xs font-medium px-2 py-1 rounded ${insight.urgency === 'high' ? 'bg-red-100 text-red-700' :
-                      insight.urgency === 'medium' ? 'bg-orange-100 text-orange-700' :
-                        'bg-blue-100 text-blue-700'
-                      }`}>
-                      {insight.urgency.toUpperCase()} PRIORITY
-                    </span>
-                  </div>
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 h-full">
+      <div className="flex items-center space-x-2 mb-4">
+        <h3 className="text-lg font-semibold text-slate-900">Key Actionable Insights</h3>
+        <ChartTooltip
+          title="How to use these insights"
+          content={[
+            "These insights translate your data into specific, prioritized actions. Each insight card shows a recommendation, the supporting evidence, and suggested next steps.",
+            "Priority levels (High, Medium, Low) indicate urgency. Focus on High Priority items first for maximum impact.",
+            "The 'Top Student Suggestions' section shows verbatim improvement ideas from students—implement 2-3 of these for quick wins."
+          ]}
+        />
+      </div>
+      <div className="space-y-4">
+        {insights.map((insight, index) => (
+          <div key={index} className={`border rounded-lg p-4 ${getUrgencyColor(insight.urgency)}`}>
+            <div className="flex items-start space-x-3">
+              <insight.icon className={`h-6 w-6 mt-0.5 ${getIconColor(insight.type)}`} />
+              <div className="flex-1">
+                <h4 className="font-semibold text-slate-900">{insight.title}</h4>
+                <p className="text-slate-700 mt-1 text-sm">{insight.content}</p>
+                <div className="mt-2 flex items-center justify-between">
+                  <span className="text-xs font-medium text-slate-600 bg-white px-2 py-1 rounded">
+                    Action: {insight.action}
+                  </span>
+                  <span className={`text-xs font-medium px-2 py-1 rounded ${insight.urgency === 'high' ? 'bg-red-100 text-red-700' :
+                    insight.urgency === 'medium' ? 'bg-orange-100 text-orange-700' :
+                      'bg-blue-100 text-blue-700'
+                    }`}>
+                    {insight.urgency.toUpperCase()} PRIORITY
+                  </span>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Student Suggestions */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <h3 className="text-lg font-semibold text-slate-900 mb-4">Top Student Suggestions</h3>
-        <p className="text-sm text-slate-600 mb-4">
-          Most frequently cited "fastest win" improvements from open-text responses
-        </p>
-        <div className="space-y-3">
-          {fastestWinSuggestions.map((item: any, index: number) => (
-            <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-              <div>
-                <p className="font-medium text-slate-900">{item.suggestion}</p>
-                <p className="text-sm text-slate-600">{item.theme}</p>
-              </div>
-              <div className="text-right">
-                <span className="text-lg font-bold text-blue-600">{item.frequency}%</span>
-                <p className="text-xs text-slate-500">of responses</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-          <p className="text-sm text-blue-800">
-            <strong>Next Steps:</strong> These student-generated suggestions provide clear direction for
-            immediate improvements. Consider implementing 2-3 of these changes this semester for maximum impact.
-          </p>
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );
 }
+

@@ -140,8 +140,8 @@ export default function TensionHeatmap({ data }: TensionHeatmapProps) {
                 </div>
             )}
 
-            {/* Priority Actions */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            {/* Priority Actions - COMMENTED OUT */}
+            {/* <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
                 <div className="flex items-center mb-4">
                     <AlertTriangle className="h-5 w-5 text-orange-600 mr-2" />
                     <h3 className="text-lg font-semibold text-slate-900">Priority Tension Areas</h3>
@@ -156,7 +156,6 @@ export default function TensionHeatmap({ data }: TensionHeatmapProps) {
                 </div>
 
                 <div className="space-y-4">
-                    {/* Cross-domain tensions */}
                     {heatmapData
                         .filter((t: any) => t.avgGapScore >= 0.2)
                         .sort((a: any, b: any) => b.avgGapScore - a.avgGapScore)
@@ -194,7 +193,7 @@ export default function TensionHeatmap({ data }: TensionHeatmapProps) {
                         </div>
                     )}
                 </div>
-            </div>
+            </div> */}
 
             {/* Cross-Domain Tension Modal */}
             {selectedTension && (

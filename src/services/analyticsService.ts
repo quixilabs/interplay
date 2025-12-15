@@ -9,8 +9,11 @@ export class AnalyticsService {
   // Get survey analytics for dashboard
   static async getSurveyAnalytics(universitySlug?: string) {
     try {
-      // Return mock data for demo university
-      if (universitySlug === 'demo-university') {
+      // Return mock data for demo university (can be toggled with env var)
+      // Set VITE_USE_MOCK_DATA=false in .env.local to use real database data
+      const useMockData = import.meta.env.VITE_USE_MOCK_DATA !== 'false';
+      
+      if (universitySlug === 'demo-university' && useMockData) {
         const { mockSurveyData } = await import('../data/mockData');
         return mockSurveyData;
       }
@@ -172,6 +175,12 @@ export class AnalyticsService {
       // Calculate action pathway data
       const actionPathwayData = this.calculateActionPathway(flourishingData || [], enablersBarriersData || []);
 
+      // Calculate Growth Index Score from v2 support barriers data
+      const growthIndexScore = this.calculateGrowthIndexScore(wellbeingData || []);
+
+      // Calculate individual driver scores from v2 support barriers data
+      const driverScores = this.calculateDriverScores(wellbeingData || []);
+
       return {
         totalResponses,
         completionRate: Math.round(completionRate * 10) / 10,
@@ -185,7 +194,9 @@ export class AnalyticsService {
         brightSpotThemes,
         tensionAnalysis,
         responses,
-        actionPathwayData
+        actionPathwayData,
+        growthIndexScore,
+        driverScores
       };
     } catch (error) {
       console.error('Error fetching survey analytics:', error);
@@ -833,6 +844,124 @@ export class AnalyticsService {
   }
 
   /**
+   * Public method for calculating Growth Index Score - used when filtering data
+   * @param wellbeingData - Array of school wellbeing responses (v2 format)
+   * @returns Growth Index Score rounded to 1 decimal place, or null if no v2 data available
+   */
+  static calculateGrowthIndexScorePublic(wellbeingData: any[]): number | null {
+    return this.calculateGrowthIndexScore(wellbeingData);
+  }
+
+  /**
+   * Calculate individual driver scores from v2 school support barriers data
+   * Returns scores for Access, Guidance, Connection, Trust, and Care
+   * 
+   * @param wellbeingData - Array of school wellbeing responses (v2 format)
+   * @returns Object with driver scores or null values if no data available
+   */
+  private static calculateDriverScores(wellbeingData: any[]): Record<string, number | null> {
+    // Filter for v2 responses only - must have explicit v2 version
+    const v2Responses = wellbeingData.filter(response => 
+      response.assessment_version === 'v2'
+    );
+
+    if (v2Responses.length === 0) {
+      return {
+        access: null,
+        guidance: null,
+        connection: null,
+        trust: null,
+        care: null
+      };
+    }
+
+    // Define driver column mappings (same as Growth Index Score)
+    const driverMapping = {
+      access: [
+        'access_hard_find_resources',
+        'access_dont_know_where_help',
+        'access_long_appointment_wait'
+      ],
+      guidance: [
+        'guidance_unsure_direction',
+        'guidance_want_help_planning',
+        'guidance_confused_courses'
+      ],
+      connection: [
+        'connection_no_mentor',
+        'connection_hard_make_friends',
+        'connection_not_connected_students'
+      ],
+      trust: [
+        'trust_messages_not_answered',
+        'trust_unclear_communication',
+        'trust_bounced_between_offices'
+      ],
+      care: [
+        'care_not_understood_supported',
+        'care_no_empathy_from_staff',
+        'care_school_doesnt_care'
+      ]
+    };
+
+    // Calculate driver scores for each student, then average
+    const studentDriverScores: Record<string, number[]> = {
+      access: [],
+      guidance: [],
+      connection: [],
+      trust: [],
+      care: []
+    };
+
+    v2Responses.forEach(response => {
+      // Calculate each driver score for this student
+      Object.entries(driverMapping).forEach(([driver, columns]) => {
+        let barrierCount = 0;
+        let hasData = false;
+
+        columns.forEach(column => {
+          const value = response[column];
+          if (value !== undefined && value !== null) {
+            hasData = true;
+            if (value === true) {
+              barrierCount++;
+            }
+          }
+        });
+
+        // Only include if student has responded to this driver's questions
+        if (hasData) {
+          const driverScore = 10 - (barrierCount * 2.5);
+          studentDriverScores[driver].push(driverScore);
+        }
+      });
+    });
+
+    // Calculate average score for each driver across all students
+    const driverAverages: Record<string, number | null> = {};
+
+    Object.entries(studentDriverScores).forEach(([driver, scores]) => {
+      if (scores.length > 0) {
+        const average = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+        driverAverages[driver] = Math.round(average * 10) / 10;
+      } else {
+        driverAverages[driver] = null;
+      }
+    });
+
+    return driverAverages;
+  }
+
+  /**
+   * Public method for calculating driver scores - used when filtering data
+   * @param wellbeingData - Array of school wellbeing responses (v2 format)
+   * @returns Object with driver scores or null values if no data available
+   */
+  static calculateDriverScoresPublic(wellbeingData: any[]): Record<string, number | null> {
+    return this.calculateDriverScores(wellbeingData);
+  }
+
+  /**
    * Internal calculation method for Action Pathway data
    */
   private static calculateActionPathway(flourishingData: any[], enablersBarriersData: any[]): ActionPathwayData {
@@ -952,5 +1081,110 @@ export class AnalyticsService {
       domains: sortedDomains,
       totalResponses: flourishingData.length
     };
+  }
+
+  /**
+   * Calculate Growth Index Score from v2 school support barriers data
+   * Growth Index Score = (Access Score + Guidance Score + Connection Score + Trust Score + Care Score) / 5
+   * Each driver score = 10 - (number of selected statements × 2.5)
+   * 
+   * @param wellbeingData - Array of school wellbeing responses (v2 format)
+   * @returns Growth Index Score rounded to 1 decimal place, or null if no v2 data available
+   */
+  private static calculateGrowthIndexScore(wellbeingData: any[]): number | null {
+    // Filter for v2 responses only - must have explicit v2 version
+    const v2Responses = wellbeingData.filter(response => 
+      response.assessment_version === 'v2'
+    );
+
+    if (v2Responses.length === 0) {
+      return null;
+    }
+
+    // Define driver column mappings
+    const driverMapping = {
+      access: [
+        'access_hard_find_resources',
+        'access_dont_know_where_help',
+        'access_long_appointment_wait'
+      ],
+      guidance: [
+        'guidance_unsure_direction',
+        'guidance_want_help_planning',
+        'guidance_confused_courses'
+      ],
+      connection: [
+        'connection_no_mentor',
+        'connection_hard_make_friends',
+        'connection_not_connected_students'
+      ],
+      trust: [
+        'trust_messages_not_answered',
+        'trust_unclear_communication',
+        'trust_bounced_between_offices'
+      ],
+      care: [
+        'care_not_understood_supported',
+        'care_no_empathy_from_staff',
+        'care_school_doesnt_care'
+      ]
+    };
+
+    // Calculate driver scores for each student, then average
+    const studentDriverScores: Record<string, number[]> = {
+      access: [],
+      guidance: [],
+      connection: [],
+      trust: [],
+      care: []
+    };
+
+    v2Responses.forEach(response => {
+      // Calculate each driver score for this student
+      Object.entries(driverMapping).forEach(([driver, columns]) => {
+        let barrierCount = 0;
+        let hasData = false;
+
+        columns.forEach(column => {
+          const value = response[column];
+          if (value !== undefined && value !== null) {
+            hasData = true;
+            if (value === true) {
+              barrierCount++;
+            }
+          }
+        });
+
+        // Only include if student has responded to this driver's questions
+        if (hasData) {
+          const driverScore = 10 - (barrierCount * 2.5);
+          studentDriverScores[driver].push(driverScore);
+        }
+      });
+    });
+
+    // Calculate average score for each driver across all students
+    const driverAverages: Record<string, number> = {};
+    let validDriverCount = 0;
+
+    Object.entries(studentDriverScores).forEach(([driver, scores]) => {
+      if (scores.length > 0) {
+        const average = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+        driverAverages[driver] = average;
+        validDriverCount++;
+      }
+    });
+
+    // Calculate Growth Index Score if we have at least one driver
+    if (validDriverCount === 0) {
+      return null;
+    }
+
+    // Growth Index Score = sum of all driver averages / 5 (always divide by 5, not validDriverCount)
+    // Missing drivers are effectively treated as 0 since they're not in driverAverages
+    const growthIndexScore = Object.values(driverAverages).reduce((sum, avg) => sum + avg, 0) / 5;
+
+    // Round to 1 decimal place
+    return Math.round(growthIndexScore * 10) / 10;
   }
 }
