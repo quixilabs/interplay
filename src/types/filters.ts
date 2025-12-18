@@ -86,7 +86,7 @@ export const FILTER_OPTIONS = {
     'Not employed',
     'Part-time (less than 20 hours/week)',
     'Part-time (20+ hours/week)',
-    'Full-time',
+    'Full-time (40+ hours/week)',
     'Prefer not to say'
   ],
   hasCaregavingResponsibilities: [

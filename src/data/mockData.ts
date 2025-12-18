@@ -73,7 +73,7 @@ export const mockSurveyData = {
       'Not employed': 298,
       'Part-time (less than 20 hours/week)': 234,
       'Part-time (20+ hours/week)': 189,
-      'Full-time': 122,
+      'Full-time (40+ hours/week)': 122,
       'Prefer not to say': 200
     },
     hasCaregavingResponsibilities: {
@@ -472,7 +472,7 @@ function generateMockResponses(count: number) {
   const yearOptions = ['First year/Freshman', 'Second year/Sophomore', 'Third year/Junior', 'Fourth year/Senior', 'Graduate student', 'Other'];
   const genderOptions = ['Woman', 'Man', 'Non-binary', 'Self-describe', 'Prefer not to say'];
   const raceOptions = ['Asian', 'Black or African American', 'Hispanic or Latino/a/x', 'White', 'American Indian or Alaska Native', 'Native Hawaiian or Other Pacific Islander', 'Prefer not to say'];
-  const employmentOptions = ['Not employed', 'Part-time (less than 20 hours/week)', 'Part-time (20+ hours/week)', 'Full-time', 'Prefer not to say'];
+  const employmentOptions = ['Not employed', 'Part-time (less than 20 hours/week)', 'Part-time (20+ hours/week)', 'Full-time (40+ hours/week)', 'Prefer not to say'];
   const enrollmentOptions = ['Full-time', 'Part-time'];
   const ageRangeOptions = ['18-19', '20-21', '22-24', '25 or older', 'Prefer not to say'];
   const internationalOptions = ['Yes, international student', 'No, domestic student', 'Prefer not to say'];

@@ -358,14 +358,14 @@ export class AnalyticsService {
         name: 'Full-time students working 20+ hours/week',
         matcher: (demo) => 
           demo.enrollmentStatus === 'Full-time' && 
-          (demo.employmentStatus === 'Part-time (20+ hours/week)' || demo.employmentStatus === 'Full-time'),
+          (demo.employmentStatus === 'Part-time (20+ hours/week)' || demo.employmentStatus === 'Full-time (40+ hours/week)'),
         description: 'Students balancing full course load with significant work commitments'
       },
       {
         name: 'First-year students from low-income families',
         matcher: (demo) => 
           (demo.yearInSchool === 'First year/Freshman') && 
-          (demo.employmentStatus === 'Full-time' || demo.employmentStatus === 'Part-time (20+ hours/week)'),
+          (demo.employmentStatus === 'Full-time (40+ hours/week)' || demo.employmentStatus === 'Part-time (20+ hours/week)'),
         description: 'New students facing financial challenges during transition'
       },
       {
@@ -398,7 +398,7 @@ export class AnalyticsService {
         name: 'Graduate students working full-time',
         matcher: (demo) => 
           demo.yearInSchool === 'Graduate student' && 
-          demo.employmentStatus === 'Full-time',
+          demo.employmentStatus === 'Full-time (40+ hours/week)',
         description: 'Graduate students balancing advanced studies with full-time employment'
       },
       {
@@ -420,6 +420,24 @@ export class AnalyticsService {
           (demo.yearInSchool === 'Fourth year/Senior' || demo.yearInSchool === 'Graduate student') &&
           demo.hasCaregavingResponsibilities === 'Yes',
         description: 'Advanced students with family responsibilities'
+      },
+      {
+        name: 'Students balancing multiple high-demand responsibilities',
+        matcher: (demo) => {
+          // External responsibility: employmentStatus ≠ 'Not employed' OR hasCaregivingResponsibilities = 'Yes'
+          const hasExternalResponsibility = 
+            (demo.employmentStatus && demo.employmentStatus !== 'Not employed' && demo.employmentStatus !== 'Prefer not to say') ||
+            demo.hasCaregavingResponsibilities === 'Yes';
+          
+          // Sustained academic load: enrollmentStatus = 'Full-time' OR yearInSchool = 'Graduate student'
+          const hasSustainedAcademicLoad = 
+            demo.enrollmentStatus === 'Full-time' || 
+            demo.yearInSchool === 'Graduate student';
+          
+          // Must meet BOTH conditions
+          return hasExternalResponsibility && hasSustainedAcademicLoad;
+        },
+        description: 'Students juggling significant work or caregiving duties with demanding academic commitments'
       }
     ];
 
