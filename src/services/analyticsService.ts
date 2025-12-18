@@ -358,14 +358,14 @@ export class AnalyticsService {
         name: 'Full-time students working 20+ hours/week',
         matcher: (demo) => 
           demo.enrollmentStatus === 'Full-time' && 
-          (demo.employmentStatus === 'Part-time (20+ hours/week)' || demo.employmentStatus === 'Full-time'),
+          (demo.employmentStatus === 'Part-time (20+ hours/week)' || demo.employmentStatus === 'Full-time (40+ hours/week)'),
         description: 'Students balancing full course load with significant work commitments'
       },
       {
         name: 'First-year students from low-income families',
         matcher: (demo) => 
           (demo.yearInSchool === 'First year/Freshman') && 
-          (demo.employmentStatus === 'Full-time' || demo.employmentStatus === 'Part-time (20+ hours/week)'),
+          (demo.employmentStatus === 'Full-time (40+ hours/week)' || demo.employmentStatus === 'Part-time (20+ hours/week)'),
         description: 'New students facing financial challenges during transition'
       },
       {
@@ -398,7 +398,7 @@ export class AnalyticsService {
         name: 'Graduate students working full-time',
         matcher: (demo) => 
           demo.yearInSchool === 'Graduate student' && 
-          demo.employmentStatus === 'Full-time',
+          demo.employmentStatus === 'Full-time (40+ hours/week)',
         description: 'Graduate students balancing advanced studies with full-time employment'
       },
       {
