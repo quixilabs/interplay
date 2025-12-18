@@ -420,6 +420,24 @@ export class AnalyticsService {
           (demo.yearInSchool === 'Fourth year/Senior' || demo.yearInSchool === 'Graduate student') &&
           demo.hasCaregavingResponsibilities === 'Yes',
         description: 'Advanced students with family responsibilities'
+      },
+      {
+        name: 'Students balancing multiple high-demand responsibilities',
+        matcher: (demo) => {
+          // External responsibility: employmentStatus ≠ 'Not employed' OR hasCaregivingResponsibilities = 'Yes'
+          const hasExternalResponsibility = 
+            (demo.employmentStatus && demo.employmentStatus !== 'Not employed' && demo.employmentStatus !== 'Prefer not to say') ||
+            demo.hasCaregavingResponsibilities === 'Yes';
+          
+          // Sustained academic load: enrollmentStatus = 'Full-time' OR yearInSchool = 'Graduate student'
+          const hasSustainedAcademicLoad = 
+            demo.enrollmentStatus === 'Full-time' || 
+            demo.yearInSchool === 'Graduate student';
+          
+          // Must meet BOTH conditions
+          return hasExternalResponsibility && hasSustainedAcademicLoad;
+        },
+        description: 'Students juggling significant work or caregiving duties with demanding academic commitments'
       }
     ];
 
