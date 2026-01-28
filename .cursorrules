@@ -1,0 +1,351 @@
+# The Growth Index - Project Rules
+
+## 🎯 Project Overview
+Student flourishing analytics platform using React, TypeScript, Vite, Tailwind CSS, and Supabase. Built on Harvard's Flourishing Measure framework for comprehensive student well-being assessment.
+
+---
+
+## 📁 Project Structure & Organization
+
+### File Organization Rules
+**CRITICAL**: Maintain the organized folder structure at all times:
+
+```
+├── docs/                    # All .md documentation files (except README.md)
+├── scripts/                 # All .js and .sh utility scripts
+├── sql/                     # SQL data dumps and verification scripts
+├── supabase/migrations/     # Database migration files only
+├── config/                  # Configuration files (nginx, etc.)
+├── src/                     # Application source code
+│   ├── components/          # React components
+│   ├── services/            # Business logic and API calls
+│   ├── stores/              # Zustand state management
+│   ├── types/               # TypeScript type definitions
+│   ├── utils/               # Helper functions
+│   ├── contexts/            # React Context providers
+│   └── data/                # Constants and mock data
+└── [root]                   # Only README.md and build tool configs
+```
+
+### File Placement Guidelines
+
+**Documentation (.md files)**
+- ✅ Keep `README.md` in root
+- ✅ Move all other .md files to `docs/`
+
+**SQL Files**
+- ✅ Database migrations → `supabase/migrations/`
+- ✅ Data dumps & verification → `sql/`
+- ❌ NEVER place SQL files in root
+
+**Scripts**
+- ✅ All .js utility scripts → `scripts/`
+- ✅ All .sh shell scripts → `scripts/`
+- ❌ NEVER place utility scripts in root
+
+**Config Files**
+- ✅ Build tool configs (eslint, tailwind, vite, etc.) → root
+- ✅ Server configs (nginx, etc.) → `config/`
+
+---
+
+## 🎨 TypeScript & React Best Practices
+
+### Component Guidelines
+
+**Functional Components Only**
+```tsx
+// ✅ GOOD
+export const StudentDashboard = () => {
+  const [data, setData] = useState<StudentData[]>([]);
+  return <div>...</div>;
+};
+
+// ❌ BAD - No class components
+export class StudentDashboard extends React.Component { }
+```
+
+**Type Safety**
+```tsx
+// ✅ GOOD - Explicit types for props and state
+interface DashboardProps {
+  universityId: string;
+  timeRange: 'week' | 'month' | 'year';
+}
+
+export const Dashboard = ({ universityId, timeRange }: DashboardProps) => {
+  // ...
+};
+
+// ❌ BAD - Using 'any'
+export const Dashboard = (props: any) => { }
+```
+
+**File Naming**
+- Components: `PascalCase.tsx` (e.g., `FlourishingChart.tsx`)
+- Services: `camelCase.ts` (e.g., `analyticsService.ts`)
+- Utils: `camelCase.ts` (e.g., `dateFormatters.ts`)
+- Types: `camelCase.ts` (e.g., `survey.ts`)
+
+### State Management
+
+**Zustand Stores**
+```typescript
+// ✅ GOOD - Create focused stores
+import { create } from 'zustand';
+
+interface SurveyStore {
+  currentStep: number;
+  responses: SurveyResponse[];
+  setCurrentStep: (step: number) => void;
+}
+
+export const useSurveyStore = create<SurveyStore>((set) => ({
+  currentStep: 0,
+  responses: [],
+  setCurrentStep: (step) => set({ currentStep: step }),
+}));
+```
+
+**React Context**
+- Use Context for authentication and theme
+- Use Zustand for application state
+- Avoid prop drilling beyond 2 levels
+
+---
+
+## 🗄️ Supabase Database Conventions
+
+### Query Patterns
+
+**Always Use TypeScript Types**
+```typescript
+// ✅ GOOD
+const { data, error } = await supabase
+  .from('flourishing_scores')
+  .select('*')
+  .eq('session_id', sessionId);
+
+if (error) {
+  console.error('Database error:', error);
+  throw new Error(`Failed to fetch scores: ${error.message}`);
+}
+
+// ❌ BAD - No error handling
+const { data } = await supabase.from('flourishing_scores').select('*');
+```
+
+**Migration Files**
+- Name format: `YYYYMMDDHHMMSS_descriptive_name.sql`
+- Always place in `supabase/migrations/`
+- Include rollback scripts when appropriate
+- Test migrations locally before applying
+
+### RLS Policies
+- Always enable Row Level Security on new tables
+- Document policy purpose in comments
+- Test with anonymous and authenticated users
+- Use descriptive policy names
+
+---
+
+## 🎯 Code Quality Standards
+
+### Error Handling
+
+**Always Handle Errors Explicitly**
+```typescript
+// ✅ GOOD
+try {
+  const result = await fetchStudentData(sessionId);
+  return result;
+} catch (error) {
+  console.error('Failed to fetch student data:', error);
+  throw new Error('Unable to load student information');
+}
+
+// ❌ BAD - Silent failures
+try {
+  await fetchStudentData(sessionId);
+} catch (e) { }
+```
+
+### Import Organization
+```typescript
+// ✅ GOOD - Organized imports
+// 1. External libraries
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+
+// 2. Internal components
+import { FlourishingChart } from '@/components/Dashboard/FlourishingChart';
+
+// 3. Types
+import type { StudentData, FlourishingScore } from '@/types/survey';
+
+// 4. Utils
+import { formatDate } from '@/utils/dateFormatters';
+```
+
+### Naming Conventions
+
+**Variables & Functions**
+- `camelCase` for variables and functions
+- `PascalCase` for components and classes
+- `SCREAMING_SNAKE_CASE` for constants
+- Descriptive names over short names
+
+```typescript
+// ✅ GOOD
+const MAX_SURVEY_ATTEMPTS = 3;
+const studentFlourishingScores = await fetchScores();
+
+// ❌ BAD
+const max = 3;
+const data = await fetch();
+```
+
+---
+
+## 🧪 Testing & Debugging
+
+### Console Logging
+```typescript
+// ✅ GOOD - Structured logging
+console.log('Survey submitted:', { sessionId, timestamp: new Date() });
+
+// ❌ BAD - Generic logs
+console.log('here');
+console.log(data);
+```
+
+### Environment Variables
+- Always use `VITE_` prefix for client-side variables
+- Never commit `.env` files
+- Document all required variables in `.env.example`
+- Validate env vars on app startup
+
+---
+
+## 🚀 Performance Best Practices
+
+### React Performance
+```tsx
+// ✅ GOOD - Memoize expensive calculations
+const chartData = useMemo(
+  () => processStudentData(rawData),
+  [rawData]
+);
+
+// ✅ GOOD - Use callback for handlers
+const handleSubmit = useCallback((data: FormData) => {
+  submitSurvey(data);
+}, []);
+```
+
+### Database Queries
+- Select only needed columns
+- Use indexes for frequently queried fields
+- Implement pagination for large datasets
+- Cache results when appropriate
+
+---
+
+## 📝 Documentation Standards
+
+### Code Comments
+```typescript
+// ✅ GOOD - Explain WHY, not WHAT
+// Calculate risk score based on flourishing domains below threshold
+// Domains scoring < 3.0 indicate areas needing intervention
+const riskScore = calculateRiskScore(flourishingScores);
+
+// ❌ BAD - Obvious comments
+// This is a function that calculates risk score
+const riskScore = calculateRiskScore(flourishingScores);
+```
+
+### Component Documentation
+```tsx
+/**
+ * FlourishingChart - Displays student flourishing metrics across 6 domains
+ * 
+ * @param data - Array of flourishing scores per domain
+ * @param timeRange - Filter results by time period
+ * @param showTrendLine - Display trend analysis overlay
+ */
+export const FlourishingChart = ({ data, timeRange, showTrendLine }: Props) => {
+  // ...
+};
+```
+
+---
+
+## 🔒 Security & Privacy
+
+### Data Handling
+- **NEVER** log personally identifiable information
+- Use session IDs for anonymous tracking
+- Validate all user inputs
+- Sanitize data before database insertion
+- Follow FERPA compliance for student data
+
+### Authentication
+- Check auth state before protected operations
+- Use RLS policies for data access control
+- Implement proper session management
+- Never expose API keys in client code
+
+---
+
+## ✨ Tailwind CSS Conventions
+
+```tsx
+// ✅ GOOD - Organized utility classes
+<div className="flex items-center justify-between gap-4 rounded-lg bg-white p-6 shadow-sm">
+
+// ✅ GOOD - Extract repeated patterns to components
+// Consider creating reusable components for repeated styling patterns
+
+// ❌ BAD - Inline styles
+<div style={{ display: 'flex', padding: '24px' }}>
+```
+
+---
+
+## 🔄 Git Commit Guidelines
+
+**Format**: `type: brief description`
+
+**Types**:
+- `feat:` New feature
+- `fix:` Bug fix
+- `refactor:` Code restructuring
+- `docs:` Documentation changes
+- `style:` Formatting, no code change
+- `chore:` Maintenance tasks
+- `perf:` Performance improvements
+
+**Examples**:
+```bash
+feat: add demographic filtering to dashboard
+fix: resolve survey session duplication issue
+refactor: reorganize project structure - move SQL and scripts
+docs: update deployment instructions
+```
+
+---
+
+## 🎯 When Making Changes
+
+1. **Respect the folder structure** - Files belong in their designated folders
+2. **Type everything** - No `any` types without justification
+3. **Handle errors** - Never silently fail
+4. **Test changes** - Verify functionality before committing
+5. **Document decisions** - Add comments for complex logic
+6. **Keep it clean** - Remove unused imports, variables, and files
+7. **Follow conventions** - Match existing code style and patterns
+
+---
+
+**Remember**: These rules maintain code quality and project organization. When in doubt, refer to existing patterns in the codebase or ask for clarification.
