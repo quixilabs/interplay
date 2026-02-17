@@ -6,6 +6,8 @@ import Dashboard from './components/Dashboard/Dashboard';
 import AdminLogin from './components/Admin/AdminLogin';
 import AdminSettings from './components/Admin/AdminSettings';
 import LandingPage from './components/LandingPage';
+import PrivacyPolicy from './components/Legal/PrivacyPolicy';
+import TermsOfService from './components/Legal/TermsOfService';
 import { useAuthStore } from './stores/authStore';
 import { SuperAdminRouter, SUPER_ADMIN_CONFIG } from './modules/superadmin';
 
@@ -16,6 +18,8 @@ function App() {
         <div className="min-h-screen bg-light-gray font-primary">
           <Routes>
             <Route path="/" element={<LandingPage />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
             <Route path="/survey/:universitySlug" element={<SurveyFlow />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
