@@ -65,33 +65,33 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <FeatureCard
               icon={<Users className="h-8 w-8 text-sage" />}
-              title="Multi-Domain Assessment"
-              description="Assess student well-being across six flourishing domains—happiness, health, purpose, relationships, character, and stability—using Harvard’s validated framework as the foundation."
+              title="Multi-Domain Readiness Assessment"
+              description="Understand what’s helping students move forward—and what’s holding them back—across six core domains: joy, health, purpose, belonging, growth, and stability."
             />
             <FeatureCard
               icon={<BarChart3 className="h-8 w-8 text-info" />}
-              title="Real-Time Analytics"
-              description="Go beyond static reports. Interplay delivers interactive dashboards that reveal patterns and tensions across flourishing domains, segmented by demographics, programs, and cohorts."
+              title="Real-Time Readiness Signals"
+              description="Move beyond static reports. Interplay surfaces early signals of strain and momentum across student groups, programs, and cohorts—so leaders can act before challenges impact retention."
             />
             <FeatureCard
               icon={<TrendingUp className="h-8 w-8 text-success" />}
-              title="Growth Opportunities"
-              description="Pinpoint areas where students struggle most, then monitor progress over time. Interplay connects well-being data directly to outcomes like engagement, retention, and student success."
+              title="Target Support Where It Matters Most"
+              description="Identify where students are building capacity—and where support will have the greatest impact. Track change over time and connect readiness signals to engagement, persistence, and completion outcomes."
             />
             <FeatureCard
               icon={<Shield className="h-8 w-8 text-success" />}
-              title="Privacy-First Design"
-              description="FERPA-compliant, anonymous responses and secure data handling ensure trust and integrity for universities, youth organizations, and participants alike."
+              title="Privacy-First by Design"
+              description="Anonymous responses and FERPA-aligned data practices ensure students can answer honestly—and institutions can act responsibly."
             />
             <FeatureCard
               icon={<CheckCircle className="h-8 w-8 text-navy" />}
-              title="Evidence-Based"
-              description="Grounded in Harvard’s Flourishing Measure, Interplay integrates global research with institutional data, applying proven reliability and academic rigor—for higher education, Scout troops, and youth programs."
+              title="Research-Informed. Practice-Ready."
+              description="Built on decades of research in well-being, resilience, and student success, Interplay translates evidence into a practical decision-support system for higher education."
             />
             <FeatureCard
               icon={<ArrowRight className="h-8 w-8 text-sage" />}
-              title="Actionable Insights"
-              description="What makes Interplay different: our proprietary Flourishing Intelligence™ closes the loop—translating student voice into prioritized, evidence-based strategies tailored to your university’s resources."
+              title="From Insight to Action"
+              description="Interplay maps how student pressures and supports interact—highlighting where targeted intervention will strengthen adaptability, reduce friction, and improve persistence."
             />
           </div>
         </div>
@@ -129,10 +129,10 @@ export default function LandingPage() {
         <div className="max-w-3xl mx-auto">
           <div className="card p-8 sm:p-10 text-center">
             <h2 className="text-2xl sm:text-3xl font-bold text-navy font-primary mb-4">
-              Ready to Transform Student Well-Being at Your Institution?
+              Strengthen Student Success Today
             </h2>
             <p className="text-warm-gray font-primary mb-8 max-w-2xl mx-auto">
-              See how Interplay can help your institution measure and improve student flourishing. Schedule a personalized demo or learn more about our evidence-based approach.
+              Join forward-thinking institutions using Interplay to surface early signals, reduce friction, and improve persistence before challenges show up in retention data.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <a
