@@ -26,8 +26,8 @@ export default function PrivacyPolicy() {
           </p>
           <p className="mb-4">
             <strong>Contact:</strong> For privacy inquiries, please contact us at{' '}
-            <a href="mailto:hello@interplay.quixilabs.com" className="text-sage hover:underline">
-              hello@interplay.quixilabs.com
+            <a href="mailto:hello@brandnewday.group" className="text-sage hover:underline">
+              hello@brandnewday.group
             </a>
             .
           </p>

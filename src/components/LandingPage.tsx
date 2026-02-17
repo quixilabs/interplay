@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BarChart3, Users, TrendingUp, Shield, ArrowRight, CheckCircle, Sparkles, X, Mail, Calendar, HelpCircle } from 'lucide-react';
 
-const CONTACT_EMAIL = 'hello@interplay.quixilabs.com';
-const DEMO_MAILTO = `mailto:${CONTACT_EMAIL}?subject=Interplay%20Demo%20Request&body=Hi%2C%20I'm%20interested%20in%20scheduling%20a%20demo%20of%20Interplay%20for%20my%20institution.%0A%0AInstitution%3A%0ARole%3A%0ABest%20time%20to%20reach%20me%3A`;
+const CONTACT_EMAIL = 'hello@brandnewday.group';
+const CALENDLY_URL = 'https://calendly.com/artworksinc/brand-new-day';
 
 export default function LandingPage() {
   const [showLearnMoreModal, setShowLearnMoreModal] = useState(false);
@@ -17,12 +17,14 @@ export default function LandingPage() {
               <BarChart3 className="h-8 w-8 text-navy" />
               <span className="text-xl font-bold text-navy font-primary">Interplay</span>
             </div>
-            <Link
-              to="/admin/login"
+            <a
+              href={CALENDLY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn-primary px-4 py-2"
             >
-              Admin Login
-            </Link>
+              Schedule a Demo
+            </a>
           </div>
         </div>
       </nav>
@@ -31,26 +33,22 @@ export default function LandingPage() {
       <section id="about" className="relative px-4 py-20 sm:px-6 lg:px-8 scroll-mt-20">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-navy font-primary mb-6">
-            Your Voice
-            <span className="block text-navy font-primary">Matters</span>
+            Measure What Matters
+            {/* <span className="block text-navy font-primary">Drive Better Outcomes.</span> */}
           </h1>
           <p className="text-xl text-warm-gray font-primary mb-8 max-w-3xl mx-auto leading-relaxed">
-            Interplay turns youth perspectives into a real-time measure of flourishing—helping universities, colleges, and youth organizations like Scouts identify hidden tensions across happiness, health, purpose, relationships, character, and stability, then translate them into strategies that drive success.
+            Interplay turns anonymous survey data into real-time analytics—helping universities, colleges, and youth organizations identify hidden tensions across happiness, health, purpose, relationships, character, and stability, then translate them into strategies that drive success.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/survey/demo-university"
+            <a
+              href={CALENDLY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn-primary px-8 py-4 rounded-brand flex items-center justify-center text-lg font-semibold"
             >
-              Take a demo survey
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-            <Link
-              to="/admin/login"
-              className="btn-subtle px-6 py-3 rounded-brand"
-            >
-              Admin Dashboard
-            </Link>
+              <Calendar className="mr-2 h-5 w-5" />
+              Schedule a Demo
+            </a>
           </div>
         </div>
       </section>
@@ -123,13 +121,6 @@ export default function LandingPage() {
               <span><strong className="text-navy">Community programs</strong>—evidence-based data for grants and improvement</span>
             </li>
           </ul>
-          <Link
-            to="/survey/demo-university"
-            className="btn-primary px-6 py-3 rounded-brand inline-flex items-center"
-          >
-            Try the demo survey
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Link>
         </div>
       </section>
 
@@ -145,7 +136,9 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <a
-                href={DEMO_MAILTO}
+                href={CALENDLY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="btn-primary px-8 py-4 rounded-brand flex items-center justify-center text-lg font-semibold w-full sm:w-auto"
               >
                 <Calendar className="mr-2 h-5 w-5" />
@@ -160,27 +153,6 @@ export default function LandingPage() {
                 Learn More
               </button>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="bg-gradient-to-r from-navy to-sage py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-white mb-6">
-            Start Measuring Flourishing Today
-          </h2>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto font-primary">
-            Join universities, colleges, and youth organizations using Interplay to improve outcomes through data-driven well-being initiatives.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/survey/demo-university"
-              className="bg-white hover:bg-gray-100 text-navy px-8 py-4 rounded-brand font-semibold inline-flex items-center transition-colors"
-            >
-              Take a demo survey
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
           </div>
         </div>
       </section>
@@ -201,7 +173,7 @@ export default function LandingPage() {
                 <span className="text-xl font-semibold font-primary text-white">Interplay</span>
               </div>
               <p className="text-white/80 font-primary text-sm leading-relaxed mb-4">
-                Your Voice Matters. Interplay turns youth perspectives into actionable insights for universities, colleges, and youth organizations.
+                Measure What Matters. Interplay turns youth perspectives into actionable insights for universities, colleges, and youth organizations.
               </p>
               <p className="text-white/50 text-sm font-primary">
                 © {new Date().getFullYear()} Interplay. All rights reserved.
@@ -228,6 +200,9 @@ export default function LandingPage() {
                 </Link>
                 <Link to="/terms" className="block text-white/80 hover:text-sage font-primary text-sm transition-colors">
                   Terms of Service
+                </Link>
+                <Link to="/admin/login" className="block text-white/40 hover:text-white/60 font-primary text-sm transition-colors mt-4">
+                  Admin Login
                 </Link>
               </nav>
             </div>
@@ -311,11 +286,13 @@ function LearnMoreModal({ onClose }: { onClose: () => void }) {
           </div>
           <div className="mt-8 pt-6 border-t border-gray-200">
             <a
-              href={DEMO_MAILTO}
+              href={CALENDLY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn-primary px-6 py-3 rounded-brand inline-flex items-center text-sm font-semibold"
             >
+              <Calendar className="mr-2 h-4 w-4" />
               Schedule a Demo
-              <ArrowRight className="ml-2 h-4 w-4" />
             </a>
           </div>
         </div>

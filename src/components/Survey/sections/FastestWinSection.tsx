@@ -42,7 +42,7 @@ export default function FastestWinSection() {
 
       <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-lg p-6 mb-8">
         <h3 className="text-lg font-semibold text-orange-800 mb-2">
-          💡 Your Voice Matters
+          💡 Measure What Matters
         </h3>
         <p className="text-orange-700">
           Student feedback directly influences university decisions about programs, resources, and policies.
