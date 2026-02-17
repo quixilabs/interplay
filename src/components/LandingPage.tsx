@@ -31,7 +31,7 @@ export default function LandingPage() {
             <span className="block text-navy font-primary">Matters</span>
           </h1>
           <p className="text-xl text-warm-gray font-primary mb-8 max-w-3xl mx-auto leading-relaxed">
-            Interplay turns youth perspectives into a real-time measure of flourishing—helping universities identify hidden tensions across happiness, health, purpose, relationships, character, and stability, then translate them into strategies that drive success.
+            Interplay turns student perspectives into a real-time picture of flourishing—helping universities see hidden tensions across happiness, health, purpose, belonging, growth, and stability, and translate them into action.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
