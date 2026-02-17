@@ -1,0 +1,10 @@
+# Interplay - robots.txt
+# https://interplay.quixilabs.com
+
+User-agent: *
+Allow: /
+Allow: /survey/
+Disallow: /admin/
+
+# Sitemap
+Sitemap: https://interplay.quixilabs.com/sitemap.xml
