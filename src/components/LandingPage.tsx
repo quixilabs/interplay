@@ -37,7 +37,7 @@ export default function LandingPage() {
             {/* <span className="block text-navy font-primary">Drive Better Outcomes.</span> */}
           </h1>
           <p className="text-xl text-warm-gray font-primary mb-8 max-w-3xl mx-auto leading-relaxed">
-            Interplay turns anonymous survey data into real-time analytics—helping universities, colleges, and youth organizations identify hidden tensions across happiness, health, purpose, relationships, character, and stability, then translate them into strategies that drive success.
+            Interplay turns student voice into early insights—so colleges can strengthen the foundations that prepare students for what’s next.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
