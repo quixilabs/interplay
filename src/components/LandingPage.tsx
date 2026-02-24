@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { BarChart3, Users, TrendingUp, Shield, ArrowRight, CheckCircle, Sparkles, X, Mail, Calendar, HelpCircle } from 'lucide-react';
 
 const CONTACT_EMAIL = 'hello@brandnewday.group';
-const CALENDLY_URL = 'https://calendly.com/artworksinc/brand-new-day';
+const CALENDLY_URL = 'https://calendly.com/brandnewdaygroup/brand-new-day';
 
 export default function LandingPage() {
   const [showLearnMoreModal, setShowLearnMoreModal] = useState(false);

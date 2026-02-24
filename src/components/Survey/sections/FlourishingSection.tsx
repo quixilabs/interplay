@@ -5,18 +5,42 @@ import { SurveyService } from '../../../services/surveyService';
 import { DomainEnablersBarriers } from '../../../types/survey';
 import { debugLog } from '../../../utils/debug';
 
+// Demo content for first domain (Joy & Energy) – used when DB is not updated
+const JOY_ENERGY_ENABLERS = [
+  'Supportive instructors',
+  'Positive relationships with other students',
+  'Meaningful coursework',
+  'Progress toward my goals',
+  'Clear communication',
+  'Flexible policies',
+  'A welcoming environment',
+  'Financial support or affordability',
+  'Other'
+];
+const JOY_ENERGY_BARRIERS = [
+  'Academic workload',
+  'Competing responsibilities outside of school',
+  'Financial stress',
+  'Unclear expectations',
+  'Administrative frustration',
+  'Feeling disconnected',
+  'Confusing communication',
+  'Lack of flexibility',
+  'Other'
+];
+
 const FLOURISHING_DOMAINS = [
   {
     key: 'happiness_satisfaction',
-    name: 'Happiness & Life Satisfaction',
+    name: 'Joy & Energy',
     questions: [
       {
-        text: 'Overall, I am satisfied with my life as a whole these days.',
-        scaleLabels: { left: 'Not Satisfied at All', right: 'Completely Satisfied' }
+        text: 'I experience genuine joy here.',
+        scaleLabels: { left: 'Strongly Disagree', right: 'Strongly Agree' }
       },
       {
-        text: 'In general, I feel happy.',
-        scaleLabels: { left: 'Extremely Unhappy', right: 'Extremely Happy' }
+        text: 'My overall experience here feels positive.',
+        scaleLabels: { left: 'Strongly Disagree', right: 'Strongly Agree' }
       }
     ]
   },
@@ -148,6 +172,11 @@ export default function FlourishingSection() {
   const score1 = scores[questionKeys[0] as keyof typeof scores];
   const score2 = scores[questionKeys[1] as keyof typeof scores];
   const currentDomainData = domainEnablersBarriers.find(d => d.domain_key === domain.key);
+  // For demo: first domain (Joy & Energy) uses hardcoded enablers/barriers without DB changes
+  const isJoyEnergyDomain = domain.key === 'happiness_satisfaction';
+  const effectiveEnablers = isJoyEnergyDomain ? JOY_ENERGY_ENABLERS : (currentDomainData?.enablers ?? []);
+  const effectiveBarriers = isJoyEnergyDomain ? JOY_ENERGY_BARRIERS : (currentDomainData?.barriers ?? []);
+  const showEnablersBarriers = currentDomainData || isJoyEnergyDomain;
 
   const handleScoreChange = (questionKey: string, value: number) => {
     setScores(prev => ({ ...prev, [questionKey]: value }));
@@ -336,7 +365,7 @@ export default function FlourishingSection() {
 
 
           {/* Enablers and Barriers Section */}
-          {currentDomainData && (
+          {showEnablersBarriers && (
             <div className="space-y-6 border-t border-slate-200 pt-8">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <p className="text-blue-800 font-medium mb-2">
@@ -350,16 +379,17 @@ export default function FlourishingSection() {
               {/* Enablers */}
               <div>
                 <h4 className="text-lg font-semibold text-slate-800 mb-3">
-                  What helps me feel {domain.name.toLowerCase().includes('happiness') ? 'happy and satisfied' :
-                    domain.name.toLowerCase().includes('health') ? 'healthy' :
+                  {isJoyEnergyDomain ? 'Enablers – Select all that apply: ' : (
+                    <>What helps me feel {domain.name.toLowerCase().includes('health') ? 'healthy' :
                       domain.name.toLowerCase().includes('meaning') ? 'purposeful' :
                         domain.name.toLowerCase().includes('character') ? 'grow in character' :
                           domain.name.toLowerCase().includes('social') ? 'connected' :
-                            'secure'}: <span className="text-red-600">*</span>
+                            'secure'}: </>
+                  )}<span className="text-red-600">*</span>
                 </h4>
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 gap-3">
-                    {currentDomainData.enablers.map((enabler, index) => (
+                    {effectiveEnablers.map((enabler, index) => (
                       <label key={index} className="flex items-start space-x-3 cursor-pointer">
                         <input
                           type="checkbox"
@@ -394,16 +424,17 @@ export default function FlourishingSection() {
               {/* Barriers */}
               <div>
                 <h4 className="text-lg font-semibold text-slate-800 mb-3">
-                  What gets in the way of my {domain.name.toLowerCase().includes('happiness') ? 'happiness and satisfaction' :
-                    domain.name.toLowerCase().includes('health') ? 'health' :
+                  {isJoyEnergyDomain ? 'Barriers – Select all that apply: ' : (
+                    <>What gets in the way of my {domain.name.toLowerCase().includes('health') ? 'health' :
                       domain.name.toLowerCase().includes('meaning') ? 'feeling purposeful' :
                         domain.name.toLowerCase().includes('character') ? 'growth' :
                           domain.name.toLowerCase().includes('social') ? 'relationships' :
-                            'security'}: <span className="text-red-600">*</span>
+                            'security'}: </>
+                  )}<span className="text-red-600">*</span>
                 </h4>
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 gap-3">
-                    {currentDomainData.barriers.map((barrier, index) => (
+                    {effectiveBarriers.map((barrier, index) => (
                       <label key={index} className="flex items-start space-x-3 cursor-pointer">
                         <input
                           type="checkbox"
