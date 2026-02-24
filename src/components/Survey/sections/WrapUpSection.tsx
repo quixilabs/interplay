@@ -36,10 +36,13 @@ export default function WrapUpSection() {
           <CheckCircle className="h-12 w-12 text-green-600" />
         </div>
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">
-          Thank you for sharing your voice! 🎉
+          Thank You. Your Input Shapes What Happens Next.
         </h1>
+        <p className="text-lg sm:text-xl text-slate-600 leading-relaxed mb-4">
+          Your responses help this institution understand how students are building confidence, navigating pressure, and preparing for what’s ahead.
+        </p>
         <p className="text-lg sm:text-xl text-slate-600 leading-relaxed">
-          Interplay translates your feedback into a research-based measure of flourishing, highlighting what’s working and where support is needed. Your input helps your university act quickly and wisely so every student has the best chance to thrive.
+          Interplay turns your input into clear, actionable insight — so leaders can strengthen the conditions that help students move forward, no matter what comes next.
         </p>
       </div>
 
