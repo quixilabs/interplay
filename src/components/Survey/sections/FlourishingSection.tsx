@@ -115,6 +115,28 @@ const BELONGING_SUPPORT_BARRIERS = [
   'Other'
 ];
 
+// Demo content for sixth domain (Stability & Security) – used when DB is not updated
+const STABILITY_SECURITY_ENABLERS = [
+  'Financial aid or scholarships',
+  'Affordable tuition',
+  'Emergency grants',
+  'Flexible work options',
+  'Food support programs',
+  'Clear billing information',
+  'Stable housing support',
+  'Other'
+];
+const STABILITY_SECURITY_BARRIERS = [
+  'Tuition or fees',
+  'Housing costs',
+  'Food insecurity',
+  'Delays in financial aid',
+  'Unexpected expenses',
+  'Balancing work hours with school demands',
+  'Lack of information about support',
+  'Other'
+];
+
 const FLOURISHING_DOMAINS = [
   {
     key: 'happiness_satisfaction',
@@ -188,15 +210,15 @@ const FLOURISHING_DOMAINS = [
   },
   {
     key: 'financial_stability',
-    name: 'Financial & Material Stability',
+    name: 'Stability & Security',
     questions: [
       {
-        text: 'I rarely worry about being able to meet normal monthly living expenses.',
-        scaleLabels: { left: 'Worry All of the Time', right: 'Do Not Ever Worry' }
+        text: 'Worries about money or basic needs make it hard for me to fully engage here.',
+        scaleLabels: { left: 'Strongly Disagree', right: 'Strongly Agree' }
       },
       {
-        text: 'I rarely worry about safety, food, or housing.',
-        scaleLabels: { left: 'Worry All of the Time', right: 'Do Not Ever Worry' }
+        text: "I feel confident I can meet my basic needs while I'm here.",
+        scaleLabels: { left: 'Strongly Disagree', right: 'Strongly Agree' }
       }
     ]
   }
@@ -258,16 +280,17 @@ export default function FlourishingSection() {
   const score1 = scores[questionKeys[0] as keyof typeof scores];
   const score2 = scores[questionKeys[1] as keyof typeof scores];
   const currentDomainData = domainEnablersBarriers.find(d => d.domain_key === domain.key);
-  // For demo: first five domains use hardcoded enablers/barriers without DB changes
+  // For demo: all six domains use hardcoded enablers/barriers without DB changes
   const isJoyEnergyDomain = domain.key === 'happiness_satisfaction';
   const isHealthBalanceDomain = domain.key === 'mental_physical_health';
   const isDirectionPurposeDomain = domain.key === 'meaning_purpose';
   const isGrowthResponsibilityDomain = domain.key === 'character_virtue';
   const isBelongingSupportDomain = domain.key === 'social_relationships';
-  const effectiveEnablers = isJoyEnergyDomain ? JOY_ENERGY_ENABLERS : isHealthBalanceDomain ? HEALTH_BALANCE_ENABLERS : isDirectionPurposeDomain ? DIRECTION_PURPOSE_ENABLERS : isGrowthResponsibilityDomain ? GROWTH_RESPONSIBILITY_ENABLERS : isBelongingSupportDomain ? BELONGING_SUPPORT_ENABLERS : (currentDomainData?.enablers ?? []);
-  const effectiveBarriers = isJoyEnergyDomain ? JOY_ENERGY_BARRIERS : isHealthBalanceDomain ? HEALTH_BALANCE_BARRIERS : isDirectionPurposeDomain ? DIRECTION_PURPOSE_BARRIERS : isGrowthResponsibilityDomain ? GROWTH_RESPONSIBILITY_BARRIERS : isBelongingSupportDomain ? BELONGING_SUPPORT_BARRIERS : (currentDomainData?.barriers ?? []);
-  const showEnablersBarriers = currentDomainData || isJoyEnergyDomain || isHealthBalanceDomain || isDirectionPurposeDomain || isGrowthResponsibilityDomain || isBelongingSupportDomain;
-  const useDemoEnablerBarrierHeadings = isJoyEnergyDomain || isHealthBalanceDomain || isDirectionPurposeDomain || isGrowthResponsibilityDomain || isBelongingSupportDomain;
+  const isStabilitySecurityDomain = domain.key === 'financial_stability';
+  const effectiveEnablers = isJoyEnergyDomain ? JOY_ENERGY_ENABLERS : isHealthBalanceDomain ? HEALTH_BALANCE_ENABLERS : isDirectionPurposeDomain ? DIRECTION_PURPOSE_ENABLERS : isGrowthResponsibilityDomain ? GROWTH_RESPONSIBILITY_ENABLERS : isBelongingSupportDomain ? BELONGING_SUPPORT_ENABLERS : isStabilitySecurityDomain ? STABILITY_SECURITY_ENABLERS : (currentDomainData?.enablers ?? []);
+  const effectiveBarriers = isJoyEnergyDomain ? JOY_ENERGY_BARRIERS : isHealthBalanceDomain ? HEALTH_BALANCE_BARRIERS : isDirectionPurposeDomain ? DIRECTION_PURPOSE_BARRIERS : isGrowthResponsibilityDomain ? GROWTH_RESPONSIBILITY_BARRIERS : isBelongingSupportDomain ? BELONGING_SUPPORT_BARRIERS : isStabilitySecurityDomain ? STABILITY_SECURITY_BARRIERS : (currentDomainData?.barriers ?? []);
+  const showEnablersBarriers = currentDomainData || isJoyEnergyDomain || isHealthBalanceDomain || isDirectionPurposeDomain || isGrowthResponsibilityDomain || isBelongingSupportDomain || isStabilitySecurityDomain;
+  const useDemoEnablerBarrierHeadings = isJoyEnergyDomain || isHealthBalanceDomain || isDirectionPurposeDomain || isGrowthResponsibilityDomain || isBelongingSupportDomain || isStabilitySecurityDomain;
 
   const handleScoreChange = (questionKey: string, value: number) => {
     setScores(prev => ({ ...prev, [questionKey]: value }));

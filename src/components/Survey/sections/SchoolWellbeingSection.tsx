@@ -41,13 +41,23 @@ export const SUPPORT_DRIVER_MAPPING = {
 } as const;
 
 /**
- * Ordered list of statements for UI display
+ * Demo content for Section 2: Your Growth Environment (client demo – no DB change)
+ * Replaces support barriers list on this page only.
  */
-const SUPPORT_BARRIERS_STATEMENTS = Object.entries(SUPPORT_DRIVER_MAPPING).map(([id, data]) => ({
-  id: parseInt(id),
-  statement: data.statement,
-  driver: data.driver
-}));
+const GROWTH_ENVIRONMENT_STATEMENTS = [
+  'I receive feedback that helps me improve.',
+  "I understand what is expected of me.",
+  "I feel safe asking questions.",
+  "I am encouraged to think for myself.",
+  "I have opportunities to take initiative.",
+  "I am trusted with responsibility.",
+  "I am supported when I make mistakes.",
+  "I know where to go when I need guidance.",
+  "Expectations feel consistent across instructors.",
+  "I feel comfortable speaking up.",
+  "I often feel like I'm navigating things alone.",
+  "I'm unsure what steps would help me grow here."
+].map((statement, index) => ({ id: index + 1, statement }));
 
 export default function SchoolWellbeingSection() {
   const { state, dispatch } = useSurvey();
@@ -102,16 +112,16 @@ export default function SchoolWellbeingSection() {
       {/* Header */}
       <div className="mb-8">
         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">
-          Tell Us About the Support You Receive
+          Your Growth Environment
         </h2>
         <p className="text-slate-600">
-          Please tell us about your experience getting support at the school. There are no right or wrong answers — Just select everything that feels true for you right now. (Choose all that apply.)
+          When it comes to your growth here, which of the following feel true? (Select all that apply)
         </p>
       </div>
 
       {/* Checkbox list - clean vertical layout */}
       <div className="space-y-3 mb-8">
-        {SUPPORT_BARRIERS_STATEMENTS.map((item) => {
+        {GROWTH_ENVIRONMENT_STATEMENTS.map((item) => {
           const key = `statement_${item.id}`;
           const isChecked = selectedBarriers[key] || false;
 
