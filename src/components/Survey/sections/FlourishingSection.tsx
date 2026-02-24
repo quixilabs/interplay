@@ -29,6 +29,49 @@ const JOY_ENERGY_BARRIERS = [
   'Other'
 ];
 
+// Demo content for second domain (Health & Balance) – used when DB is not updated
+const HEALTH_BALANCE_ENABLERS = [
+  'Manageable workload',
+  'Flexible scheduling',
+  'Supportive instructors',
+  'Access to support services',
+  'Clear deadlines and expectations',
+  'Safe learning environment',
+  'Other'
+];
+const HEALTH_BALANCE_BARRIERS = [
+  'Overwhelming workload',
+  'Time pressure',
+  'Difficulty accessing support services',
+  'Work or family responsibilities',
+  'Financial strain',
+  'Long commutes',
+  'Inconsistent communication',
+  'Other'
+];
+
+// Demo content for third domain (Direction & Purpose) – used when DB is not updated
+const DIRECTION_PURPOSE_ENABLERS = [
+  'Clear degree or certificate roadmap',
+  'Helpful academic advising',
+  'Career planning support',
+  'Internships or real-world experiences',
+  'Feedback that helps me improve',
+  'Seeing progress toward graduation',
+  'Opportunities to explore interests',
+  'Mentorship',
+  'Other'
+];
+const DIRECTION_PURPOSE_BARRIERS = [
+  'Unclear program requirements',
+  'Difficulty getting advising appointments',
+  'Uncertainty about career direction',
+  'Limited internship or hands-on opportunities',
+  'Delayed or unclear feedback',
+  'Course availability issues',
+  'Other'
+];
+
 const FLOURISHING_DOMAINS = [
   {
     key: 'happiness_satisfaction',
@@ -46,28 +89,28 @@ const FLOURISHING_DOMAINS = [
   },
   {
     key: 'mental_physical_health',
-    name: 'Mental & Physical Health',
+    name: 'Health & Balance',
     questions: [
       {
-        text: 'In general, I would rate my physical health as…',
-        scaleLabels: { left: 'Poor', right: 'Excellent' }
+        text: 'Being here supports my mental well-being.',
+        scaleLabels: { left: 'Strongly Disagree', right: 'Strongly Agree' }
       },
       {
-        text: 'I would rate my overall mental health as…',
-        scaleLabels: { left: 'Poor', right: 'Excellent' }
+        text: 'The pace and demands here feel manageable.',
+        scaleLabels: { left: 'Strongly Disagree', right: 'Strongly Agree' }
       }
     ]
   },
   {
     key: 'meaning_purpose',
-    name: 'Meaning & Purpose',
+    name: 'Direction & Purpose',
     questions: [
       {
-        text: 'The things I do in my life feel worthwhile.',
-        scaleLabels: { left: 'Not at All Worthwhile', right: 'Completely Worthwhile' }
+        text: "What I'm doing here feels connected to who I want to become.",
+        scaleLabels: { left: 'Strongly Disagree', right: 'Strongly Agree' }
       },
       {
-        text: 'I understand my purpose in life.',
+        text: "I can see a clear path forward from what I'm doing here.",
         scaleLabels: { left: 'Strongly Disagree', right: 'Strongly Agree' }
       }
     ]
@@ -172,11 +215,14 @@ export default function FlourishingSection() {
   const score1 = scores[questionKeys[0] as keyof typeof scores];
   const score2 = scores[questionKeys[1] as keyof typeof scores];
   const currentDomainData = domainEnablersBarriers.find(d => d.domain_key === domain.key);
-  // For demo: first domain (Joy & Energy) uses hardcoded enablers/barriers without DB changes
+  // For demo: first three domains use hardcoded enablers/barriers without DB changes
   const isJoyEnergyDomain = domain.key === 'happiness_satisfaction';
-  const effectiveEnablers = isJoyEnergyDomain ? JOY_ENERGY_ENABLERS : (currentDomainData?.enablers ?? []);
-  const effectiveBarriers = isJoyEnergyDomain ? JOY_ENERGY_BARRIERS : (currentDomainData?.barriers ?? []);
-  const showEnablersBarriers = currentDomainData || isJoyEnergyDomain;
+  const isHealthBalanceDomain = domain.key === 'mental_physical_health';
+  const isDirectionPurposeDomain = domain.key === 'meaning_purpose';
+  const effectiveEnablers = isJoyEnergyDomain ? JOY_ENERGY_ENABLERS : isHealthBalanceDomain ? HEALTH_BALANCE_ENABLERS : isDirectionPurposeDomain ? DIRECTION_PURPOSE_ENABLERS : (currentDomainData?.enablers ?? []);
+  const effectiveBarriers = isJoyEnergyDomain ? JOY_ENERGY_BARRIERS : isHealthBalanceDomain ? HEALTH_BALANCE_BARRIERS : isDirectionPurposeDomain ? DIRECTION_PURPOSE_BARRIERS : (currentDomainData?.barriers ?? []);
+  const showEnablersBarriers = currentDomainData || isJoyEnergyDomain || isHealthBalanceDomain || isDirectionPurposeDomain;
+  const useDemoEnablerBarrierHeadings = isJoyEnergyDomain || isHealthBalanceDomain || isDirectionPurposeDomain;
 
   const handleScoreChange = (questionKey: string, value: number) => {
     setScores(prev => ({ ...prev, [questionKey]: value }));
@@ -379,12 +425,11 @@ export default function FlourishingSection() {
               {/* Enablers */}
               <div>
                 <h4 className="text-lg font-semibold text-slate-800 mb-3">
-                  {isJoyEnergyDomain ? 'Enablers – Select all that apply: ' : (
-                    <>What helps me feel {domain.name.toLowerCase().includes('health') ? 'healthy' :
-                      domain.name.toLowerCase().includes('meaning') ? 'purposeful' :
-                        domain.name.toLowerCase().includes('character') ? 'grow in character' :
-                          domain.name.toLowerCase().includes('social') ? 'connected' :
-                            'secure'}: </>
+                  {useDemoEnablerBarrierHeadings ? 'Enablers – Select all that apply: ' : (
+                    <>What helps me feel {domain.name.toLowerCase().includes('meaning') ? 'purposeful' :
+                      domain.name.toLowerCase().includes('character') ? 'grow in character' :
+                        domain.name.toLowerCase().includes('social') ? 'connected' :
+                          'secure'}: </>
                   )}<span className="text-red-600">*</span>
                 </h4>
                 <div className="space-y-3">
@@ -424,12 +469,11 @@ export default function FlourishingSection() {
               {/* Barriers */}
               <div>
                 <h4 className="text-lg font-semibold text-slate-800 mb-3">
-                  {isJoyEnergyDomain ? 'Barriers – Select all that apply: ' : (
-                    <>What gets in the way of my {domain.name.toLowerCase().includes('health') ? 'health' :
-                      domain.name.toLowerCase().includes('meaning') ? 'feeling purposeful' :
-                        domain.name.toLowerCase().includes('character') ? 'growth' :
-                          domain.name.toLowerCase().includes('social') ? 'relationships' :
-                            'security'}: </>
+                  {useDemoEnablerBarrierHeadings ? 'Barriers – Select all that apply: ' : (
+                    <>What gets in the way of my {domain.name.toLowerCase().includes('meaning') ? 'feeling purposeful' :
+                      domain.name.toLowerCase().includes('character') ? 'growth' :
+                        domain.name.toLowerCase().includes('social') ? 'relationships' :
+                          'security'}: </>
                   )}<span className="text-red-600">*</span>
                 </h4>
                 <div className="space-y-3">
