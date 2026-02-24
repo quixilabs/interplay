@@ -72,6 +72,27 @@ const DIRECTION_PURPOSE_BARRIERS = [
   'Other'
 ];
 
+// Demo content for fourth domain (Growth & Responsibility) – used when DB is not updated
+const GROWTH_RESPONSIBILITY_ENABLERS = [
+  'Clear expectations',
+  'Constructive feedback',
+  'Opportunities to take initiative',
+  'Real-world problem solving',
+  'Support when I make mistakes',
+  'Leadership opportunities',
+  'Faculty who model accountability',
+  'Other'
+];
+const GROWTH_RESPONSIBILITY_BARRIERS = [
+  'Inconsistent expectations',
+  'Fear of asking questions',
+  'Lack of feedback',
+  'Policies that feel unclear or unfair',
+  'Limited opportunity to apply learning',
+  'Competitive or discouraging environment',
+  'Other'
+];
+
 const FLOURISHING_DOMAINS = [
   {
     key: 'happiness_satisfaction',
@@ -117,15 +138,15 @@ const FLOURISHING_DOMAINS = [
   },
   {
     key: 'character_virtue',
-    name: 'Character & Virtue',
+    name: 'Growth & Responsibility',
     questions: [
       {
-        text: 'I try to do what is right in all circumstances, even when it is difficult.',
-        scaleLabels: { left: 'Not True of Me', right: 'Completely True of Me' }
+        text: 'Being here supports me in taking responsibility for my actions.',
+        scaleLabels: { left: 'Strongly Disagree', right: 'Strongly Agree' }
       },
       {
-        text: 'I am willing to give up some happiness now for greater happiness later.',
-        scaleLabels: { left: 'Not True of Me', right: 'Completely True of Me' }
+        text: "Being here strengthens my ability to adjust when things don't go as planned.",
+        scaleLabels: { left: 'Strongly Disagree', right: 'Strongly Agree' }
       }
     ]
   },
@@ -215,14 +236,15 @@ export default function FlourishingSection() {
   const score1 = scores[questionKeys[0] as keyof typeof scores];
   const score2 = scores[questionKeys[1] as keyof typeof scores];
   const currentDomainData = domainEnablersBarriers.find(d => d.domain_key === domain.key);
-  // For demo: first three domains use hardcoded enablers/barriers without DB changes
+  // For demo: first four domains use hardcoded enablers/barriers without DB changes
   const isJoyEnergyDomain = domain.key === 'happiness_satisfaction';
   const isHealthBalanceDomain = domain.key === 'mental_physical_health';
   const isDirectionPurposeDomain = domain.key === 'meaning_purpose';
-  const effectiveEnablers = isJoyEnergyDomain ? JOY_ENERGY_ENABLERS : isHealthBalanceDomain ? HEALTH_BALANCE_ENABLERS : isDirectionPurposeDomain ? DIRECTION_PURPOSE_ENABLERS : (currentDomainData?.enablers ?? []);
-  const effectiveBarriers = isJoyEnergyDomain ? JOY_ENERGY_BARRIERS : isHealthBalanceDomain ? HEALTH_BALANCE_BARRIERS : isDirectionPurposeDomain ? DIRECTION_PURPOSE_BARRIERS : (currentDomainData?.barriers ?? []);
-  const showEnablersBarriers = currentDomainData || isJoyEnergyDomain || isHealthBalanceDomain || isDirectionPurposeDomain;
-  const useDemoEnablerBarrierHeadings = isJoyEnergyDomain || isHealthBalanceDomain || isDirectionPurposeDomain;
+  const isGrowthResponsibilityDomain = domain.key === 'character_virtue';
+  const effectiveEnablers = isJoyEnergyDomain ? JOY_ENERGY_ENABLERS : isHealthBalanceDomain ? HEALTH_BALANCE_ENABLERS : isDirectionPurposeDomain ? DIRECTION_PURPOSE_ENABLERS : isGrowthResponsibilityDomain ? GROWTH_RESPONSIBILITY_ENABLERS : (currentDomainData?.enablers ?? []);
+  const effectiveBarriers = isJoyEnergyDomain ? JOY_ENERGY_BARRIERS : isHealthBalanceDomain ? HEALTH_BALANCE_BARRIERS : isDirectionPurposeDomain ? DIRECTION_PURPOSE_BARRIERS : isGrowthResponsibilityDomain ? GROWTH_RESPONSIBILITY_BARRIERS : (currentDomainData?.barriers ?? []);
+  const showEnablersBarriers = currentDomainData || isJoyEnergyDomain || isHealthBalanceDomain || isDirectionPurposeDomain || isGrowthResponsibilityDomain;
+  const useDemoEnablerBarrierHeadings = isJoyEnergyDomain || isHealthBalanceDomain || isDirectionPurposeDomain || isGrowthResponsibilityDomain;
 
   const handleScoreChange = (questionKey: string, value: number) => {
     setScores(prev => ({ ...prev, [questionKey]: value }));
