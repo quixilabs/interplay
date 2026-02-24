@@ -93,6 +93,28 @@ const GROWTH_RESPONSIBILITY_BARRIERS = [
   'Other'
 ];
 
+// Demo content for fifth domain (Belonging & Support) – used when DB is not updated
+const BELONGING_SUPPORT_ENABLERS = [
+  'Supportive instructors',
+  'Academic advisors',
+  'Peer relationships',
+  'Student organizations',
+  'Small class sizes',
+  'Mentorship',
+  'Cultural or identity-based communities',
+  'Welcoming environment',
+  'Other'
+];
+const BELONGING_SUPPORT_BARRIERS = [
+  'Large or impersonal classes',
+  'Difficulty making friends',
+  'Limited access to mentors',
+  'Feeling different or isolated',
+  'Lack of community-building opportunities',
+  'Scheduling conflicts',
+  'Other'
+];
+
 const FLOURISHING_DOMAINS = [
   {
     key: 'happiness_satisfaction',
@@ -152,14 +174,14 @@ const FLOURISHING_DOMAINS = [
   },
   {
     key: 'social_relationships',
-    name: 'Close Social Relationships',
+    name: 'Belonging & Support',
     questions: [
       {
-        text: 'I am content with my friendships and relationships.',
+        text: 'I feel like I truly belong here.',
         scaleLabels: { left: 'Strongly Disagree', right: 'Strongly Agree' }
       },
       {
-        text: 'My relationships are as satisfying as I want them to be.',
+        text: 'If I needed help, I know someone here I could turn to.',
         scaleLabels: { left: 'Strongly Disagree', right: 'Strongly Agree' }
       }
     ]
@@ -236,15 +258,16 @@ export default function FlourishingSection() {
   const score1 = scores[questionKeys[0] as keyof typeof scores];
   const score2 = scores[questionKeys[1] as keyof typeof scores];
   const currentDomainData = domainEnablersBarriers.find(d => d.domain_key === domain.key);
-  // For demo: first four domains use hardcoded enablers/barriers without DB changes
+  // For demo: first five domains use hardcoded enablers/barriers without DB changes
   const isJoyEnergyDomain = domain.key === 'happiness_satisfaction';
   const isHealthBalanceDomain = domain.key === 'mental_physical_health';
   const isDirectionPurposeDomain = domain.key === 'meaning_purpose';
   const isGrowthResponsibilityDomain = domain.key === 'character_virtue';
-  const effectiveEnablers = isJoyEnergyDomain ? JOY_ENERGY_ENABLERS : isHealthBalanceDomain ? HEALTH_BALANCE_ENABLERS : isDirectionPurposeDomain ? DIRECTION_PURPOSE_ENABLERS : isGrowthResponsibilityDomain ? GROWTH_RESPONSIBILITY_ENABLERS : (currentDomainData?.enablers ?? []);
-  const effectiveBarriers = isJoyEnergyDomain ? JOY_ENERGY_BARRIERS : isHealthBalanceDomain ? HEALTH_BALANCE_BARRIERS : isDirectionPurposeDomain ? DIRECTION_PURPOSE_BARRIERS : isGrowthResponsibilityDomain ? GROWTH_RESPONSIBILITY_BARRIERS : (currentDomainData?.barriers ?? []);
-  const showEnablersBarriers = currentDomainData || isJoyEnergyDomain || isHealthBalanceDomain || isDirectionPurposeDomain || isGrowthResponsibilityDomain;
-  const useDemoEnablerBarrierHeadings = isJoyEnergyDomain || isHealthBalanceDomain || isDirectionPurposeDomain || isGrowthResponsibilityDomain;
+  const isBelongingSupportDomain = domain.key === 'social_relationships';
+  const effectiveEnablers = isJoyEnergyDomain ? JOY_ENERGY_ENABLERS : isHealthBalanceDomain ? HEALTH_BALANCE_ENABLERS : isDirectionPurposeDomain ? DIRECTION_PURPOSE_ENABLERS : isGrowthResponsibilityDomain ? GROWTH_RESPONSIBILITY_ENABLERS : isBelongingSupportDomain ? BELONGING_SUPPORT_ENABLERS : (currentDomainData?.enablers ?? []);
+  const effectiveBarriers = isJoyEnergyDomain ? JOY_ENERGY_BARRIERS : isHealthBalanceDomain ? HEALTH_BALANCE_BARRIERS : isDirectionPurposeDomain ? DIRECTION_PURPOSE_BARRIERS : isGrowthResponsibilityDomain ? GROWTH_RESPONSIBILITY_BARRIERS : isBelongingSupportDomain ? BELONGING_SUPPORT_BARRIERS : (currentDomainData?.barriers ?? []);
+  const showEnablersBarriers = currentDomainData || isJoyEnergyDomain || isHealthBalanceDomain || isDirectionPurposeDomain || isGrowthResponsibilityDomain || isBelongingSupportDomain;
+  const useDemoEnablerBarrierHeadings = isJoyEnergyDomain || isHealthBalanceDomain || isDirectionPurposeDomain || isGrowthResponsibilityDomain || isBelongingSupportDomain;
 
   const handleScoreChange = (questionKey: string, value: number) => {
     setScores(prev => ({ ...prev, [questionKey]: value }));
