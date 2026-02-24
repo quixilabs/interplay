@@ -41,11 +41,11 @@ const SECTIONS = [
   { name: 'Demographics Intro', component: null, type: 'intro', introKey: 'demographics' },
   { name: 'Demographics', component: DemographicsSection, type: 'content' },
   { name: 'Flourishing Intro', component: null, type: 'intro', introKey: 'flourishing' },
-  { name: 'Core Flourishing', component: FlourishingSection, type: 'content' },
+  { name: 'Foundations of Future Readiness', component: FlourishingSection, type: 'content' },
   { name: 'Well-Being Intro', component: null, type: 'intro', introKey: 'wellbeing' },
-  { name: 'School Well-Being', component: SchoolWellbeingSection, type: 'content' },
+  { name: 'Your Growth Environment', component: SchoolWellbeingSection, type: 'content' },
   { name: 'Tensions Intro', component: null, type: 'intro', introKey: 'tensions' },
-  { name: 'Tensions Assessment', component: TensionsSection, type: 'content' },
+  { name: 'Navigating Competing Demands', component: TensionsSection, type: 'content' },
   { name: 'Fastest Win', component: FastestWinSection, type: 'content' },
   { name: 'Complete', component: WrapUpSection, type: 'content' }
 ];
