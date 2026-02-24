@@ -33,7 +33,7 @@ export default function LandingPage() {
       <section id="about" className="relative px-4 py-20 sm:px-6 lg:px-8 scroll-mt-20">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-navy font-primary mb-6">
-            Measure What Matters
+            Measure What Moves Students Forward
             {/* <span className="block text-navy font-primary">Drive Better Outcomes.</span> */}
           </h1>
           <p className="text-xl text-warm-gray font-primary mb-8 max-w-3xl mx-auto leading-relaxed">
@@ -173,7 +173,7 @@ export default function LandingPage() {
                 <span className="text-xl font-semibold font-primary text-white">Interplay</span>
               </div>
               <p className="text-white/80 font-primary text-sm leading-relaxed mb-4">
-                Measure What Matters. Interplay turns youth perspectives into actionable insights for universities, colleges, and youth organizations.
+                Measure What Moves Students Forward. Interplay turns youth perspectives into actionable insights for universities, colleges, and youth organizations.
               </p>
               <p className="text-white/50 text-sm font-primary">
                 © {new Date().getFullYear()} Interplay. All rights reserved.

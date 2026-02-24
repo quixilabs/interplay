@@ -23,16 +23,16 @@ const SECTION_INTROS = {
     description: 'These questions help us understand different student experiences and ensure all voices are represented in our analysis. Your responses will remain completely anonymous and confidential.'
   },
   flourishing: {
-    title: 'Core Flourishing Domains',
-    description: 'These questions are built on a research-validated measure of flourishing, developed at Harvard, and adapted for your university through Interplay. Your answers help us understand well-being in a holistic way—so your school can respond where it matters most.'
+    title: 'Foundations of Future Readiness',
+    description: "These questions help us understand how your experience here is shaping your ability to move forward — especially when things get demanding.\n\nYour responses show what's strengthening your confidence, what's creating friction, and how this institution can better support student growth."
   },
   wellbeing: {
-    title: 'School Well-Being',
-    description: 'These questions focus specifically on your experience at this institution and how it impacts your overall well-being. Your insights help us understand what\'s working well and where there are opportunities for improvement.'
+    title: 'Your Growth Environment',
+    description: "These questions focus on how this institution supports your development — including clarity, support, feedback, and opportunity. Your input helps leaders understand what's building capability — and what might be getting in the way."
   },
   tensions: {
-    title: 'Tensions Self-Check',
-    description: 'Sometimes thriving means balancing two important things that can feel in tension—like focusing on performance vs. caring for your well-being. These sliders help us see where students feel pulled, so your university can better support both sides.'
+    title: 'Navigating Competing Demands',
+    description: "Growth often means holding two important priorities at the same time.\n\nFor each pair below, use the slider to show how confident you feel navigating between these two demands right now. There is no \"right\" position. We're measuring your confidence moving between them — not choosing one over the other."
   }
 };
 

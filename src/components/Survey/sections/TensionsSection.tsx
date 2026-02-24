@@ -2,36 +2,37 @@ import { useState } from 'react';
 import { useSurvey } from '../../../contexts/SurveyContext';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
+// Demo content – same keys preserved for state/DB compatibility
 const TENSION_PAIRS = [
   {
     key: 'performance_wellbeing',
-    left: 'Performance',
-    right: 'Well-Being',
-    description: 'How do you balance achieving high performance with maintaining your well-being?'
+    left: 'Academic Performance',
+    right: 'Personal Well-Being',
+    description: 'When it comes to school and your well-being, where do you feel the stronger pull right now?'
   },
   {
     key: 'ambition_contribution',
-    left: 'Personal Ambition',
-    right: 'Beyond-Self Contribution',
-    description: 'How do you balance pursuing your own goals with helping others achieve theirs?'
+    left: 'Independence',
+    right: 'Asking for Help',
+    description: 'When things feel hard, where do you tend to lean?'
   },
   {
     key: 'selfreliance_connection',
-    left: 'Self-Reliance',
-    right: 'Connection & Support',
-    description: 'How do you balance being independent with staying connected to your community?'
+    left: 'Current Responsibilities',
+    right: 'Planning for the Future',
+    description: 'In this season, where is most of your energy going?'
   },
   {
     key: 'stability_growth',
-    left: 'Stability & Routine',
-    right: 'Growth & Change',
-    description: 'How do you balance seeking security with pursuing new growth opportunities?'
+    left: 'Coursework',
+    right: 'Life Outside School',
+    description: 'Where do you feel more pressure right now?'
   },
   {
     key: 'academic_creative',
-    left: 'Academic Focus',
-    right: 'Creative Exploration',
-    description: 'How do you balance academic achievement with creative and artistic pursuits?'
+    left: 'I prefer clear direction',
+    right: "I'm comfortable figuring it out as I go",
+    description: 'When things feel uncertain, where do you tend to lean?'
   }
 ];
 
@@ -65,17 +66,9 @@ export default function TensionsSection() {
   return (
     <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-4xl mx-auto">
       <div className="mb-8">
-        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">Tensions Self-Check</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">Navigating Competing Demands</h2>
         <p className="text-slate-600">
-          Life often involves balancing competing priorities. For each pair below, move the slider to show
-          where you currently find yourself in balancing these two important areas.
-        </p>
-      </div>
-
-      <div className="mb-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <p className="text-blue-800 text-sm">
-          <strong>Remember:</strong> There's no "right" answer here. This is about understanding your current
-          approach to balancing these important aspects of life as a student.
+          College often requires holding two important priorities at the same time. For each pair, move the slider toward where you feel pulled right now.
         </p>
       </div>
 
@@ -114,17 +107,13 @@ export default function TensionsSection() {
                   />
                 </div>
 
-                <div className="text-center mt-3">
-                  {value === 50 ? (
-                    <span className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                      Balanced (50% | 50%)
-                    </span>
-                  ) : (
+                {value !== 50 && (
+                  <div className="text-center mt-3">
                     <span className="inline-block px-3 py-1 bg-slate-200 rounded-full text-sm text-slate-700">
                       {pair.left}: {100 - value}% | {pair.right}: {value}%
                     </span>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
           );
