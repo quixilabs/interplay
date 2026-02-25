@@ -314,12 +314,12 @@ export class AnalyticsService {
     if (!responses || responses.length === 0) return [];
 
     const domains = [
-      { key: 'happiness_satisfaction', label: 'Happiness & Satisfaction' },
-      { key: 'mental_physical_health', label: 'Mental Health' },
-      { key: 'meaning_purpose', label: 'Meaning & Purpose' },
-      { key: 'character_virtue', label: 'Character & Virtue' },
-      { key: 'social_relationships', label: 'Social Relationships' },
-      { key: 'financial_stability', label: 'Financial Stability' }
+      { key: 'happiness_satisfaction', label: 'Joy & Energy' },
+      { key: 'mental_physical_health', label: 'Health & Balance' },
+      { key: 'meaning_purpose', label: 'Direction & Purpose' },
+      { key: 'character_virtue', label: 'Growth & Responsibility' },
+      { key: 'social_relationships', label: 'Belonging & Support' },
+      { key: 'financial_stability', label: 'Stability & Security' }
     ];
 
     // Helper to check if a student is at risk

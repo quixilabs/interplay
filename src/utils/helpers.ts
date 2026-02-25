@@ -31,12 +31,12 @@ export const calculateOverallFlourishingScore = (scores: any): number => {
 
 export const identifyAtRiskDomains = (scores: any): string[] => {
   const domains = [
-    { key: 'happiness_satisfaction', name: 'Happiness & Life Satisfaction' },
-    { key: 'mental_physical_health', name: 'Mental & Physical Health' },
-    { key: 'meaning_purpose', name: 'Meaning & Purpose' },
-    { key: 'character_virtue', name: 'Character & Virtue' },
-    { key: 'social_relationships', name: 'Close Social Relationships' },
-    { key: 'financial_stability', name: 'Financial & Material Stability' }
+    { key: 'happiness_satisfaction', name: 'Joy & Energy' },
+    { key: 'mental_physical_health', name: 'Health & Balance' },
+    { key: 'meaning_purpose', name: 'Direction & Purpose' },
+    { key: 'character_virtue', name: 'Growth & Responsibility' },
+    { key: 'social_relationships', name: 'Belonging & Support' },
+    { key: 'financial_stability', name: 'Stability & Security' }
   ];
 
   return domains.filter(domain => {

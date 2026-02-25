@@ -193,9 +193,9 @@ export default function InsightTiles({ data }: InsightTilesProps) {
     const categories = [
         { key: 'all', label: 'All Insights', count: relevantInsights.length },
         { key: 'relevant', label: 'Most Relevant', count: highRelevanceInsights.length },
-        { key: 'performance_wellbeing', label: 'Performance vs Wellbeing', count: relevantInsights.filter(i => i.category === 'performance_wellbeing').length },
-        { key: 'selfreliance_connection', label: 'Connection & Belonging', count: relevantInsights.filter(i => i.category === 'selfreliance_connection').length },
-        { key: 'stability_growth', label: 'Stability vs Growth', count: relevantInsights.filter(i => i.category === 'stability_growth').length },
+        { key: 'performance_wellbeing', label: 'Academic Performance & Personal Well-Being', count: relevantInsights.filter(i => i.category === 'performance_wellbeing').length },
+        { key: 'selfreliance_connection', label: 'Current Responsibilities & Planning for the Future', count: relevantInsights.filter(i => i.category === 'selfreliance_connection').length },
+        { key: 'stability_growth', label: 'Coursework & Life Outside School', count: relevantInsights.filter(i => i.category === 'stability_growth').length },
     ];
 
     const getDisplayInsights = () => {

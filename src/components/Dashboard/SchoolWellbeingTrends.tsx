@@ -25,7 +25,7 @@ export default function SchoolWellbeingTrends({ data }: SchoolWellbeingTrendsPro
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-slate-900">School Well-Being Trends</h3>
+        <h3 className="text-lg font-semibold text-slate-900">Your Growth Environment Trends</h3>
         <p className="text-sm text-slate-600">Key institutional well-being metrics over time</p>
       </div>
 

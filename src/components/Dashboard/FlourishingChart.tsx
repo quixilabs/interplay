@@ -11,37 +11,37 @@ export default function FlourishingChart({ data }: FlourishingChartProps) {
   
   const flourishingData = [
     {
-      domain: 'Happiness & Life Satisfaction',
+      domain: 'Joy & Energy',
       current: domainAverages.happiness_satisfaction || 0,
       benchmark: 6.8, // Keep benchmark as static for now
       fullMark: 10
     },
     {
-      domain: 'Mental & Physical Health',
+      domain: 'Health & Balance',
       current: domainAverages.mental_physical_health || 0,
       benchmark: 6.9,
       fullMark: 10
     },
     {
-      domain: 'Meaning & Purpose',
+      domain: 'Direction & Purpose',
       current: domainAverages.meaning_purpose || 0,
       benchmark: 7.1,
       fullMark: 10
     },
     {
-      domain: 'Character & Virtue',
+      domain: 'Growth & Responsibility',
       current: domainAverages.character_virtue || 0,
       benchmark: 7.6,
       fullMark: 10
     },
     {
-      domain: 'Social Relationships',
+      domain: 'Belonging & Support',
       current: domainAverages.social_relationships || 0,
       benchmark: 7.3,
       fullMark: 10
     },
     {
-      domain: 'Financial Stability',
+      domain: 'Stability & Security',
       current: domainAverages.financial_stability || 0,
       benchmark: 6.2,
       fullMark: 10

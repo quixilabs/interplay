@@ -20,11 +20,18 @@ export default function KeyInsights({ data }: KeyInsightsProps) {
   const weakestDomain = domainEntries.reduce((min, [key, value]) =>
     (value as number) < (min[1] as number) ? [key, value] : min, ['', 10]);
 
-  const formatDomainName = (key: string) => {
-    return key.split('_').map(word =>
+  const DOMAIN_DISPLAY_NAMES: Record<string, string> = {
+    happiness_satisfaction: 'Joy & Energy',
+    mental_physical_health: 'Health & Balance',
+    meaning_purpose: 'Direction & Purpose',
+    character_virtue: 'Growth & Responsibility',
+    social_relationships: 'Belonging & Support',
+    financial_stability: 'Stability & Security'
+  };
+  const formatDomainName = (key: string) =>
+    DOMAIN_DISPLAY_NAMES[key] ?? key.split('_').map(word =>
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' & ');
-  };
 
   const insights = [
     {

@@ -127,7 +127,7 @@ export const mockSurveyData = {
     ],
     domainAnalysis: {
       'mental_physical_health': {
-        domainName: 'Mental & Physical Health',
+        domainName: 'Health & Balance',
         enablerSelections: 1456,
         barrierSelections: 1789,
         topEnablers: {
@@ -148,7 +148,7 @@ export const mockSurveyData = {
         averageBarrierCount: 2.8
       },
       'financial_stability': {
-        domainName: 'Financial & Material Stability',
+        domainName: 'Stability & Security',
         enablerSelections: 1234,
         barrierSelections: 1678,
         topEnablers: {
@@ -169,7 +169,7 @@ export const mockSurveyData = {
         averageBarrierCount: 2.6
       },
       'social_relationships': {
-        domainName: 'Close Social Relationships',
+        domainName: 'Belonging & Support',
         enablerSelections: 1345,
         barrierSelections: 1234,
         topEnablers: {
@@ -300,7 +300,7 @@ export const mockSurveyData = {
     domains: [
       {
         domainKey: 'financial_stability',
-        domainLabel: 'Financial & Material Stability',
+        domainLabel: 'Stability & Security',
         averageScore: 5.9,
         criticality: {
           level: 3,
@@ -314,7 +314,7 @@ export const mockSurveyData = {
       },
       {
         domainKey: 'mental_physical_health',
-        domainLabel: 'Mental & Physical Health',
+        domainLabel: 'Health & Balance',
         averageScore: 6.3,
         criticality: {
           level: 2,
@@ -328,7 +328,7 @@ export const mockSurveyData = {
       },
       {
         domainKey: 'social_relationships',
-        domainLabel: 'Close Social Relationships',
+        domainLabel: 'Belonging & Support',
         averageScore: 6.8,
         criticality: {
           level: 2,
@@ -342,7 +342,7 @@ export const mockSurveyData = {
       },
       {
         domainKey: 'happiness_satisfaction',
-        domainLabel: 'Happiness & Life Satisfaction',
+        domainLabel: 'Joy & Energy',
         averageScore: 7.2,
         criticality: {
           level: 2,
@@ -356,7 +356,7 @@ export const mockSurveyData = {
       },
       {
         domainKey: 'meaning_purpose',
-        domainLabel: 'Meaning & Purpose',
+        domainLabel: 'Direction & Purpose',
         averageScore: 7.6,
         criticality: {
           level: 2,
@@ -370,7 +370,7 @@ export const mockSurveyData = {
       },
       {
         domainKey: 'character_virtue',
-        domainLabel: 'Character & Growth',
+        domainLabel: 'Growth & Responsibility',
         averageScore: 8.0,
         criticality: {
           level: 1,
@@ -408,7 +408,7 @@ export const mockSurveyData = {
         totalInGroup: 867,
         riskPercentage: 18,
         riskLevel: 'medium',
-        primaryConcerns: ['Financial Stability', 'Mental Health'],
+        primaryConcerns: ['Stability & Security', 'Health & Balance'],
         atRiskMemberIds: [] // Mock - not used in display
       },
       {
@@ -419,7 +419,7 @@ export const mockSurveyData = {
         totalInGroup: 592,
         riskPercentage: 24,
         riskLevel: 'high',
-        primaryConcerns: ['Financial Stability', 'Social Relationships'],
+        primaryConcerns: ['Stability & Security', 'Belonging & Support'],
         atRiskMemberIds: [] // Mock - not used in display
       },
       {
@@ -430,7 +430,7 @@ export const mockSurveyData = {
         totalInGroup: 653,
         riskPercentage: 15,
         riskLevel: 'medium',
-        primaryConcerns: ['Social Relationships', 'Meaning & Purpose'],
+        primaryConcerns: ['Belonging & Support', 'Direction & Purpose'],
         atRiskMemberIds: [] // Mock - not used in display
       },
       {
@@ -441,7 +441,7 @@ export const mockSurveyData = {
         totalInGroup: 633,
         riskPercentage: 12,
         riskLevel: 'medium',
-        primaryConcerns: ['Mental Health', 'Social Relationships'],
+        primaryConcerns: ['Health & Balance', 'Belonging & Support'],
         atRiskMemberIds: [] // Mock - not used in display
       },
       {
@@ -452,7 +452,7 @@ export const mockSurveyData = {
         totalInGroup: 284,
         riskPercentage: 19,
         riskLevel: 'medium',
-        primaryConcerns: ['Financial Stability', 'Character & Virtue'],
+        primaryConcerns: ['Stability & Security', 'Growth & Responsibility'],
         atRiskMemberIds: [] // Mock - not used in display
       }
     ],
@@ -597,19 +597,19 @@ export const mockUniversityData = {
 
 export const mockGrowthModules = [
   {
-    domainName: 'Mental & Physical Health',
+    domainName: 'Health & Balance',
     enablers: ['Better time management', 'Stress reduction'],
     barriers: 'Academic pressure',
     responses: 156
   },
   {
-    domainName: 'Financial & Material Stability', 
+    domainName: 'Stability & Security', 
     enablers: ['Financial assistance', 'Part-time work opportunities'],
     barriers: 'High cost of living',
     responses: 134
   },
   {
-    domainName: 'Close Social Relationships',
+    domainName: 'Belonging & Support',
     enablers: ['More social connections', 'Campus events'],
     barriers: 'Time constraints',
     responses: 98
