@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BarChart3, Users, TrendingUp, Shield, ArrowRight, CheckCircle, Sparkles, X, Mail, Calendar, HelpCircle } from 'lucide-react';
+import { BarChart3, Users, TrendingUp, Shield, ArrowRight, CheckCircle, Sparkles, X, Mail, Calendar, HelpCircle, ClipboardList } from 'lucide-react';
 
 const CONTACT_EMAIL = 'hello@brandnewday.group';
 const CALENDLY_URL = 'https://calendly.com/brandnewdaygroup/brand-new-day';
+const DEMO_SURVEY_PATH = '/survey/demo-university';
 
 export default function LandingPage() {
   const [showLearnMoreModal, setShowLearnMoreModal] = useState(false);
@@ -17,14 +18,22 @@ export default function LandingPage() {
               <BarChart3 className="h-8 w-8 text-navy" />
               <span className="text-xl font-bold text-navy font-primary">Interplay</span>
             </div>
-            <a
-              href={CALENDLY_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary px-4 py-2"
-            >
-              Schedule a Demo
-            </a>
+            <div className="flex items-center gap-4">
+              <Link
+                to={DEMO_SURVEY_PATH}
+                className="text-navy hover:text-sage font-primary text-sm font-medium transition-colors"
+              >
+                Experience the survey
+              </Link>
+              <a
+                href={CALENDLY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary px-4 py-2"
+              >
+                Schedule a Demo
+              </a>
+            </div>
           </div>
         </div>
       </nav>
@@ -49,6 +58,13 @@ export default function LandingPage() {
               <Calendar className="mr-2 h-5 w-5" />
               Schedule a Demo
             </a>
+            <Link
+              to={DEMO_SURVEY_PATH}
+              className="btn-subtle px-8 py-4 rounded-brand flex items-center justify-center text-lg font-semibold border border-navy/20 hover:border-sage hover:text-sage transition-colors"
+            >
+              <ClipboardList className="mr-2 h-5 w-5" />
+              Experience the survey
+            </Link>
           </div>
         </div>
       </section>
@@ -134,7 +150,7 @@ export default function LandingPage() {
             <p className="text-warm-gray font-primary mb-8 max-w-2xl mx-auto">
               Join forward-thinking institutions using Interplay to surface early signals, reduce friction, and improve persistence before challenges show up in retention data.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center flex-wrap">
               <a
                 href={CALENDLY_URL}
                 target="_blank"
@@ -144,6 +160,13 @@ export default function LandingPage() {
                 <Calendar className="mr-2 h-5 w-5" />
                 Schedule a Demo
               </a>
+              <Link
+                to={DEMO_SURVEY_PATH}
+                className="btn-subtle px-8 py-4 rounded-brand flex items-center justify-center text-lg font-semibold w-full sm:w-auto border border-navy/20 hover:border-sage hover:text-sage transition-colors"
+              >
+                <ClipboardList className="mr-2 h-5 w-5" />
+                Experience the survey
+              </Link>
               <button
                 type="button"
                 onClick={() => setShowLearnMoreModal(true)}
@@ -194,6 +217,9 @@ export default function LandingPage() {
                 </Link>
                 <Link to="/#contact" className="block text-white/80 hover:text-sage font-primary text-sm transition-colors">
                   Contact
+                </Link>
+                <Link to={DEMO_SURVEY_PATH} className="block text-white/80 hover:text-sage font-primary text-sm transition-colors">
+                  Experience the survey
                 </Link>
                 <Link to="/privacy" className="block text-white/80 hover:text-sage font-primary text-sm transition-colors">
                   Privacy Policy
@@ -284,7 +310,7 @@ function LearnMoreModal({ onClose }: { onClose: () => void }) {
               </div>
             ))}
           </div>
-          <div className="mt-8 pt-6 border-t border-gray-200">
+          <div className="mt-8 pt-6 border-t border-gray-200 space-y-3">
             <a
               href={CALENDLY_URL}
               target="_blank"
@@ -294,6 +320,12 @@ function LearnMoreModal({ onClose }: { onClose: () => void }) {
               <Calendar className="mr-2 h-4 w-4" />
               Schedule a Demo
             </a>
+            <p className="text-warm-gray font-primary text-sm">
+              Or try the survey yourself:{' '}
+              <Link to={DEMO_SURVEY_PATH} className="text-sage hover:underline font-medium">
+                Experience the survey
+              </Link>
+            </p>
           </div>
         </div>
       </div>
