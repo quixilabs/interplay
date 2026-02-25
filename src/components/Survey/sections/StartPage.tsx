@@ -22,10 +22,13 @@ export default function StartPage() {
     <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-3xl mx-auto">
       <div className="text-center mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">
-          Your Voice Powers Youth Flourishing
+          The Foundations of Future Readiness
         </h1>
         <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
-          Interplay™ is the first Flourishing Intelligence™ platform built for colleges and universities. We capture authentic student perspectives, map them across Harvard’s six validated domains of well-being, and deliver actionable, research-backed strategies to improve engagement, retention, and student success.
+          This assessment measures six core domains that shape how students navigate pressure, pursue purpose, and sustain momentum—joy, health, purpose, belonging, growth, and stability.
+        </p>
+        <p className="text-base sm:text-lg text-slate-600 leading-relaxed mt-3">
+          Interplay surfaces where students are stretched, where they are supported, and how adaptability can be strengthened—so leaders can act before strain becomes attrition.
         </p>
       </div>
 
