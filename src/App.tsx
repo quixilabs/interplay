@@ -10,6 +10,7 @@ import PrivacyPolicy from './components/Legal/PrivacyPolicy';
 import TermsOfService from './components/Legal/TermsOfService';
 import { useAuthStore } from './stores/authStore';
 import { SuperAdminRouter, SUPER_ADMIN_CONFIG } from './modules/superadmin';
+import { BgcaRouter, BGCA_CONFIG } from './modules/bgca';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
             <Route path="/admin/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/admin/settings" element={<ProtectedRoute><AdminSettings /></ProtectedRoute>} />
             <Route path={`${SUPER_ADMIN_CONFIG.ADMIN_PATH}/*`} element={<SuperAdminRouter />} />
+            <Route path={`${BGCA_CONFIG.BASE_PATH}/*`} element={<BgcaRouter />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
