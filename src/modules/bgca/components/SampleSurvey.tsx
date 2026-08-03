@@ -17,10 +17,20 @@ export default function SampleSurvey() {
   const site = SITES.find((s) => s.id === 'goshen')!;
   const pct = Math.round((Q.index / Q.total) * 100);
 
+  const isFriction = rating !== null && rating <= 2;
+  const followUpPrompt = isFriction ? Q.frictionPrompt : Q.enablerPrompt;
+  const followUpOptions = isFriction ? Q.frictions : Q.enablers;
+
   const toggle = (id: string) =>
     setSelections((prev) =>
       prev.includes(id) ? prev.filter((s) => s !== id) : prev.length >= 2 ? prev : [...prev, id]
     );
+
+  /** Selections belong to one branch, so switching rating clears them. */
+  const handleRate = (value: number) => {
+    setRating(value);
+    setSelections([]);
+  };
 
   const reset = () => {
     setRating(null);
@@ -87,7 +97,7 @@ export default function SampleSurvey() {
                   <button
                     key={opt.value}
                     type="button"
-                    onClick={() => setRating(opt.value)}
+                    onClick={() => handleRate(opt.value)}
                     className={`rounded-brand border-2 px-3 py-5 text-center transition-all ${
                       active
                         ? 'border-navy bg-navy/5 ring-2 ring-navy/15'
@@ -106,9 +116,15 @@ export default function SampleSurvey() {
 
             {rating !== null && (
               <div className="mt-8 border-t border-navy/10 pt-6">
-                <p className="text-h4 font-medium text-navy">{Q.followUpPrompt}</p>
+                <p className="text-h4 font-medium text-navy">
+                  <span aria-hidden className="mr-2">
+                    {isFriction ? '🔴' : '🟢'}
+                  </span>
+                  {followUpPrompt}
+                </p>
+                <p className="mt-1 text-small text-warm-gray">Select up to 2</p>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  {Q.followUpOptions.map((opt) => {
+                  {followUpOptions.map((opt) => {
                     const active = selections.includes(opt.id);
                     const atLimit = selections.length >= 2 && !active;
                     return (

@@ -10,7 +10,7 @@ import type {
   SurveyQuestion,
 } from '../types';
 
-export const REGION_NAME = 'Northern Indiana Alliance';
+export const REGION_NAME = 'Northern Indiana Corridor';
 
 export const CADENCE_LABELS: Record<Cadence, string> = {
   fall: 'Fall 2026 Baseline',
@@ -153,14 +153,21 @@ export const SAMPLE_SURVEY_QUESTION: SurveyQuestion = {
     { value: 2, label: 'SOMETIMES', sub: 'Friction' },
     { value: 1, label: 'NOT REALLY', sub: 'Never / Low' },
   ],
-  followUpPrompt: 'What makes you say that? (Select up to 2)',
-  followUpOptions: [
-    { id: 'notices', label: 'Someone notices when I do well' },
-    { id: 'listens', label: 'Grown-ups listen when I talk' },
-    { id: 'helps-goals', label: 'Someone helps me with my goals' },
-    { id: 'knows-name', label: 'They know my name and what I like' },
-    { id: 'too-busy', label: 'Grown-ups are usually too busy' },
+  // Branches on the rating, same as the kiosk. Both branches stay tied to the
+  // stem — they ask about believing in you, not about the room in general.
+  enablerPrompt: 'What makes you feel that way?',
+  enablers: [
+    { id: 'notices-good', label: 'A grown-up notices when I do well' },
+    { id: 'asks-goals', label: 'Someone here asks about my goals' },
+    { id: 'remembers', label: 'They remember things I tell them' },
+    { id: 'told-me', label: 'A grown-up told me they believe in me' },
+  ],
+  frictionPrompt: 'What gets in the way?',
+  frictions: [
+    { id: 'too-busy', label: 'Grown-ups here seem too busy to talk' },
     { id: 'dont-know', label: "I don't really know the grown-ups here" },
+    { id: 'never-asked', label: "Nobody asks what I'm good at" },
+    { id: 'only-trouble', label: 'I only get noticed when I mess up' },
   ],
   openTextPrompt: 'Anything you want the Club to know? (Optional)',
   openTextPlaceholder: 'You can skip this one.',

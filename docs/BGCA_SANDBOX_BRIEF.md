@@ -1,9 +1,9 @@
 # BGCA Sandbox — Consolidated Brief
 
-**Client:** Boys & Girls Clubs of America — Northern Indiana Alliance (Dwayne, Alliance CEO)
+**Client:** Boys & Girls Clubs of America — Northern Indiana Corridor (Dwayne, Alliance CEO)
 **Sources:** Charlie/Nicole call, 2026-07-31 ([recording](https://fathom.video/share/9yt6XUXgxLyHZeTEqNByDXUua9GWBzii), 48 min) + Nicole's "Developer Brief: Interplay Executive Dashboard & Youth Kiosk"
 **Compiled:** 2026-08-03
-**Status:** Requirements gathered. Nothing built. No BGCA code exists in the repo yet.
+**Status:** Built. Sandbox lives at `/bgca` (`src/modules/bgca/`). Updated 2026-08-03 after review.
 
 ---
 
@@ -74,7 +74,7 @@ Worked example throughout the spec: Goshen Club, "I feel safe, calm, and respect
 
 ## 5. Surface B — Executive Dashboard (single screen, three stacked sections)
 
-Header: `REGION: Northern Indiana Alliance | PULSE CADENCE: [Fall 2026 Baseline] Mid-Year Spring`
+Header: `REGION: Northern Indiana Corridor | PULSE CADENCE: [Fall 2026 Baseline] Mid-Year Spring`
 
 **Section 1 — Regional health, three KPI cards**
 - Regional Momentum Index — `3.2 / 4.0`, 🟢 82% Positive
@@ -117,7 +117,7 @@ Four stacked blocks:
 
 - **Pulse cadence:** Fall → Mid-Year → Spring, aligned to the school year. Dwayne's ask.
 - **Pilot:** Fall 2026 ("Fall 2026 Baseline" is the first wave)
-- **Region naming:** Nicole's mock says "Northern Indiana Alliance"; on the call she noted Dwayne's actual term for his region is **"Corridor Indiana"** — she said it doesn't really matter, but worth confirming with him.
+- **Region naming — DECIDED 2026-08-03:** **"Northern Indiana Corridor"**. Nicole's original mock said "Northern Indiana Alliance"; on the call she noted Dwayne's own term was "Corridor Indiana". Charlie settled it on the combined form, and the sandbox uses it (`REGION_NAME` in `src/modules/bgca/data/mockData.ts`). "Alliance CEO" remains Dwayne's job title.
 - Schools in the area open **~Aug 10**, which is one week out.
 
 ---
@@ -141,21 +141,23 @@ This is the strongest argument for doing it inside the existing codebase rather 
 
 ---
 
-## 9. Open questions — need answers before building
+## 9. Open questions
 
-**Blocking (decide with Nicole today):**
+**Resolved 2026-08-03, and built:**
 
-1. **Mock data or live Supabase?** The transcript points at "marketing page… he just wants to see how things look," but also "kind of interactive pages." These are very different builds. *Recommendation: mock data via the existing `VITE_USE_MOCK_DATA` pattern, with the Play Card state machine held in local state so the click-through genuinely works.* Dwayne needs to feel the loop close, not to have real data behind it.
-2. **What are the other 5 pulse prompts?** Only prompt 1 of 6 ("I feel safe, calm, and respected") is specified. The other five domains are undefined. Given `DOMAIN_CONFIG` already has 6 domains, they may map 1:1 — worth checking.
-3. **Does the sandbox include a survey page at all?** Charlie described `/bgca/survey` + `/bgca/pulse` + `/bgca/dashboard`, but Nicole's brief only covers kiosk + dashboard. Is the NYOI-style long survey in scope for the demo, or just the pulse?
+1. ~~Mock data or live Supabase?~~ → **Mock data for everything.** No Supabase anywhere in `src/modules/bgca/`. State is in-memory (zustand), so the loop genuinely closes but nothing persists.
+2. ~~Does the sandbox include a survey page?~~ → **Yes**, a single sample question at `/bgca/survey`, in addition to pulse + dashboard.
+3. ~~Who logs the barrier — is a third surface needed?~~ → **Built one**: `/bgca/director`, also mock. It logs bottlenecks and confirms execution, and deliberately has no path to closing a card.
+4. ~~Region label~~ → **Northern Indiana Corridor** (see §7).
+5. ~~Other 5 pulse prompts~~ → **Not needed for the sandbox.** The one written prompt is enough to show the pattern. Still required for the real build.
 
-**Non-blocking, but ask Dwayne:**
+**Still open — ask Dwayne:**
 
-4. **Reset Playbook contents.** "Play #104: 2-Minute Transition Reset Protocol (YPQI)" implies a real numbered library. Does BGCA have this already (YPQI is a real BGCA/Weikart framework), or are we inventing plausible plays for the demo?
-5. **Who logs the barrier?** Spec says Unit Director. There is no Unit Director surface in the mock — only CEO dashboard and youth kiosk. Either the demo fakes it, or a third surface is needed.
-6. **Age bands beyond 9–12.** Everything is scoped to 9–12 "for now." Teen Room appears as a location option, implying older kids exist on site.
-7. **"Corridor Indiana" vs "Northern Indiana Alliance"** — confirm the label Dwayne wants.
-8. **Charting.** Nicole says no heavy charting libraries; Interplay already ships Recharts and the existing dashboard leans on it. Fine if the sandbox is separate, but it means Section 1–3 need bespoke lightweight components.
+6. **Reset Playbook contents.** The five plays in the sandbox (#104, #112, #118, #127, #131) are **invented but plausible**, mapped to real frameworks (YPQI, restorative practice). Does BGCA have an actual numbered library to swap in?
+7. **The other 5 pulse prompts**, for the real build. `DOMAIN_CONFIG` already has 6 domains — they may map 1:1.
+8. **Age bands beyond 9–12.** Everything is scoped to 9–12 "for now," yet Teen Room is a location option.
+9. **Cadence survey length.** The sandbox shows "Question 4 of 18" as a plausible placeholder. Real instrument length is unknown.
+10. **Charting.** Sandbox uses no charting library per Nicole's rule — badges and CSS bars only. Confirm that holds as the dashboard grows.
 
 ---
 

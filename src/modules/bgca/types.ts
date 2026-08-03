@@ -80,8 +80,11 @@ export interface SurveyQuestion {
   text: string;
   helper: string;
   scaleLabels: { value: number; label: string; sub: string }[];
-  followUpPrompt: string;
-  followUpOptions: PulseOption[];
+  /** Branching follow-up, same pattern as the kiosk pulse. */
+  enablerPrompt: string;
+  enablers: PulseOption[];
+  frictionPrompt: string;
+  frictions: PulseOption[];
   openTextPrompt: string;
   openTextPlaceholder: string;
 }
