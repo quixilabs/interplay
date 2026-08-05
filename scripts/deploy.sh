@@ -56,7 +56,7 @@ if [ ! -d "$BUILD_DIR" ]; then
     DEPLOY_DURATION=$((DEPLOY_END - DEPLOY_START))
     
     # Generate failure log
-    bash generate-deployment-log.sh "$DEPLOY_STATUS" "$DEPLOY_TIMESTAMP" "$CURRENT_COMMIT" "$COMMIT_MESSAGE" "$COMMIT_AUTHOR" "$COMMIT_DATE" "$FILES_CHANGED" "$DEPLOY_DURATION" "$TEMP_LOG"
+    bash scripts/generate-deployment-log.sh "$DEPLOY_STATUS" "$DEPLOY_TIMESTAMP" "$CURRENT_COMMIT" "$COMMIT_MESSAGE" "$COMMIT_AUTHOR" "$COMMIT_DATE" "$FILES_CHANGED" "$DEPLOY_DURATION" "$TEMP_LOG"
     
     exit 1
 fi
@@ -87,7 +87,7 @@ DEPLOY_STATUS="SUCCESS"
 
 # Generate deployment log HTML
 echo "📝 Generating deployment log..."
-bash generate-deployment-log.sh "$DEPLOY_STATUS" "$DEPLOY_TIMESTAMP" "$CURRENT_COMMIT" "$COMMIT_MESSAGE" "$COMMIT_AUTHOR" "$COMMIT_DATE" "$FILES_CHANGED" "$DEPLOY_DURATION" "$TEMP_LOG" "$CHANGED_FILES"
+bash scripts/generate-deployment-log.sh "$DEPLOY_STATUS" "$DEPLOY_TIMESTAMP" "$CURRENT_COMMIT" "$COMMIT_MESSAGE" "$COMMIT_AUTHOR" "$COMMIT_DATE" "$FILES_CHANGED" "$DEPLOY_DURATION" "$TEMP_LOG" "$CHANGED_FILES"
 
 echo "🌐 Visit https://interplay.quixilabs.com to see your app!"
 echo "📊 View deployment logs at: https://interplay.quixilabs.com/deployment-logs/"
